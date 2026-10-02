@@ -139,10 +139,12 @@
     .supabase-auth-primary:disabled{opacity:.6;cursor:wait}
     .supabase-auth-divider{display:flex;align-items:center;gap:12px;margin:17px 0;color:#778178;font-size:12px}
     .supabase-auth-divider:before,.supabase-auth-divider:after{height:1px;flex:1;background:#e2e8e2;content:""}
-    .supabase-google-button{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:42px;border:1px solid #cdd7ce;border-radius:4px;color:#26352b;background:#fff;font:inherit;font-weight:550;cursor:pointer}
+    .supabase-google-button{display:grid;grid-template-columns:1fr 18px auto 1fr;align-items:center;column-gap:10px;width:100%;min-height:42px;border:1px solid #cdd7ce;border-radius:4px;color:#26352b;background:#fff;font:inherit;font-weight:550;cursor:pointer}
     .supabase-google-button:hover{background:#f7f9f7}
     .supabase-google-button:disabled{opacity:.6;cursor:wait}
     .supabase-google-mark{display:block;width:18px;height:18px;object-fit:contain}
+    .supabase-google-button .supabase-google-mark{grid-column:2}
+    .supabase-google-button span{grid-column:3}
     .supabase-auth-message{min-height:20px;margin:13px 0 0;color:#59655c;font-size:13px;line-height:1.45}
     .supabase-auth-message[data-error="true"]{color:#a13e36}
     .supabase-auth-warning{margin:18px 0 0;padding:11px 12px;border-left:3px solid #b17c36;background:#faf6ed;color:#594a32;font-size:13px;line-height:1.45}

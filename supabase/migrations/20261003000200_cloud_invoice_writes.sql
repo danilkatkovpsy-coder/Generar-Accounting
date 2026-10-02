@@ -1,14 +1,22 @@
 alter table public.clients
-  add column reference_number text;
+  add column if not exists reference_number text;
 
 alter table public.invoices
-  add column client_type text not null default 'person'
+  add column if not exists client_type text not null default 'person'
     check (client_type in ('company', 'person')),
-  add column client_registration_code text,
-  add column client_phone text;
+  add column if not exists client_registration_code text,
+  add column if not exists client_phone text;
 
-drop policy "Members can manage invoices" on public.invoices;
-drop policy "Members can manage invoice items" on public.invoice_items;
+drop policy if exists "Members can manage invoices" on public.invoices;
+drop policy if exists "Members can manage invoice items" on public.invoice_items;
+drop policy if exists "Organization members can read invoices" on public.invoices;
+drop policy if exists "Authorized roles can create invoices" on public.invoices;
+drop policy if exists "Authorized roles can update invoices" on public.invoices;
+drop policy if exists "Owners and administrators can delete invoices" on public.invoices;
+drop policy if exists "Organization members can read invoice items" on public.invoice_items;
+drop policy if exists "Authorized roles can create invoice items" on public.invoice_items;
+drop policy if exists "Authorized roles can update invoice items" on public.invoice_items;
+drop policy if exists "Owners and administrators can delete invoice items" on public.invoice_items;
 
 create policy "Organization members can read invoices"
   on public.invoices for select to authenticated
@@ -44,7 +52,7 @@ create policy "Owners and administrators can delete invoice items"
   on public.invoice_items for delete to authenticated
   using ((select public.has_organization_role(organization_id, array['owner', 'administrator'])));
 
-create function public.save_invoice(
+create or replace function public.save_invoice(
   p_organization_id uuid,
   p_number text,
   p_reference_number text,

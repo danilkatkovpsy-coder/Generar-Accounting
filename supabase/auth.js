@@ -62,6 +62,7 @@
   const authForm = document.getElementById("supabaseAuthForm");
   const authSubmit = document.getElementById("supabaseAuthSubmit");
   const googleButton = document.getElementById("supabaseGoogleButton");
+  const googleDivider = root.querySelector(".supabase-auth-divider");
   const authMessage = document.getElementById("supabaseAuthMessage");
   const organizationStage = document.getElementById("supabaseOrganizationStage");
   const organizationForm = document.getElementById("supabaseOrganizationForm");
@@ -135,9 +136,13 @@
   }
 
   function showStage(stage) {
-    authForm.hidden = stage !== "auth";
-    document.querySelector(".supabase-auth-tabs").hidden = stage !== "auth";
-    authMessage.hidden = stage !== "auth";
+    const authVisible = stage === "auth";
+    document.getElementById("supabaseAuthTitle").hidden = !authVisible;
+    authForm.hidden = !authVisible;
+    document.querySelector(".supabase-auth-tabs").hidden = !authVisible;
+    googleButton.hidden = !authVisible;
+    googleDivider.hidden = !authVisible;
+    authMessage.hidden = stage !== "auth" && stage !== "loading";
     organizationStage.hidden = stage !== "organization";
     connectedStage.hidden = stage !== "connected";
   }
@@ -146,6 +151,8 @@
     showStage("auth");
     authForm.hidden = true;
     document.querySelector(".supabase-auth-tabs").hidden = true;
+    googleButton.hidden = true;
+    googleDivider.hidden = true;
     setMessage(authMessage, text, true);
     authMessage.hidden = false;
   }
@@ -172,9 +179,7 @@
   applyLanguage();
 
   async function showUserState(user) {
-    showStage("auth");
-    authForm.hidden = true;
-    document.querySelector(".supabase-auth-tabs").hidden = true;
+    showStage("loading");
     setMessage(authMessage, "checkingOrganization");
 
     const { data: memberships, error: membershipError } = await supabaseClient
