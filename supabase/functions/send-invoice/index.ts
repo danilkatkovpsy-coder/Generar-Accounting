@@ -144,13 +144,9 @@ Deno.serve(async (request) => {
     .single();
   if (deliveryError || !delivery) return jsonResponse(500, { error: "Could not record the email delivery." }, headers);
 
-  const locale = body.locale === "et" || body.locale === "ru" ? body.locale : "und";
-  const defaultSubject = locale === "et"
-    ? `Arve ${invoice.number} ettevõttelt ${organization.name}`
-    : `Счет ${invoice.number} от ${organization.name}`;
-  const defaultBody = locale === "et"
-    ? `Tere!\n\nSaadame teile arve nr ${invoice.number}. Arve on manuses.\n\nLugupidamisega,\n${organization.name}`
-    : `Здравствуйте!\n\nНаправляем вам счет №${invoice.number}. Счет во вложении.\n\nС уважением,\n${organization.name}`;
+  const locale = "und";
+  const defaultSubject = `Arve ${invoice.number} ettevõttelt ${organization.name}`;
+  const defaultBody = `Tere!\n\nSaadame teile arve nr ${invoice.number}. Arve on manuses.\n\nLugupidamisega,\n${organization.name}`;
   const subject = String(body.email_subject ?? defaultSubject).replace(/[\r\n]+/g, " ").trim().slice(0, 200);
   const emailText = String(body.email_body ?? defaultBody).trim().slice(0, 10000);
   const ccEmail = String(body.cc_email ?? "").trim();
