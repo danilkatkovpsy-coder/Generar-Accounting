@@ -144,7 +144,7 @@ Deno.serve(async (request) => {
     .single();
   if (deliveryError || !delivery) return jsonResponse(500, { error: "Could not record the email delivery." }, headers);
 
-  const locale = body.locale === "et" ? "et" : "ru";
+  const locale = body.locale === "et" || body.locale === "ru" ? body.locale : "und";
   const defaultSubject = locale === "et"
     ? `Arve ${invoice.number} ettevõttelt ${organization.name}`
     : `Счет ${invoice.number} от ${organization.name}`;
@@ -158,7 +158,7 @@ Deno.serve(async (request) => {
   if (ccEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ccEmail)) return jsonResponse(400, { error: "The CC email address is invalid." }, headers);
   const attachmentName = `Invoice-${safeFilePart(invoice.number)}.pdf`;
   const htmlBody = escapeHtml(emailText).replace(/\r?\n/g, "<br>");
-  const html = `<!doctype html><html lang="${locale}"><body><p>${htmlBody}</p></body></html>`;
+  const html = `<!doctype html><html><body><p>${htmlBody}</p></body></html>`;
 
   let resendResponse: Response;
   let resendResult: Record<string, unknown>;
@@ -177,7 +177,7 @@ Deno.serve(async (request) => {
         subject,
         text: emailText,
         html,
-        headers: { "Content-Language": locale },
+        headers: locale === "und" ? {} : { "Content-Language": locale },
         attachments: [{ filename: attachmentName, content: body.pdf_base64 }]
       })
     });
