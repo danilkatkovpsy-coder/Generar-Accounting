@@ -145,23 +145,14 @@ Deno.serve(async (request) => {
   if (deliveryError || !delivery) return jsonResponse(500, { error: "Could not record the email delivery." }, headers);
 
   const locale = body.locale === "et" ? "et" : "ru";
-  const numberFormat = new Intl.NumberFormat(locale === "et" ? "et-EE" : "ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-  const lineRows = items.map((item) => {
-    const lineTotal = Number(item.quantity) * Number(item.unit_price);
-    return `<tr><td>${escapeHtml(item.description)}</td><td>${numberFormat.format(Number(item.quantity))}</td><td>${numberFormat.format(Number(item.unit_price))} EUR</td><td>${numberFormat.format(lineTotal)} EUR</td></tr>`;
-  }).join("");
   const subject = locale === "et"
     ? `Arve ${invoice.number} ettevõttelt ${organization.name}`
     : `Счет ${invoice.number} от ${organization.name}`;
-  const greeting = locale === "et" ? "Tere!" : "Здравствуйте!";
-  const intro = locale === "et" ? "Saadame teile arve:" : "Направляем вам счет:";
-  const totalLabel = locale === "et" ? "Kokku" : "Итого";
-  const dueLabel = locale === "et" ? "Maksetähtaeg" : "Срок оплаты";
   const attachmentName = `Invoice-${safeFilePart(invoice.number)}.pdf`;
-  const html = `<!doctype html><html lang="${locale}"><body style="margin:0;padding:24px;background:#f4f6f3;font-family:Arial,sans-serif;color:#28352c"><main style="max-width:680px;margin:auto;padding:28px;background:#fff;border:1px solid #dce4dc;border-radius:8px"><h1 style="font-size:20px">${greeting}</h1><p>${intro} <strong>${escapeHtml(invoice.number)}</strong> · ${escapeHtml(organization.name)}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th align="left">${locale === "et" ? "Kirjeldus" : "Описание"}</th><th align="right">${locale === "et" ? "Kogus" : "Кол-во"}</th><th align="right">${locale === "et" ? "Hind" : "Цена"}</th><th align="right">${locale === "et" ? "Summa" : "Сумма"}</th></tr></thead><tbody>${lineRows}</tbody><tfoot><tr><td colspan="3" align="right"><strong>${totalLabel}</strong></td><td align="right"><strong>${numberFormat.format(Number(invoice.total))} EUR</strong></td></tr></tfoot></table>${invoice.due_date ? `<p>${dueLabel}: ${escapeHtml(invoice.due_date)}</p>` : ""}${invoice.note ? `<p>${escapeHtml(invoice.note)}</p>` : ""}<p>${escapeHtml(organization.name)}</p></main></body></html>`;
+  const emailText = locale === "et"
+    ? `Arve ${invoice.number} on manuses.`
+    : `Счет №${invoice.number} во вложении.`;
+  const html = `<!doctype html><html lang="${locale}"><body><p>${escapeHtml(emailText)}</p></body></html>`;
 
   let resendResponse: Response;
   let resendResult: Record<string, unknown>;
@@ -177,7 +168,9 @@ Deno.serve(async (request) => {
         to: [invoice.client_email],
         reply_to: replyTo,
         subject,
+        text: emailText,
         html,
+        headers: { "Content-Language": locale },
         attachments: [{ filename: attachmentName, content: body.pdf_base64 }]
       })
     });
