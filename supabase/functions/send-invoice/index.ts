@@ -46,7 +46,7 @@ Deno.serve(async (request) => {
     return jsonResponse(401, { error: "Sign in before sending an invoice." }, headers);
   }
 
-  let body: { invoice_id?: string; pdf_base64?: string; locale?: string };
+  let body: { invoice_id?: string; pdf_base64?: string; locale?: string; email_subject?: string; email_body?: string; cc_email?: string | null };
   try {
     body = await request.json();
   } catch {
@@ -145,14 +145,20 @@ Deno.serve(async (request) => {
   if (deliveryError || !delivery) return jsonResponse(500, { error: "Could not record the email delivery." }, headers);
 
   const locale = body.locale === "et" ? "et" : "ru";
-  const subject = locale === "et"
+  const defaultSubject = locale === "et"
     ? `Arve ${invoice.number} ettevõttelt ${organization.name}`
     : `Счет ${invoice.number} от ${organization.name}`;
+  const defaultBody = locale === "et"
+    ? `Tere!\n\nSaadame teile arve nr ${invoice.number}. Arve on manuses.\n\nLugupidamisega,\n${organization.name}`
+    : `Здравствуйте!\n\nНаправляем вам счет №${invoice.number}. Счет во вложении.\n\nС уважением,\n${organization.name}`;
+  const subject = String(body.email_subject ?? defaultSubject).replace(/[\r\n]+/g, " ").trim().slice(0, 200);
+  const emailText = String(body.email_body ?? defaultBody).trim().slice(0, 10000);
+  const ccEmail = String(body.cc_email ?? "").trim();
+  if (!subject || !emailText) return jsonResponse(400, { error: "Email subject and message are required." }, headers);
+  if (ccEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ccEmail)) return jsonResponse(400, { error: "The CC email address is invalid." }, headers);
   const attachmentName = `Invoice-${safeFilePart(invoice.number)}.pdf`;
-  const emailText = locale === "et"
-    ? `Arve ${invoice.number} on manuses.`
-    : `Счет №${invoice.number} во вложении.`;
-  const html = `<!doctype html><html lang="${locale}"><body><p>${escapeHtml(emailText)}</p></body></html>`;
+  const htmlBody = escapeHtml(emailText).replace(/\r?\n/g, "<br>");
+  const html = `<!doctype html><html lang="${locale}"><body><p>${htmlBody}</p></body></html>`;
 
   let resendResponse: Response;
   let resendResult: Record<string, unknown>;
@@ -166,6 +172,7 @@ Deno.serve(async (request) => {
       body: JSON.stringify({
         from: emailFrom,
         to: [invoice.client_email],
+        cc: ccEmail ? [ccEmail] : undefined,
         reply_to: replyTo,
         subject,
         text: emailText,

@@ -17,7 +17,7 @@ create table public.organization_accounting_data (
   data_key text not null check (data_key in (
     'purchases', 'expenses', 'suppliers', 'supplierInvoices', 'articles',
     'background', 'logo', 'color', 'theme', 'designTokens',
-    'invoiceNumberStart', 'paymentTermsDays', 'permissions'
+    'invoiceNumberStart', 'paymentTermsDays', 'permissions', 'emailTemplate'
   )),
   data_value jsonb not null,
   updated_by uuid not null default auth.uid() references auth.users(id),

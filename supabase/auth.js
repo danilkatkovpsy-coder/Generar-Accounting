@@ -43,7 +43,7 @@
         <div class="supabase-auth-field" id="supabaseSignupConfirmField" hidden>
           <label for="supabaseSignupConfirmPassword" data-auth-copy="confirmSignupPassword">Подтвердите пароль</label>
           <div class="supabase-auth-password-control">
-            <input id="supabaseSignupConfirmPassword" type="password" minlength="8" autocomplete="new-password" required>
+            <input id="supabaseSignupConfirmPassword" type="password" minlength="8" autocomplete="off" required>
             <button class="supabase-password-toggle" id="supabaseConfirmPasswordToggle" type="button" aria-label="Показать пароль" title="Показать пароль" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
           </div>
         </div>
@@ -56,16 +56,28 @@
       </button>
       <button class="supabase-guest-button" id="supabaseGuestButton" type="button" data-auth-copy="guestAction" title="Демо-режим без аккаунта; данные останутся только в этом браузере">Войти как гость</button>
       <p class="supabase-auth-message" id="supabaseAuthMessage" role="status" aria-live="polite"></p>
+      <section id="supabasePasswordResetRequestStage" hidden>
+        <h1 data-auth-copy="resetPasswordTitle">Восстановление пароля</h1>
+        <form id="supabasePasswordResetRequestForm">
+          <div class="supabase-auth-field">
+            <label for="supabaseResetEmail" data-auth-copy="email">Электронная почта</label>
+            <input id="supabaseResetEmail" type="email" autocomplete="email" required>
+          </div>
+          <button class="supabase-auth-primary" id="supabaseResetEmailSubmit" type="submit" data-auth-copy="sendResetLink">Отправить ссылку</button>
+          <button class="supabase-auth-forgot" id="supabaseResetBackToLogin" type="button" data-auth-copy="backToLogin">Назад ко входу</button>
+        </form>
+        <p class="supabase-auth-message" id="supabaseResetEmailMessage" role="status" aria-live="polite"></p>
+      </section>
       <section id="supabasePasswordRecoveryStage" hidden>
         <h1 data-auth-copy="newPasswordTitle">Установить новый пароль</h1>
         <form id="supabasePasswordRecoveryForm">
           <div class="supabase-auth-field">
             <label for="supabaseNewPassword" data-auth-copy="newPassword">Новый пароль</label>
-            <input id="supabaseNewPassword" type="password" minlength="8" autocomplete="new-password" required>
+            <input id="supabaseNewPassword" type="password" minlength="8" autocomplete="off" required>
           </div>
           <div class="supabase-auth-field">
             <label for="supabaseConfirmPassword" data-auth-copy="confirmPassword">Повторите новый пароль</label>
-            <input id="supabaseConfirmPassword" type="password" minlength="8" autocomplete="new-password" required>
+            <input id="supabaseConfirmPassword" type="password" minlength="8" autocomplete="off" required>
           </div>
           <button class="supabase-auth-primary" id="supabasePasswordRecoverySubmit" type="submit" data-auth-copy="saveNewPassword">Сохранить пароль</button>
         </form>
@@ -116,6 +128,12 @@
   const guestButton = document.getElementById("supabaseGuestButton");
   const googleDivider = root.querySelector(".supabase-auth-divider");
   const authMessage = document.getElementById("supabaseAuthMessage");
+  const resetRequestStage = document.getElementById("supabasePasswordResetRequestStage");
+  const resetRequestForm = document.getElementById("supabasePasswordResetRequestForm");
+  const resetEmailInput = document.getElementById("supabaseResetEmail");
+  const resetEmailSubmit = document.getElementById("supabaseResetEmailSubmit");
+  const resetBackToLogin = document.getElementById("supabaseResetBackToLogin");
+  const resetEmailMessage = document.getElementById("supabaseResetEmailMessage");
   const organizationStage = document.getElementById("supabaseOrganizationStage");
   const organizationForm = document.getElementById("supabaseOrganizationForm");
   const organizationSubmit = document.getElementById("supabaseOrganizationSubmit");
@@ -132,7 +150,7 @@
       brandSubtitle: "Бухгалтерия компании", welcomeEyebrow: "Arvesemu · учет компании", welcomeTitle: "Добро пожаловать",
       welcomeDescription: "Ведите клиентов, выставляйте счета и контролируйте операции компании в одном месте.", welcomeNote: "Войдите в аккаунт или начните с гостевого режима.",
       email: "Электронная почта", password: "Пароль", confirmSignupPassword: "Подтвердите пароль", showPassword: "Показать пароль", hidePassword: "Скрыть пароль", signInAction: "Войти", signUpAction: "Зарегистрироваться",
-      forgotPassword: "Забыли пароль?", resetEmailWait: "Отправляю ссылку…", resetEmailSent: "Если аккаунт с таким адресом существует, на него отправлена ссылка для сброса пароля.", resetEmailError: "Не удалось отправить ссылку для сброса пароля.",
+      forgotPassword: "Забыли пароль?", resetPasswordTitle: "Восстановление пароля", sendResetLink: "Отправить ссылку", backToLogin: "Назад ко входу", resetEmailWait: "Отправляю ссылку…", resetEmailSent: "Если аккаунт с таким адресом существует, на него отправлена ссылка для сброса пароля.", resetEmailError: "Не удалось отправить ссылку для сброса пароля.",
       newPasswordTitle: "Установить новый пароль", newPassword: "Новый пароль", confirmPassword: "Повторите новый пароль", saveNewPassword: "Сохранить пароль", passwordMismatch: "Пароли не совпадают.", passwordUpdateWait: "Сохраняю новый пароль…", passwordUpdated: "Пароль обновлён.",
       googleAction: "Продолжить с Google", googleWait: "Переход к Google…", guestAction: "Войти как гость", or: "или",
       createOrganizationTitle: "Создать организацию", companyName: "Название компании", registrationCode: "Регистрационный код",
@@ -148,7 +166,7 @@
       brandSubtitle: "Ettevõtte raamatupidamine", welcomeEyebrow: "Arvesemu · ettevõtte arvestus", welcomeTitle: "Tere tulemast",
       welcomeDescription: "Halda kliente, koosta arveid ja jälgi ettevõtte toiminguid ühes kohas.", welcomeNote: "Logi sisse või alusta külalisrežiimis.",
       email: "E-posti aadress", password: "Parool", confirmSignupPassword: "Kinnitage parool", showPassword: "Näita parooli", hidePassword: "Peida parool", signInAction: "Logi sisse", signUpAction: "Loo konto",
-      forgotPassword: "Unustasid parooli?", resetEmailWait: "Saadan lähtestamislinki…", resetEmailSent: "Kui selle aadressiga konto on olemas, saadetakse sellele parooli lähtestamise link.", resetEmailError: "Parooli lähtestamise linki ei õnnestunud saata.",
+      forgotPassword: "Unustasid parooli?", resetPasswordTitle: "Parooli taastamine", sendResetLink: "Saada link", backToLogin: "Tagasi sisselogimise juurde", resetEmailWait: "Saadan lähtestamislinki…", resetEmailSent: "Kui selle aadressiga konto on olemas, saadetakse sellele parooli lähtestamise link.", resetEmailError: "Parooli lähtestamise linki ei õnnestunud saata.",
       newPasswordTitle: "Määra uus parool", newPassword: "Uus parool", confirmPassword: "Korda uut parooli", saveNewPassword: "Salvesta parool", passwordMismatch: "Paroolid ei kattu.", passwordUpdateWait: "Salvestan uut parooli…", passwordUpdated: "Parool on uuendatud.",
       googleAction: "Jätka Google'iga", googleWait: "Suunan Google'isse…", guestAction: "Sisene külalisena", or: "või",
       createOrganizationTitle: "Loo organisatsioon", companyName: "Ettevõtte nimi", registrationCode: "Registrikood",
@@ -188,8 +206,8 @@
     forgotPasswordButton.hidden = mode !== "sign-in";
     signupConfirmField.hidden = mode !== "sign-up";
     signupConfirmPassword.required = mode === "sign-up";
-    passwordInput.autocomplete = mode === "sign-up" ? "new-password" : "current-password";
-    signupConfirmPassword.autocomplete = "new-password";
+    passwordInput.autocomplete = mode === "sign-up" ? "off" : "current-password";
+    signupConfirmPassword.autocomplete = "off";
     for (const [input, toggle] of [[passwordInput, passwordToggle], [signupConfirmPassword, confirmPasswordToggle]]) {
       const label = translate(input.type === "password" ? "showPassword" : "hidePassword");
       toggle.setAttribute("aria-label", label);
@@ -212,6 +230,7 @@
 
   function showStage(stage) {
     const authVisible = stage === "auth";
+    const resetRequestVisible = stage === "password-reset-request";
     const recoveryVisible = stage === "password-recovery";
     document.getElementById("supabaseAuthTitle").hidden = !authVisible;
     authForm.hidden = !authVisible;
@@ -219,6 +238,8 @@
     googleButton.hidden = !authVisible;
     googleDivider.hidden = !authVisible;
     authMessage.hidden = stage !== "auth" && stage !== "loading";
+    resetRequestStage.hidden = !resetRequestVisible;
+    resetEmailMessage.hidden = !resetRequestVisible;
     recoveryStage.hidden = !recoveryVisible;
     recoveryMessage.hidden = !recoveryVisible;
     organizationStage.hidden = stage !== "organization";
@@ -351,23 +372,33 @@
 
   signInTab.addEventListener("click", () => setMode("sign-in"));
   signUpTab.addEventListener("click", () => setMode("sign-up"));
-  forgotPasswordButton.addEventListener("click", async () => {
-    const emailInput = document.getElementById("supabaseAuthEmail");
-    if (!emailInput.reportValidity()) return;
-    forgotPasswordButton.disabled = true;
-    setMessage(authMessage, "resetEmailWait");
+  forgotPasswordButton.addEventListener("click", () => {
+    resetEmailInput.value = document.getElementById("supabaseAuthEmail").value.trim();
+    showStage("password-reset-request");
+    setMessage(resetEmailMessage, "");
+    resetEmailInput.focus();
+  });
+  resetBackToLogin.addEventListener("click", () => {
+    setMode("sign-in");
+    showStage("auth");
+  });
+  resetRequestForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!resetEmailInput.reportValidity()) return;
+    resetEmailSubmit.disabled = true;
+    setMessage(resetEmailMessage, "resetEmailWait");
     try {
       const redirectUrl = new URL(window.location.href);
       redirectUrl.hash = "";
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(emailInput.value.trim(), {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(resetEmailInput.value.trim(), {
         redirectTo: redirectUrl.href
       });
       if (error) throw error;
-      setMessage(authMessage, "resetEmailSent");
+      setMessage(resetEmailMessage, "resetEmailSent");
     } catch (error) {
-      setMessage(authMessage, { ru: `${authText.ru.resetEmailError} ${error.message}`, et: `${authText.et.resetEmailError} ${error.message}` }, true);
+      setMessage(resetEmailMessage, { ru: `${authText.ru.resetEmailError} ${error.message}`, et: `${authText.et.resetEmailError} ${error.message}` }, true);
     } finally {
-      forgotPasswordButton.disabled = false;
+      resetEmailSubmit.disabled = false;
     }
   });
   googleButton.addEventListener("click", async () => {
