@@ -10,8 +10,8 @@
           <span><strong>Arvesemu</strong><small data-auth-copy="brandSubtitle">Бухгалтерия компании</small></span>
         </a>
         <div class="supabase-auth-language" role="group" aria-label="Язык интерфейса">
-          <button type="button" data-auth-language="ru" aria-pressed="true">RU</button>
-          <button type="button" data-auth-language="et" aria-pressed="false">ET</button>
+          <button type="button" data-auth-language="et" aria-pressed="true">ET</button>
+          <button type="button" data-auth-language="ru" aria-pressed="false">RU</button>
         </div>
       </header>
       <div class="supabase-auth-layout">
@@ -160,9 +160,9 @@
       setupError: "Supabase'i ühendust ei õnnestunud laadida. Kontrolli seadistust ja internetiühendust."
     }
   };
-  let language = "ru";
+  let language = "et";
   try {
-    language = localStorage.getItem("accounting-language") === "et" ? "et" : "ru";
+    language = localStorage.getItem("accounting-language-choice") === "ru" ? "ru" : "et";
   } catch {}
 
   function translate(key) {
@@ -260,6 +260,7 @@
       language = button.dataset.authLanguage;
       try {
         localStorage.setItem("accounting-language", language);
+        localStorage.setItem("accounting-language-choice", language);
       } catch {}
       applyLanguage();
     });
