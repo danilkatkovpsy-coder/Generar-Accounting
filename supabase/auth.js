@@ -89,7 +89,7 @@
       <section id="supabaseConnectedStage" hidden>
         <h1 data-auth-copy="accountConnected">Аккаунт подключен</h1>
         <p class="supabase-auth-message" id="supabaseConnectedMessage"></p>
-        <p class="supabase-auth-warning" data-auth-copy="dataNotConnected">Облачное хранение клиентов, счетов и остальных данных ещё не подключено. Пока не вносите сюда реальные бухгалтерские данные.</p>
+        <p class="supabase-auth-warning" data-auth-copy="dataNotConnected">Данные организации сохраняются в облаке. Для отправки счетов требуется настройка почтового сервиса.</p>
         <button class="supabase-auth-logout" id="supabaseSignOut" type="button" data-auth-copy="signOut">Выйти</button>
       </section>
         </section>
@@ -136,7 +136,7 @@
       newPasswordTitle: "Установить новый пароль", newPassword: "Новый пароль", confirmPassword: "Повторите новый пароль", saveNewPassword: "Сохранить пароль", passwordMismatch: "Пароли не совпадают.", passwordUpdateWait: "Сохраняю новый пароль…", passwordUpdated: "Пароль обновлён.",
       googleAction: "Продолжить с Google", googleWait: "Переход к Google…", guestAction: "Войти как гость", or: "или",
       createOrganizationTitle: "Создать организацию", companyName: "Название компании", registrationCode: "Регистрационный код",
-      create: "Создать", accountConnected: "Аккаунт подключен", dataNotConnected: "Облачное хранение клиентов, счетов и остальных данных ещё не подключено. Пока не вносите сюда реальные бухгалтерские данные.",
+      create: "Создать", accountConnected: "Аккаунт подключен", dataNotConnected: "Данные организации сохраняются в облаке. Для отправки счетов требуется настройка почтового сервиса.",
       signOut: "Выйти", language: "Язык интерфейса", checkingOrganization: "Проверяю доступ к организации…",
       createAccountWait: "Создаю аккаунт…", signInWait: "Выполняю вход…", confirmEmail: "Аккаунт создан. Подтвердите адрес по ссылке из письма, затем войдите.",
       createOrganizationWait: "Создаю организацию…", signedOut: "Вы вышли из аккаунта.",
@@ -152,7 +152,7 @@
       newPasswordTitle: "Määra uus parool", newPassword: "Uus parool", confirmPassword: "Korda uut parooli", saveNewPassword: "Salvesta parool", passwordMismatch: "Paroolid ei kattu.", passwordUpdateWait: "Salvestan uut parooli…", passwordUpdated: "Parool on uuendatud.",
       googleAction: "Jätka Google'iga", googleWait: "Suunan Google'isse…", guestAction: "Sisene külalisena", or: "või",
       createOrganizationTitle: "Loo organisatsioon", companyName: "Ettevõtte nimi", registrationCode: "Registrikood",
-      create: "Loo", accountConnected: "Konto on ühendatud", dataNotConnected: "Klientide, arvete ja muude andmete pilvesalvestus pole veel ühendatud. Palun ära sisesta siia päris raamatupidamisandmeid.",
+      create: "Loo", accountConnected: "Konto on ühendatud", dataNotConnected: "Organisatsiooni andmed salvestatakse pilve. Arvete saatmiseks tuleb seadistada e-posti teenus.",
       signOut: "Logi välja", language: "Liidese keel", checkingOrganization: "Kontrollin organisatsiooni ligipääsu…",
       createAccountWait: "Loon kontot…", signInWait: "Sisselogimine…", confirmEmail: "Konto on loodud. Kinnita e-posti aadress kirjas oleva lingi kaudu ja logi seejärel sisse.",
       createOrganizationWait: "Loon organisatsiooni…", signedOut: "Logisid kontolt välja.",
@@ -171,7 +171,7 @@
 
   function applyLanguage() {
     document.documentElement.lang = language;
-    document.title = language === "et" ? "Arvesemu | Arved" : "Arvesemu | Счета";
+    document.title = "Arvesemu";
     root.querySelectorAll("[data-auth-language]").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.authLanguage === language));
     });
@@ -313,7 +313,7 @@
     const organizationIds = memberships.map((membership) => membership.organization_id);
     const { data: organization, error: organizationError } = await supabaseClient
       .from("organizations")
-      .select("id, name, registration_code, address")
+      .select("id, name, registration_code, address, phone, email, bank_name, bank_swift, bank_iban")
       .eq("id", organizationIds[0])
       .single();
 
