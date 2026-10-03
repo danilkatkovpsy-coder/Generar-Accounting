@@ -252,6 +252,7 @@
     try {
       if (!window.GENERAR_ACCOUNTING_APP?.connect) throw new Error("Application connection is unavailable.");
       await window.GENERAR_ACCOUNTING_APP.connect({ supabase: supabaseClient, user, organization, role: memberships[0].role, language });
+        window.applyRoleAccess?.();
       document.documentElement.classList.remove("supabase-auth-required");
       root.remove();
     } catch (error) {
