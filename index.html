@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f5f1eb">
   <link rel="icon" type="image/png" sizes="256x256" href="images/favicon.png">
   <link rel="apple-touch-icon" sizes="256x256" href="images/favicon.png">
-  <title>Accounting | Счета</title>
+  <title>Arvesemu | Счета</title>
   <style>
     :root{color-scheme:light;--ink:#302820;--muted:#887b6d;--line:#e8dfd4;--paper:#fffdf9;--canvas:#f5f1eb;--accent:#987453;--accent-dark:#76583d;--soft:#eee5d9;--green:#47775b;--red:#a35446;font-family:"Avenir Next",Avenir,"Segoe UI",sans-serif;font-synthesis:none;text-rendering:optimizeLegibility}
     *{box-sizing:border-box}body{margin:0;min-width:320px;color:var(--ink);background:radial-gradient(ellipse at 8% 0%,rgba(219,204,184,.28),transparent 34rem),var(--canvas)}
@@ -135,6 +135,7 @@
     .supabase-auth-field label{font-size:13px;font-weight:550}
     .supabase-auth-field input{width:100%;min-height:42px;padding:9px 11px;border:1px solid #cdd7ce;border-radius:4px;background:#fff;font:inherit}
     .supabase-auth-field input:focus{border-color:#47775b;outline:3px solid rgba(71,119,91,.15)}
+    .supabase-auth-forgot{display:block;margin:4px 0 10px auto;padding:4px 0;border:0;color:#47775b;background:none;font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
     .supabase-auth-primary{width:100%;min-height:42px;margin-top:8px;border:0;border-radius:4px;color:#fff;background:#47775b;font:inherit;font-weight:600;cursor:pointer}
     .supabase-auth-primary:disabled{opacity:.6;cursor:wait}
     .supabase-auth-divider{display:flex;align-items:center;gap:12px;margin:17px 0;color:#778178;font-size:12px}
@@ -308,7 +309,7 @@
       const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
       while(node=walker.nextNode()){const parent=node.parentElement;if(!parent||parent.closest("script,style,#invoicePreview"))continue;if(!originalTextNodes.has(node))originalTextNodes.set(node,node.nodeValue);const original=originalTextNodes.get(node),trimmed=original.trim();if(!trimmed)continue;const key=parent.dataset.i18n||"",translated=translateCopy(trimmed,key),start=original.indexOf(trimmed);node.nodeValue=original.slice(0,start)+translated+original.slice(start+trimmed.length)}
       document.querySelectorAll("[placeholder],[aria-label],[title]").forEach(element=>{if(element.closest("#invoicePreview"))return;if(!originalAttributes.has(element))originalAttributes.set(element,{placeholder:element.getAttribute("placeholder"),"aria-label":element.getAttribute("aria-label"),title:element.getAttribute("title")});for(const name of ["placeholder","aria-label","title"]){const value=originalAttributes.get(element)[name];if(value!==null)element.setAttribute(name,translateCopy(value))}});
-      document.title=translateCopy("Accounting | Счета");document.querySelectorAll("[data-language]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.language===language)));
+      document.title=language==="et"?"Arvesemu | Arved":"Arvesemu | Счета";const brandLogo=document.querySelector(".brand-logo");if(brandLogo)brandLogo.alt="Arvesemu";document.querySelectorAll("[data-language]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.language===language)));
     }
     document.querySelectorAll("[data-language]").forEach(button=>button.addEventListener("click",()=>applyLanguage(button.dataset.language)));
     let clients=readStorage(STORAGE.clients,[]),invoices=readStorage(STORAGE.invoices,[]),purchases=readStorage(STORAGE.purchases,[]),expenses=readStorage(STORAGE.expenses,[]),members=readStorage(STORAGE.members,[{email:"danil.katkov.work@gmail.com",role:"owner",status:"Владелец"}]),messageTimer,pdfBackground="",pdfLogo="";
@@ -326,7 +327,7 @@
     let cloudWorkspace=null;
     async function saveCloudClient(client){if(!cloudWorkspace)throw new Error("Sign in to save client data.");const{error}=await cloudWorkspace.supabase.from("clients").upsert({id:client.id,organization_id:cloudWorkspace.organizationId,name:client.name,client_type:client.type||"person",registration_code:client.reg||null,reference_number:client.reference||null,address:client.address||null,email:client.email||null,phone:client.phone||null},{onConflict:"id"});if(error)throw error}
     async function removeCloudClient(client){if(!cloudWorkspace||!client.id)throw new Error("Client is not connected to the cloud.");const{error}=await cloudWorkspace.supabase.from("clients").delete().eq("id",client.id).eq("organization_id",cloudWorkspace.organizationId);if(error)throw error}
-    async function saveCloudInvoice(invoice){if(!cloudWorkspace)throw new Error("Sign in to save invoice data.");const{error}=await cloudWorkspace.supabase.rpc("save_invoice",{p_organization_id:cloudWorkspace.organizationId,p_number:invoice.number,p_reference_number:invoice.reference||null,p_issue_date:invoice.date,p_due_date:invoice.dueDate||null,p_note:invoice.note||null,p_client_name:invoice.client.name,p_client_email:invoice.client.email||null,p_client_address:invoice.client.address||null,p_client_type:invoice.client.type||"person",p_client_registration_code:invoice.client.reg||null,p_client_phone:invoice.client.phone||null,p_items:invoice.items.map(item=>({articleNumber:item.articleNumber||null,description:item.description,quantity:item.quantity,price:item.price}))});if(error)throw error}
+    async function saveCloudInvoice(invoice){if(!cloudWorkspace)throw new Error("Sign in to save invoice data.");const{data,error}=await cloudWorkspace.supabase.rpc("save_invoice",{p_organization_id:cloudWorkspace.organizationId,p_number:invoice.number,p_reference_number:invoice.reference||null,p_issue_date:invoice.date,p_due_date:invoice.dueDate||null,p_note:invoice.note||null,p_client_name:invoice.client.name,p_client_email:invoice.client.email||null,p_client_address:invoice.client.address||null,p_client_type:invoice.client.type||"person",p_client_registration_code:invoice.client.reg||null,p_client_phone:invoice.client.phone||null,p_items:invoice.items.map(item=>({articleNumber:item.articleNumber||null,description:item.description,quantity:item.quantity,price:item.price}))});if(error)throw error;return data}
     async function removeCloudInvoice(number){if(!cloudWorkspace)throw new Error("Sign in to delete invoice data.");const{error}=await cloudWorkspace.supabase.from("invoices").delete().eq("organization_id",cloudWorkspace.organizationId).eq("number",number);if(error)throw error}
     const rolePermissionRows=[{key:"overview",label:"permissionOverview"},{key:"sales",label:"permissionSales"},{key:"createInvoice",label:"permissionCreateInvoice"},{key:"editInvoices",label:"permissionEditInvoices"},{key:"deleteInvoices",label:"permissionDeleteInvoices"},{key:"exportInvoices",label:"permissionExportInvoices"},{key:"payments",label:"permissionPayments"},{key:"expenses",label:"permissionExpenses"},{key:"reports",label:"permissionReports"},{key:"exportReports",label:"permissionExportReports"},{key:"companySettings",label:"permissionCompanySettings"},{key:"manageUsers",label:"permissionManageUsers"}];
     const defaultRolePermissions={administrator:Object.fromEntries(rolePermissionRows.map(item=>[item.key,true])),accountant:{overview:true,sales:true,createInvoice:true,editInvoices:true,deleteInvoices:false,exportInvoices:true,payments:true,expenses:true,reports:true,exportReports:true,companySettings:false,manageUsers:false}};
@@ -517,7 +518,7 @@
     function loadClient(name){const client=clients.find(saved=>saved.name===name);if(!client)return;document.getElementById("clientName").value=client.name;document.getElementById("clientAddress").value=client.address||"";document.getElementById("clientEmail").value=client.email||"";document.getElementById("referenceNumber").value=client.reference||"";invoiceClientDetails={name:client.name,type:client.type||"person",reg:client.reg||"",phone:client.phone||""};selectedSavedClientName=client.name;renderClientPicker(client.name);renderPreview()}
     function readInvoiceForm(){return{number:document.getElementById("invoiceNumber").value.trim(),reference:document.getElementById("referenceNumber").value.trim(),date:document.getElementById("invoiceDate").value,dueDate:document.getElementById("dueDate").value,note:document.getElementById("invoiceNote").value.trim(),client:{name:document.getElementById("clientName").value.trim(),address:document.getElementById("clientAddress").value.trim(),email:document.getElementById("clientEmail").value.trim()},items:getItems()}}
     function validateInvoice(invoice){if(!invoice.client.name)return"Укажите имя клиента.";if(!invoice.number)return"Укажите номер счета.";if(!invoice.items.some(item=>item.description&&item.price>0))return"Добавьте описание и цену хотя бы одной услуги.";return""}
-    async function persistInvoice(invoice){invoice.total=currentTotal(invoice.items);invoice.createdAt=invoice.createdAt||new Date().toISOString();await saveCloudInvoice(invoice);invoices=[invoice,...invoices.filter(saved=>String(saved.number)!==String(invoice.number))].slice(0,100);renderHistory(document.getElementById("historySearch").value);renderDashboard();renderReport()}
+    async function persistInvoice(invoice){invoice.total=currentTotal(invoice.items);invoice.createdAt=invoice.createdAt||new Date().toISOString();invoice.id=await saveCloudInvoice(invoice);invoices=[invoice,...invoices.filter(saved=>String(saved.number)!==String(invoice.number))].slice(0,100);renderHistory(document.getElementById("historySearch").value);renderDashboard();renderReport()}
     async function saveInvoice(){if(denyAction(invoiceIsSaved?"editInvoices":"createInvoice"))return;const invoice=readInvoiceForm(),problem=validateInvoice(invoice);if(problem){showMessage(problem,true);return}const isUpdate=invoices.some(saved=>String(saved.number)===String(invoice.number));try{await persistInvoice(invoice);showMessage(isUpdate?"Счет обновлен.":"Счет сохранен и добавлен в продажи.");switchView("salesView");window.scrollTo({top:0,behavior:"smooth"})}catch(error){console.error(error);showMessage(error.message||"Не удалось сохранить счет в облаке.",true)}}
 
     Object.assign(ruTexts,{selectInvoice:"Выбрать счет",selectAllInvoices:"Выбрать все счета на странице",downloadSelectedInvoices:"Скачать выбранные",downloadPreparing:"Подготавливаю файлы…",downloadSingleComplete:"Счет скачан в PDF.",downloadMultipleComplete:"Счета скачаны в ZIP-архиве.",downloadInvoicesError:"Не удалось скачать выбранные счета.",invoiceDueDateColumn:"Срок оплаты",downloadSalesRegister:"Реестр счетов",salesRegisterComplete:"Файл реестра скачан.",salesRegisterError:"Не удалось сформировать файл реестра.","Формат файла":"Формат файла","Скачать реестр счетов":"Скачать реестр счетов"});
@@ -645,10 +646,14 @@
       const button=document.getElementById("sendInvoiceButton");button.disabled=true;
       try{
         await persistInvoice(invoice);
-        const address=encodeURIComponent(recipient).replace(/%40/gi,"@"),subject=encodeURIComponent(`Arve nr ${invoice.number}`),body=encodeURIComponent(`Tere,\n\nSaadan arve nr ${invoice.number}. Laadige alla ja lisage kirjale allalaaditud PDF-arve.\n\nLugupidamisega,\n${currentSeller().name}`);
-        const mailLink=document.createElement("a");mailLink.href=`mailto:${address}?subject=${subject}&body=${body}`;mailLink.hidden=true;document.body.append(mailLink);mailLink.click();mailLink.remove();
-        const safeNumber=invoice.number.replace(/[^a-z0-9_-]/gi,"-")||"uus",blob=await createPdfBlob(invoice),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`Arve-${safeNumber}.pdf`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showMessage(translateCopy("Письмо подготовлено, PDF скачан. Прикрепите файл и отправьте письмо."))
-      }catch(error){console.error(error);showMessage("Не удалось подготовить письмо и PDF.",true)}finally{button.disabled=false}
+        const pdf=await createPdfBlob(invoice);
+        if(pdf.size>4*1024*1024)throw new Error(translateCopy("PDF превышает лимит отправки 4 МБ.","invoiceEmailPdfTooLarge"));
+        const bytes=new Uint8Array(await pdf.arrayBuffer());let binary="";
+        for(let offset=0;offset<bytes.length;offset+=0x8000)binary+=String.fromCharCode(...bytes.subarray(offset,offset+0x8000));
+        const{error}=await cloudWorkspace.supabase.functions.invoke("send-invoice",{body:{invoice_id:invoice.id,pdf_base64:btoa(binary),locale:language}});
+        if(error)throw error;
+        showMessage(translateCopy("Счет отправлен клиенту по email.","cloudEmailSent"));
+      }catch(error){console.error(error);showMessage(error.message||translateCopy("Не удалось отправить счет по email.","cloudEmailFailed"),true)}finally{button.disabled=false}
     }
     function setDateDefaults(){const now=new Date(),iso=date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`,due=new Date(now),paymentDays=Number(readStorage(STORAGE.paymentTermsDays,14));due.setDate(due.getDate()+(Number.isInteger(paymentDays)&&paymentDays>=0?paymentDays:14));document.getElementById("invoiceDate").value=iso(now);document.getElementById("dueDate").value=iso(due)}
     function invoiceDueDateAfterDays(dateValue,days){if(!dateValue)return"";const date=new Date(`${dateValue}T12:00:00`);date.setDate(date.getDate()+days);return`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
@@ -708,6 +713,7 @@
   <script>
     Object.assign(ruTexts,{saveSettings:"Сохранить",settingsSaved:"Настройки сохранены.",companySettingsSaved:"Данные фирмы сохранены."});
     Object.assign(etTexts,{saveSettings:"Salvesta",settingsSaved:"Seaded salvestati.",companySettingsSaved:"Ettevõtte andmed salvestati."});
+    Object.assign(ruTexts,{productName:"Arvesemu"});Object.assign(etTexts,{productName:"Arvesemu"});
     let invoiceThemeDraft={...invoiceTheme},draftBackgroundFile=null,draftLogoFile=null,resetBackgroundDraft=false;
     let savedSeller={...sellerDefaults,...readStorage(STORAGE.seller,{})};
     currentSeller=()=>({...savedSeller});
@@ -770,10 +776,13 @@
   <script>
     Object.assign(ruTexts,{clientSavedCloud:"Клиент сохранен в облаке.",clientUpdated:"Клиент обновлен."});
     Object.assign(etTexts,{clientSavedCloud:"Klient salvestati pilve.",clientUpdated:"Klient uuendati."});
+    Object.assign(ruTexts,{cloudEmailSent:"Счет отправлен клиенту по email.",cloudEmailFailed:"Не удалось отправить счет. Проверьте настройки почтового сервиса.",invoiceEmailPdfTooLarge:"PDF превышает лимит отправки 4 МБ."});
+    Object.assign(etTexts,{cloudEmailSent:"Arve saadeti kliendile e-postiga.",cloudEmailFailed:"Arvet ei õnnestunud saata. Kontrollige e-posti teenuse seadeid.",invoiceEmailPdfTooLarge:"PDF ületab 4 MB saatmispiirangu."});
     Object.assign(ruTexts,{cloudCoreNotice:"В облаке сохраняются клиенты и счета. Закупки, расходы и настройки фирмы пока не подключены; отправка счета пока открывает почтовую программу.",cloudSettingsNotReady:"Настройки организации ещё не подключены к облаку."});
     Object.assign(etTexts,{cloudCoreNotice:"Kliendid ja arved salvestatakse pilve. Ostud, kulud ja ettevõtte seaded pole veel ühendatud; arve saatmine avab praegu e-posti programmi.",cloudSettingsNotReady:"Organisatsiooni seaded pole veel pilve ühendatud."});
     window.GENERAR_ACCOUNTING_APP={
-      async connect({supabase,user,organization,role}){
+      async connect({supabase,user,organization,role,language:authLanguage}){
+        if(authLanguage==="et"||authLanguage==="ru")applyLanguage(authLanguage);
         const organizationId=organization.id;
         const [clientResult,invoiceResult,itemResult]=await Promise.all([
           supabase.from("clients").select("id,name,client_type,registration_code,reference_number,address,email,phone").eq("organization_id",organizationId).order("name"),
@@ -806,6 +815,6 @@
       }
     };
   </script>
-  <script src="supabase/auth.js?v=20261003-2"></script>
+  <script src="supabase/auth.js?v=20261003-3"></script>
 </body>
 </html>

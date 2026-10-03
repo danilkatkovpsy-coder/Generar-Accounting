@@ -4,7 +4,7 @@ The app has Supabase email sign-in and stores clients and invoices in the organi
 
 ## First setup
 
-1. Open the Supabase dashboard at `https://supabase.com/dashboard`, create an account, then create a project named `Generar Accounting`.
+1. Open the Supabase dashboard at `https://supabase.com/dashboard`, create an account, then create a project named `Arvesemu`.
 2. Choose a region in the EU. Generate a strong database password, save it in a password manager, and do not put it in this repository or send it in chat.
 3. Wait until the project is ready. Open **SQL Editor**, create a query, paste the contents of `migrations/20261003000100_accounting_core.sql`, and run it. The migration creates the tables and enables Row Level Security.
 4. Create a second query and run `migrations/20261003000200_cloud_invoice_writes.sql`. It adds invoice snapshots and an atomic, organization-scoped operation for saving invoice lines. Run each migration only once.
@@ -30,4 +30,23 @@ The login screen includes a Google button. Configure its provider once before us
 
 The Supabase project URL and publishable/anon key may be used by the browser only after the app is connected and the RLS policies have been reviewed. Never put a `service_role` key, database password, or email-provider API key in `index.html`, another browser file, or the GitHub repository.
 
-Invoice email must be sent by a server-side function. That function will create delivery records so the app can display sent/failed status. The current “Отправить” action still opens the user's mail program and does not send or attach email automatically. Later, a mail provider and verified sender address will be needed; its API key must be stored as a server-side function secret, never in browser code.
+## Invoice email delivery
+
+The send action uses the `send-invoice` Supabase Edge Function. It checks the signed-in user's organization role, reads the saved invoice, emails its PDF attachment through Resend, and writes `pending`, `sent`, or `failed` to `invoice_email_deliveries`. The visible sender is the verified domain address in `EMAIL_FROM`; replies are addressed to the organization's owner email from Supabase Auth.
+
+1. Create a Resend account and verify a domain you control. Add the DNS records Resend gives you. A GitHub Pages address is not a sender domain. For initial testing, Resend's test sender can only send to the account's verified address.
+2. Create a Resend API key. Do not paste it into chat, source files, GitHub, or the browser.
+3. Install the Supabase CLI on macOS (`brew install supabase/tap/supabase`) and log in (`supabase login`).
+4. From the project folder, enter the Resend key and verified sender address as Supabase secrets. Type the real key only in your terminal:
+
+	```sh
+	supabase secrets set --project-ref jkdknlxgeuvxhyauhden RESEND_API_KEY=re_your_key EMAIL_FROM="Arvesemu <arved@your-verified-domain>"
+	```
+
+5. Deploy the function:
+
+	```sh
+	supabase functions deploy send-invoice --project-ref jkdknlxgeuvxhyauhden
+	```
+
+The browser sends only the invoice ID and generated PDF. Supabase secrets, including `SUPABASE_SERVICE_ROLE_KEY`, stay on the server. Test with your own verified email before sending customer invoices.
