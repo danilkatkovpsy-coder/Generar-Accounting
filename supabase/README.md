@@ -15,9 +15,10 @@ The app stores clients, invoices, purchases, expenses, suppliers, supplier invoi
 9. Run `migrations/20261004000400_vat_registration_and_invoice_tax.sql` to add organization VAT settings and invoice tax fields.
 10. Run `migrations/20261005000100_invoice_payment_status.sql` to add invoice payment status and payment date. This is required for the Paid/Unpaid control in Sales.
 11. Run `migrations/20261005000200_invoice_amount_due.sql` to add invoice balances, backfill unpaid amounts, and keep paid status synchronized with a zero balance.
-12. In **Authentication > Sign In / Providers**, verify that the Email provider is enabled. Hosted Supabase projects require email confirmation by default. In **URL Configuration**, set the production Site URL to `https://arvesemu.ee/` and add `https://arvesemu.ee/**`, `https://www.arvesemu.ee/**`, and `http://127.0.0.1:8000/**` to the allowed redirect URLs. These allow the confirmation and password-reset links to return to the site.
-13. Open the project's **Connect** dialog or **Settings > API Keys** and copy the **Project URL** and public **publishable** key (or legacy `anon` key). These are intended for browser apps. Never share the database password, a `service_role` key, or a secret API key.
-14. Do not upload real client or accounting data until all nine migrations have been applied and authentication, database access, and email delivery have been tested.
+12. Run `migrations/20261005000300_invoice_payments.sql` to store invoice payment amounts, methods, and dates, and atomically update the remaining balance.
+13. In **Authentication > Sign In / Providers**, verify that the Email provider is enabled. Hosted Supabase projects require email confirmation by default. In **URL Configuration**, set the production Site URL to `https://arvesemu.ee/` and add `https://arvesemu.ee/**`, `https://www.arvesemu.ee/**`, and `http://127.0.0.1:8000/**` to the allowed redirect URLs. These allow the confirmation and password-reset links to return to the site.
+14. Open the project's **Connect** dialog or **Settings > API Keys** and copy the **Project URL** and public **publishable** key (or legacy `anon` key). These are intended for browser apps. Never share the database password, a `service_role` key, or a secret API key.
+15. Do not upload real client or accounting data until all ten migrations have been applied and authentication, database access, and email delivery have been tested.
 
 The `create_organization(name, registration_code)` RPC creates an organization for the signed-in user and makes that user its owner. Team invitations need a server-side endpoint; clients must not be allowed to write directly to `organization_members`.
 
