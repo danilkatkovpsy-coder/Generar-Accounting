@@ -334,7 +334,7 @@
     const organizationIds = memberships.map((membership) => membership.organization_id);
     const { data: organization, error: organizationError } = await supabaseClient
       .from("organizations")
-      .select("id, name, registration_code, address, phone, email, bank_name, bank_swift, bank_iban")
+      .select("id, name, registration_code, kmkr_number, vat_registered, address, phone, email, bank_name, bank_swift, bank_iban")
       .eq("id", organizationIds[0])
       .single();
 
