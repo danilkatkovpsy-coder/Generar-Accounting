@@ -1,4 +1,4 @@
-create table public.invoice_payments (
+create table if not exists public.invoice_payments (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null,
   invoice_id uuid not null,
@@ -12,15 +12,17 @@ create table public.invoice_payments (
     on delete cascade
 );
 
-create index invoice_payments_invoice_date_idx
+create index if not exists invoice_payments_invoice_date_idx
   on public.invoice_payments (organization_id, invoice_id, paid_at desc);
 
 alter table public.invoice_payments enable row level security;
 
+drop policy if exists "Organization members can read invoice payments" on public.invoice_payments;
 create policy "Organization members can read invoice payments"
   on public.invoice_payments for select to authenticated
   using ((select public.is_organization_member(organization_id)));
 
+drop policy if exists "Authorized roles can record invoice payments" on public.invoice_payments;
 create policy "Authorized roles can record invoice payments"
   on public.invoice_payments for insert to authenticated
   with check ((select public.has_organization_role(organization_id, array['owner', 'accountant', 'administrator'])));
@@ -90,3 +92,5 @@ $$;
 
 revoke all on function public.record_invoice_payment(uuid, uuid, numeric, text, timestamptz) from public;
 grant execute on function public.record_invoice_payment(uuid, uuid, numeric, text, timestamptz) to authenticated;
+
+notify pgrst, 'reload schema';
