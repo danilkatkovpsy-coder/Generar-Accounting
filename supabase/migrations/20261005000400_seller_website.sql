@@ -7,5 +7,5 @@ alter table public.organization_accounting_data
     'purchases', 'expenses', 'suppliers', 'supplierInvoices', 'articles',
     'background', 'logo', 'color', 'theme', 'designTokens',
     'invoiceNumberStart', 'paymentTermsDays', 'permissions', 'emailTemplate',
-    'sellerWebsite'
+    'sellerWebsite', 'invoiceLateFee'
   ));
