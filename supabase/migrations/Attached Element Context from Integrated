@@ -1,0 +1,65 @@
+Attached Element Context from Integrated Browser
+
+Element: span.nav-label
+
+URL: file:///Users/daniellindenberg/Desktop/Arvesemu/index.html
+
+HTML Path: header.topbar > nav#appNav.app-nav > button.nav-button > span.nav-label
+
+Outer HTML:
+```html
+<span class="nav-label" data-i18n="navExpenses">Расходы</span>
+```
+
+Dimensions:
+- top: 109px
+- left: 418px
+- width: 58px
+- height: 19px
+
+CSS:
+```css
+* { box-sizing:border-box }
+
+/* Inherited */
+button, input, textarea, select { font:inherit }
+button { cursor:pointer }
+.nav-button { color:var(--muted); font-size:12px; white-space:nowrap }
+.nav-button { color:#4f5d52; font-size:16px; font-weight:600; text-align:left; white-space:nowrap }
+.nav-button:hover, .nav-button[aria-current="page"] { color:var(--accent-dark) }
+.nav-button[aria-current="page"] { color:#fff }
+.app-nav .nav-button { color:rgba(255,255,255,.94) }
+.app-nav .nav-button { font-size:14px; font-weight:600 }
+.app-nav .nav-button[aria-current="page"] { color:var(--green) }
+.app-nav .nav-button[aria-current="page"] { color:#203c34 }
+body { color:var(--ink) }
+:root { font-family:"Avenir Next",Avenir,"Segoe UI",sans-serif }
+
+/* Resolved values */
+box-sizing: border-box;
+color: rgb(32, 60, 52);
+cursor: pointer;
+display: block;
+font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+font-feature-settings: normal;
+font-kerning: auto;
+font-size: 14px;
+font-size-adjust: none;
+font-stretch: 100%;
+font-style: normal;
+font-weight: 600;
+height: 19px;
+letter-spacing: normal /*UA*/;
+line-height: normal;
+text-align: left;
+text-indent: 0px /*UA*/;
+text-transform: none /*UA*/;
+width: 58.4141px;
+word-spacing: 0px /*UA*/;
+
+/* CSS variables */
+--muted: #74817c;
+--green: #16834b;
+--accent-dark: #56645e;
+--ink: #1d2b27;
+```
