@@ -4,10 +4,10 @@ alter table public.invoices
 
 update public.invoices as invoice
 set created_by_email = coalesce(invoice.created_by_email, author.email),
-    updated_by_email = coalesce(invoice.updated_by_email, author.email)
+    updated_by_email = invoice.updated_by_email
 from auth.users as author
 where author.id = invoice.created_by
-  and (invoice.created_by_email is null or invoice.updated_by_email is null);
+  and invoice.created_by_email is null;
 
 create or replace function public.capture_invoice_actor_emails()
 returns trigger
