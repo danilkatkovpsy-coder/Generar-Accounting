@@ -25,20 +25,29 @@
           <h2 id="supabaseAuthTitle" data-auth-copy="signInTitle">Вход в аккаунт</h2>
           <div class="supabase-auth-tabs" role="group" aria-label="Авторизация">
             <button type="button" id="supabaseSignInTab" data-auth-copy="signInTab" hidden>Войти</button>
+            <span class="supabase-auth-register-label" id="supabaseAuthRegisterLabel" data-auth-copy="newUser">Новый пользователь?</span>
             <button type="button" id="supabaseSignUpTab" data-auth-copy="signUpTab">Регистрация</button>
-            <button class="supabase-auth-forgot" id="supabaseForgotPassword" type="button" data-auth-copy="forgotPassword">Забыли пароль?</button>
+            <span class="supabase-auth-register-arrow" id="supabaseAuthRegisterArrow" aria-hidden="true">→</span>
           </div>
           <form id="supabaseAuthForm">
         <div class="supabase-auth-field">
           <label for="supabaseAuthEmail" data-auth-copy="email">Электронная почта</label>
-          <input id="supabaseAuthEmail" type="email" autocomplete="email" required>
+          <div class="supabase-auth-input-control">
+            <svg class="supabase-auth-input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg>
+            <input id="supabaseAuthEmail" type="email" autocomplete="email" data-auth-placeholder="emailPlaceholder" required>
+          </div>
         </div>
         <div class="supabase-auth-field">
           <label for="supabaseAuthPassword" data-auth-copy="password">Пароль</label>
           <div class="supabase-auth-password-control">
-            <input id="supabaseAuthPassword" type="password" minlength="8" autocomplete="current-password" required>
+            <svg class="supabase-auth-input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg>
+            <input id="supabaseAuthPassword" type="password" minlength="8" autocomplete="current-password" data-auth-placeholder="passwordPlaceholder" required>
             <button class="supabase-password-toggle" id="supabasePasswordToggle" type="button" aria-label="Показать пароль" title="Показать пароль" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
           </div>
+        </div>
+        <div class="supabase-auth-options" id="supabaseAuthOptions">
+          <label class="supabase-auth-remember" for="supabaseRememberMe"><input id="supabaseRememberMe" type="checkbox"><span data-auth-copy="rememberMe">Запомнить меня</span></label>
+          <button class="supabase-auth-forgot" id="supabaseForgotPassword" type="button" data-auth-copy="forgotPassword">Забыли пароль?</button>
         </div>
         <div class="supabase-auth-field" id="supabaseSignupConfirmField" hidden>
           <label for="supabaseSignupConfirmPassword" data-auth-copy="confirmSignupPassword">Подтвердите пароль</label>
@@ -111,6 +120,11 @@
 
   const signInTab = document.getElementById("supabaseSignInTab");
   const signUpTab = document.getElementById("supabaseSignUpTab");
+  const registerLabel = document.getElementById("supabaseAuthRegisterLabel");
+  const registerArrow = document.getElementById("supabaseAuthRegisterArrow");
+  const authEmailInput = document.getElementById("supabaseAuthEmail");
+  const rememberMeCheckbox = document.getElementById("supabaseRememberMe");
+  const authOptions = document.getElementById("supabaseAuthOptions");
   const authForm = document.getElementById("supabaseAuthForm");
   const authSubmit = document.getElementById("supabaseAuthSubmit");
   const authSubmitLabel = document.getElementById("supabaseAuthSubmitLabel");
@@ -178,9 +192,24 @@
       setupError: "Supabase'i ühendust ei õnnestunud laadida. Kontrolli seadistust ja internetiühendust."
     }
   };
+  authText.ru.newUser = "Новый пользователь?";
+  authText.ru.rememberMe = "Запомнить меня";
+  authText.ru.emailPlaceholder = "Ваш адрес электронной почты";
+  authText.ru.passwordPlaceholder = "Ваш пароль";
+  authText.et.newUser = "Uus kasutaja?";
+  authText.et.rememberMe = "Jäta mind meelde";
+  authText.et.emailPlaceholder = "Teie e-posti aadress";
+  authText.et.passwordPlaceholder = "Teie parool";
   let language = "et";
   try {
     language = localStorage.getItem("accounting-language-choice") === "ru" ? "ru" : "et";
+  } catch {}
+  try {
+    const rememberedEmail = localStorage.getItem("supabase-auth-remembered-email");
+    if (rememberedEmail) {
+      authEmailInput.value = rememberedEmail;
+      rememberMeCheckbox.checked = true;
+    }
   } catch {}
 
   function translate(key) {
@@ -196,14 +225,20 @@
     root.querySelectorAll("[data-auth-copy]").forEach((element) => {
       element.textContent = translate(element.dataset.authCopy);
     });
+    root.querySelectorAll("[data-auth-placeholder]").forEach((element) => {
+      element.placeholder = translate(element.dataset.authPlaceholder);
+    });
     document.querySelector(".supabase-auth-language").setAttribute("aria-label", translate("language"));
     document.querySelector(".supabase-auth-tabs").setAttribute("aria-label", translate("authMethods"));
     document.getElementById("supabaseAuthTitle").textContent = translate(mode === "sign-up" ? "signUpTitle" : "signInTitle");
     authSubmitLabel.textContent = translate(mode === "sign-up" ? "signUpAction" : "signInAction");
     signInTab.hidden = mode === "sign-in";
     signUpTab.hidden = mode === "sign-up";
+    registerLabel.hidden = mode !== "sign-in";
+    registerArrow.hidden = mode !== "sign-in";
     forgotPasswordButton.textContent = translate("forgotPassword");
     forgotPasswordButton.hidden = mode !== "sign-in";
+    authOptions.hidden = mode !== "sign-in";
     signupConfirmField.hidden = mode !== "sign-up";
     signupConfirmPassword.required = mode === "sign-up";
     passwordInput.autocomplete = mode === "sign-up" ? "off" : "current-password";
@@ -425,6 +460,11 @@
 
   authForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    try {
+      const email = authEmailInput.value.trim();
+      if (rememberMeCheckbox.checked && email) localStorage.setItem("supabase-auth-remembered-email", email);
+      else localStorage.removeItem("supabase-auth-remembered-email");
+    } catch {}
     authSubmit.disabled = true;
     setMessage(authMessage, mode === "sign-up" ? "createAccountWait" : "signInWait");
 

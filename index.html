@@ -31,6 +31,7 @@
     .app-nav{display:flex;align-items:center;gap:4px;margin-left:auto}.nav-button{min-height:36px;padding:8px 11px;border:0;border-radius:5px;color:var(--muted);background:transparent;font-size:12px;white-space:nowrap}.nav-button:hover,.nav-button[aria-current="page"]{color:var(--accent-dark);background:var(--soft)}.language-switch{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:5px;background:#fffdfa}.language-switch button{min-width:34px;min-height:28px;padding:5px 7px;border:0;border-radius:3px;color:var(--muted);background:transparent;font-size:10px;font-weight:650}.language-switch button[aria-pressed="true"]{color:var(--accent-dark);background:var(--soft)}.account-tools{display:flex;align-items:center;gap:9px}.demo-label{color:var(--muted);font-size:10px;white-space:nowrap}.account-tools select{width:auto;min-height:34px;padding:6px 8px;font-size:11px}.app-view[hidden]{display:none!important}.view-heading{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:20px}.view-heading h1{margin:0;font:28px Georgia,"Times New Roman",serif;font-weight:500}.view-heading p{margin:6px 0 0;color:var(--muted);font-size:13px}.overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}.stat-panel{min-height:112px;padding:17px;background:rgba(255,253,249,.94);border:1px solid var(--line);border-radius:8px}.stat-label{color:var(--muted);font-size:11px}.stat-value{margin-top:16px;font:24px Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums}.overview-columns{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:14px}.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.quick-actions button{min-height:48px;text-align:left}.data-panel{margin-top:15px;padding:18px;background:rgba(255,253,249,.94);border:1px solid var(--line);border-radius:8px}.data-panel h2{margin:0 0 14px;font-size:14px}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;gap:10px}.form-grid .field.wide{grid-column:span 2}.data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th,.data-table td{padding:10px 8px;border-bottom:1px solid #eee7de;text-align:left;vertical-align:top}.data-table th{color:var(--muted);font-size:10px;font-weight:500}.data-table td:last-child,.data-table th:last-child{text-align:right}.table-wrap{overflow:auto}.empty-row{text-align:center!important;color:var(--muted)}.status-pill{display:inline-block;padding:4px 7px;border-radius:4px;color:var(--green);background:#edf3ed;font-size:10px}.report-controls{display:flex;align-items:end;gap:10px;margin-bottom:16px}.report-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}.report-summary .stat-panel{min-height:auto;padding:13px}.report-summary .stat-value{margin-top:8px;font-size:19px}.color-field{width:46px;min-height:36px;padding:4px}.file-label input[type=file]{display:none}.invoice-paper{--invoice-accent:#987453}.invoice-number{color:var(--invoice-accent,var(--accent))}.party-title,.bank-title{color:var(--invoice-accent,var(--accent))}.message:empty{display:none}.global-message{position:fixed;right:20px;bottom:20px;z-index:20;max-width:min(420px,calc(100vw - 40px));padding:12px 16px;border:1px solid var(--line);border-radius:6px;background:var(--paper);box-shadow:0 6px 24px rgba(66,49,31,.12)}
     @media(max-width:1440px){.topbar{flex-wrap:wrap}.app-nav{order:3;flex:1 0 100%;margin:0;overflow-x:auto}.account-tools{margin-left:auto}.overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:760px){.overview-columns{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}.report-summary{grid-template-columns:1fr 1fr}.view-heading{align-items:start;flex-direction:column}.nav-button{padding:8px 9px}.account-tools{gap:5px}.demo-label{display:none}}
+    @media(max-width:760px){#overviewView>.view-heading{align-items:center;flex-direction:row}}
     @media(max-width:420px){.overview-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-panel{padding:13px}.stat-value{font-size:19px}.form-grid{grid-template-columns:1fr}.form-grid .field.wide{grid-column:auto}.report-controls{align-items:stretch;flex-direction:column}}
     .date-range-filter{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 0;border-bottom:1px solid var(--line)}.date-range-filter .field{display:flex;align-items:center;gap:8px}.date-range-filter input[type=date]{width:150px;min-height:34px;padding:7px 9px;font-size:12px}.date-range-filter .history-search{flex:0 1 220px;width:220px;max-width:220px;min-height:34px;padding:7px 9px;font-size:12px}.date-range-filter .text-button{min-height:34px;padding:7px 0}
     @media(max-width:520px){.date-range-filter{display:grid;grid-template-columns:1fr 1fr}.date-range-filter .field{display:grid}.date-range-filter input[type=date]{width:100%}.date-range-filter .history-search{grid-column:1/-1;width:100%;max-width:none}.date-range-filter .text-button{grid-column:1/-1;justify-self:start}}
@@ -166,18 +167,19 @@
     .supabase-auth-brand small{color:#758078;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
     .supabase-auth-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:20px;padding:14px 20px 18px}
     .supabase-auth-welcome{max-width:350px;padding:4px 0 8px}
-    .supabase-auth-eyebrow{margin:0 0 9px;color:var(--green);font-size:13px;font-weight:650}
-    .supabase-auth-welcome h1{max-width:330px;margin:0 0 12px;font:31px/1.18 Georgia,"Times New Roman",serif;font-weight:500}
-    .supabase-auth-welcome-copy{max-width:330px;margin:0;color:#34433c;font-size:15px;line-height:1.55}
-    .supabase-auth-welcome-note{margin:16px 0 0;color:#758078;font-size:14px;line-height:1.45}
+    .supabase-auth-eyebrow{margin:0 0 11px;color:var(--green);font-size:15px;font-weight:650}
+    .supabase-auth-welcome h1{max-width:360px;margin:0 0 14px;font:40px/1.14 Georgia,"Times New Roman",serif;font-weight:500}
+    .supabase-auth-welcome-copy{max-width:360px;margin:0;color:#34433c;font-size:18px;line-height:1.45}
+    .supabase-auth-welcome-note{margin:18px 0 0;color:#758078;font-size:16px;line-height:1.45}
     .supabase-auth-panel{width:100%;max-width:360px;justify-self:end;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
     .supabase-auth-language{display:flex;gap:2px;padding:3px;border-radius:5px;background:#f0f3f0}
     .supabase-auth-language button{min-width:37px;min-height:30px;border:0;border-radius:3px;color:#59655c;background:transparent;font:inherit;font-size:12px;cursor:pointer}
     .supabase-auth-language button[aria-pressed="true"]{color:#26352b;background:#fff;box-shadow:0 1px 3px rgba(20,35,24,.12)}
     .supabase-auth-panel h1{margin:0 0 20px;font-size:18px;font-weight:550}
     #supabaseAuthTitle{margin:0 0 16px;font-size:24px;font-weight:600}
-    .supabase-auth-tabs{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:32px;margin:0;padding:0 0 8px;border-bottom:1px solid #e2e8e2}
-    .supabase-auth-tabs button{min-height:28px;padding:3px 0;border:0;color:#3984a8;background:transparent;font:inherit;font-size:14px;font-weight:550;text-decoration:none;cursor:pointer}
+    .supabase-auth-tabs{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;margin:0;padding:0;border:0;color:#69756d;font-size:14px}
+    .supabase-auth-tabs button{min-height:28px;padding:3px 0;border:0;color:#118050;background:transparent;font:inherit;font-size:14px;font-weight:650;text-decoration:none;cursor:pointer}
+    .supabase-auth-register-arrow{color:#118050;font-size:18px}
     .supabase-auth-tabs button:hover{text-decoration:underline}
     .supabase-auth-tabs button[hidden]{display:none!important}
     .supabase-auth-field{display:grid;gap:5px;margin:9px 0}
@@ -185,9 +187,14 @@
     .supabase-auth-field label{font-size:13px;font-weight:550}
     .supabase-auth-field input{width:100%;min-height:42px;padding:9px 11px;border:1px solid #cdd7ce;border-radius:4px;background:#fff;font:inherit}
     .supabase-auth-field input:focus{border-color:#47775b;outline:3px solid rgba(71,119,91,.15)}
-    .supabase-auth-password-control{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:7px;align-items:center}
+    .supabase-auth-input-control,.supabase-auth-password-control{display:grid;grid-template-columns:20px minmax(0,1fr) 38px;gap:9px;align-items:center;min-height:46px;padding:0 8px 0 12px;border:1px solid #cdd7ce;border-radius:8px;background:#fff}
+    .supabase-auth-input-control{grid-template-columns:20px minmax(0,1fr);padding-right:12px}
+    .supabase-auth-input-control:focus-within,.supabase-auth-password-control:focus-within{border-color:#16804f;outline:3px solid rgba(22,128,79,.12)}
+    .supabase-auth-input-icon{width:20px;height:20px;fill:none;stroke:#929c96;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .supabase-auth-field .supabase-auth-input-control input,.supabase-auth-field .supabase-auth-password-control input{min-width:0;min-height:42px;padding:7px 0;border:0;border-radius:0;background:transparent;outline:0;box-shadow:none}
+    .supabase-auth-field .supabase-auth-input-control input:focus,.supabase-auth-field .supabase-auth-password-control input:focus{border:0;outline:0;box-shadow:none}
     .supabase-auth-password-control input{min-width:0}
-    .supabase-password-toggle{display:grid;width:42px;height:42px;place-items:center;padding:8px;border:1px solid #cdd7ce;border-radius:4px;color:#536457;background:#fff;cursor:pointer}
+    .supabase-password-toggle{display:grid;width:38px;height:38px;place-items:center;padding:8px;border:0;border-radius:50%;color:#536457;background:transparent;cursor:pointer}
     .supabase-password-toggle:hover,.supabase-password-toggle[aria-pressed="true"]{background:#edf3ee}
     .supabase-password-toggle:focus-visible{outline:3px solid rgba(71,119,91,.2);outline-offset:2px}
     .supabase-password-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -445,6 +452,63 @@
     #invoicePreview .invoice-table th:nth-child(6),#invoicePreview .invoice-table td:nth-child(6){width:16%}
     #invoicePreview .invoice-bottom .tax-note{width:50%;margin-left:auto}
     #invoicePreview.invoice-paper{background-color:var(--invoice-primary-background,#ffffff)}
+  </style>
+  <style id="mobile-auth-minimal">
+    #supabase-auth-root .supabase-auth-field>label{color:#1d2b27}
+    #supabase-auth-root .supabase-auth-panel{display:flex;flex-direction:column;align-items:stretch}
+    #supabase-auth-root #supabaseAuthForm{order:1}
+    #supabase-auth-root .supabase-auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+    #supabase-auth-root .supabase-auth-options[hidden]{display:none!important}
+    #supabase-auth-root .supabase-auth-remember{display:inline-flex;align-items:center;gap:8px;min-height:34px;color:#647068;font-size:13px;cursor:pointer}
+    #supabase-auth-root .supabase-auth-remember input{width:19px;height:19px;margin:0;accent-color:#12804f}
+    #supabase-auth-root .supabase-auth-options .supabase-auth-forgot{margin:0;color:#12804f;font-size:13px;font-weight:600;text-decoration:none}
+    #supabase-auth-root .supabase-auth-divider{order:2}
+    #supabase-auth-root #supabaseGoogleButton{order:3}
+    #supabase-auth-root #supabaseGuestButton{order:4}
+    #supabase-auth-root .supabase-auth-tabs{order:5;justify-content:center}
+    #supabase-auth-root #supabaseAuthMessage{order:6}
+    #supabase-auth-root .supabase-auth-field .supabase-auth-input-control input,#supabase-auth-root .supabase-auth-field .supabase-auth-password-control input{min-width:0;min-height:42px;padding:7px 0;border:0;border-radius:0;background:transparent;outline:0;box-shadow:none}
+    #supabase-auth-root .supabase-auth-field .supabase-auth-input-control input:focus,#supabase-auth-root .supabase-auth-field .supabase-auth-password-control input:focus{border:0;outline:0;box-shadow:none}
+    @media(max-width:480px){
+      #supabase-auth-root{position:fixed;inset:0;width:100%;height:100vh;height:100dvh;min-height:0;padding:0;overflow:hidden;place-items:stretch;background:#fbfcfa;isolation:isolate}
+      .supabase-auth-shell{position:relative;z-index:1;width:100%;height:100%;min-height:0;grid-template-rows:auto minmax(0,1fr);background:transparent;box-shadow:none}
+      .supabase-auth-header{min-height:70px;padding:9px 18px;border:0;border-bottom:3px solid var(--green)}
+      .supabase-auth-brand{gap:9px}
+      .supabase-auth-brand img{width:48px;height:48px}
+      .supabase-auth-brand strong{font:700 24px Arial,sans-serif}
+      .supabase-auth-brand small{font-size:9px;letter-spacing:.1em}
+      .supabase-auth-language{background:#f1f4f1}
+      .supabase-auth-language button{min-width:38px;min-height:32px}
+      .supabase-auth-layout{width:100%;max-width:480px;height:calc(100dvh - 70px);min-height:0;margin:0 auto;overflow-y:auto;overscroll-behavior:contain;align-content:start;justify-items:stretch;gap:20px;padding:20px 29px max(22px,env(safe-area-inset-bottom))}
+      .supabase-auth-welcome{width:100%;max-width:none;padding:12px 0 0}
+      .supabase-auth-eyebrow{margin-bottom:12px;font-size:13px;letter-spacing:.15em;text-transform:uppercase}
+      .supabase-auth-welcome h1{max-width:none;margin:0 0 12px;font:700 40px/1.12 Arial,sans-serif}
+      .supabase-auth-welcome-copy{max-width:none;color:#6c7770;font-size:19px;line-height:1.38}
+      .supabase-auth-welcome-note{display:block;margin:12px 0 0;color:#758078;font-size:16px;line-height:1.4}
+      .supabase-auth-panel{display:flex;width:100%;max-width:none;justify-self:stretch;flex-direction:column;align-items:stretch}
+      .supabase-auth-panel #supabaseAuthTitle{display:none}
+      .supabase-auth-panel #supabaseAuthForm{order:1}
+      .supabase-auth-options{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+      .supabase-auth-options[hidden]{display:none!important}
+      .supabase-auth-remember{display:inline-flex;align-items:center;gap:8px;min-height:34px;color:#647068;font-size:13px;cursor:pointer}
+      .supabase-auth-remember input{width:19px;height:19px;margin:0;accent-color:#12804f}
+      .supabase-auth-options .supabase-auth-forgot{margin:0;font-size:13px}
+      .supabase-auth-field{gap:6px;margin:12px 0}
+      .supabase-auth-field label{font-size:14px;font-weight:600}
+      .supabase-auth-input-control,.supabase-auth-password-control{min-height:48px}
+      #supabase-auth-root .supabase-auth-field .supabase-auth-input-control input,#supabase-auth-root .supabase-auth-field .supabase-auth-password-control input{min-height:44px;padding:7px 0;border:0;border-radius:0;background:transparent;outline:0;box-shadow:none}
+      #supabase-auth-root .supabase-auth-field .supabase-auth-input-control input:focus,#supabase-auth-root .supabase-auth-field .supabase-auth-password-control input:focus{border:0;outline:0;box-shadow:none}
+      .supabase-auth-options .supabase-auth-forgot{color:#12804f;font-weight:600;text-decoration:none}
+      .supabase-auth-primary{min-height:52px;margin-top:16px;border-radius:9px;background:#12804f;font-size:17px}
+      .supabase-auth-divider{order:2;margin:15px 0 12px;font-size:13px}
+      .supabase-auth-panel #supabaseGoogleButton{order:3;min-height:46px;border-radius:9px}
+      .supabase-auth-panel #supabaseGuestButton{order:4;min-height:46px;margin-top:8px;border-radius:9px;background:#edf4ee}
+      .supabase-auth-panel .supabase-auth-tabs{order:5;min-height:38px;justify-content:center;gap:7px;border:0}
+      .supabase-auth-tabs button{color:#118050;font-size:14px;font-weight:650}
+      .supabase-auth-register-label{color:#6c7770;font-size:14px}
+      .supabase-auth-panel #supabaseAuthMessage{order:6;text-align:center}
+      .supabase-auth-register-arrow{font-size:20px}
+    }
   </style>
 </head>
 <body>
