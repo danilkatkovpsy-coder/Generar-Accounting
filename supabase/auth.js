@@ -332,20 +332,27 @@
     }
 
     const organizationIds = memberships.map((membership) => membership.organization_id);
-    const { data: organization, error: organizationError } = await supabaseClient
+    const { data: organizations, error: organizationError } = await supabaseClient
       .from("organizations")
       .select("id, name, registration_code, kmkr_number, vat_registered, address, phone, email, bank_name, bank_swift, bank_iban")
-      .eq("id", organizationIds[0])
-      .single();
+      .in("id", organizationIds);
 
-    if (organizationError) {
-      showSetupError({ ru: `${authText.ru.loadOrganizationError}${organizationError.message}`, et: `${authText.et.loadOrganizationError}${organizationError.message}` });
+    if (organizationError || !organizations?.length) {
+      const message = organizationError?.message || "No organizations are available for this account.";
+      showSetupError({ ru: `${authText.ru.loadOrganizationError}${message}`, et: `${authText.et.loadOrganizationError}${message}` });
       return;
     }
 
+    let savedOrganizationId = "";
+    try {
+      savedOrganizationId = localStorage.getItem("accounting-active-company-v1") || "";
+    } catch {}
+    const organization = organizations.find((item) => item.id === savedOrganizationId) || organizations[0];
+    const membership = memberships.find((item) => item.organization_id === organization.id);
+
     try {
       if (!window.GENERAR_ACCOUNTING_APP?.connect) throw new Error("Application connection is unavailable.");
-      await window.GENERAR_ACCOUNTING_APP.connect({ supabase: supabaseClient, user, organization, role: memberships[0].role, language });
+      await window.GENERAR_ACCOUNTING_APP.connect({ supabase: supabaseClient, user, organization, organizations, role: membership.role, language });
         window.applyRoleAccess?.();
       document.documentElement.classList.remove("supabase-auth-required");
       root.remove();
