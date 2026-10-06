@@ -1,0 +1,60 @@
+#supplierInvoiceEditorView .supplier-invoice-composer{display:grid;gap:12px;padding:0;border:0;background:transparent;box-shadow:none}
+#supplierInvoiceEditorView .supplier-invoice-top{display:grid;grid-template-columns:minmax(240px,.9fr) minmax(0,2.1fr);gap:12px}
+#supplierInvoiceEditorView .supplier-invoice-card{min-width:0;padding:12px 14px;border:1px solid #e5e9e6;border-radius:6px;background:#fff}
+#supplierInvoiceEditorView .supplier-invoice-card h3{display:flex;align-items:center;gap:9px;margin:0 0 11px;padding-bottom:9px;border-bottom:1px solid #e8ece9;color:#26352e;font-size:14px}
+#supplierInvoiceEditorView .supplier-invoice-step{color:#b39568;font-variant-numeric:tabular-nums}
+#supplierInvoiceEditorView .supplier-invoice-top .field{min-width:0}
+#supplierInvoiceEditorView .supplier-invoice-details-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:9px 10px}
+#supplierInvoiceEditorView .supplier-invoice-details-grid>.field{grid-column:span 2}
+#supplierInvoiceEditorView .supplier-invoice-details-grid>.field.detail-wide{grid-column:span 3}
+#supplierInvoiceEditorView .supplier-invoice-details-grid>.field.detail-full{grid-column:1/-1}
+#supplierInvoiceEditorView .supplier-invoice-details label,#supplierInvoiceEditorView .supplier-invoice-supplier label,#supplierInvoiceEditorView .supplier-invoice-finance label{font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-details input,#supplierInvoiceEditorView .supplier-invoice-details select{min-height:35px;padding:7px 9px;font-size:12px}
+#supplierInvoiceEditorView .supplier-invoice-supplier .supplier-picker-row{align-items:stretch}
+#supplierInvoiceEditorView .supplier-invoice-supplier .supplier-picker-action{width:34px;height:35px}
+#supplierInvoiceEditorView .supplier-invoice-supplier-address{margin:6px 0 0;color:#78847d;font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-items{padding-bottom:10px}
+#supplierInvoiceEditorView .supplier-invoice-items-heading{display:flex;align-items:center;gap:8px}
+#supplierInvoiceEditorView .supplier-invoice-item-actions{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+#supplierInvoiceEditorView .supplier-invoice-item-actions button{min-height:31px;padding:5px 8px;font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-lines-scroll{max-width:100%;overflow-x:auto}
+#supplierInvoiceEditorView .supplier-invoice-line-grid{display:grid;grid-template-columns:112px minmax(140px,1.45fr) 62px 66px 76px 70px 62px 82px 108px 108px 30px;gap:5px;align-items:center;min-width:980px}
+#supplierInvoiceEditorView .supplier-invoice-line-head{min-height:32px;padding:5px 7px;color:#52605a;background:#e8eeea;font-size:9px;font-weight:650}
+#supplierInvoiceEditorView .supplier-invoice-line{min-height:40px;padding:4px 6px;border-bottom:1px solid #edf0ee}
+#supplierInvoiceEditorView .supplier-invoice-line-grid input,#supplierInvoiceEditorView .supplier-invoice-line-grid select,#supplierInvoiceEditorView .supplier-invoice-line-grid textarea{width:100%;min-width:0;min-height:30px;padding:4px 5px;border:1px solid #dfe5e1;border-radius:4px;background:#fff;font:inherit;font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-line-grid input[type=number]{text-align:right;font-variant-numeric:tabular-nums}
+#supplierInvoiceEditorView .supplier-invoice-line-total{text-align:right;color:#46534c;font-size:10px;font-variant-numeric:tabular-nums}
+#supplierInvoiceEditorView .supplier-invoice-remove{display:grid;width:28px;min-height:28px;place-items:center;padding:0;border:0;color:#66736b;background:transparent}
+#supplierInvoiceEditorView .supplier-invoice-remove:hover{color:#a35446;background:#f8efed}
+#supplierInvoiceEditorView .supplier-invoice-text-line{grid-template-columns:minmax(0,1fr) 30px;min-width:0}
+#supplierInvoiceEditorView .supplier-invoice-add-line{display:inline-flex;align-items:center;gap:5px;min-height:30px;margin-top:7px;padding:4px 7px;border:0;color:#35634d;background:transparent;font-size:11px;font-weight:650}
+#supplierInvoiceEditorView .supplier-invoice-totals{display:grid;gap:5px;width:min(300px,100%);margin:11px 0 0 auto;color:#46534c;font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-total-row{display:flex;justify-content:space-between;gap:12px}
+#supplierInvoiceEditorView .supplier-invoice-rounding{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#supplierInvoiceEditorView .supplier-invoice-rounding input{width:82px;min-height:29px;text-align:right}
+#supplierInvoiceEditorView .supplier-invoice-grand-total{padding-top:6px;border-top:1px solid #dfe5e1;color:#202b25;font-size:14px;font-weight:750}
+#supplierInvoiceEditorView .supplier-invoice-finance{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px;padding:10px;border-radius:6px;background:#f3e7d8}
+#supplierInvoiceEditorView .supplier-invoice-finance .supplier-invoice-card{padding:10px;border-color:#ece9e4}
+#supplierInvoiceEditorView .supplier-invoice-finance .supplier-invoice-card h3{margin-bottom:8px;padding-bottom:7px}
+#supplierInvoiceEditorView .supplier-payment-head,#supplierInvoiceEditorView .supplier-payment-row{display:grid;grid-template-columns:minmax(86px,1fr) minmax(100px,1.1fr) minmax(76px,.9fr) 28px;gap:5px;align-items:center}
+#supplierInvoiceEditorView .supplier-payment-head{padding:3px;color:#66726b;font-size:9px}
+#supplierInvoiceEditorView .supplier-payment-row{margin-bottom:5px}
+#supplierInvoiceEditorView .supplier-payment-row input,#supplierInvoiceEditorView .supplier-payment-row select{width:100%;min-width:0;min-height:29px;padding:4px;font-size:9px}
+#supplierInvoiceEditorView .supplier-payment-row input[type=number]{text-align:right}
+#supplierInvoiceEditorView .supplier-invoice-payment-summary{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:10px;font-weight:650}
+#supplierInvoiceEditorView .supplier-invoice-drop{display:grid;min-height:82px;place-items:center;gap:5px;padding:10px;border:1px dashed #c8d1ca;border-radius:5px;color:#68756e;background:#fbfcfa;text-align:center;font-size:10px;cursor:pointer}
+#supplierInvoiceEditorView .supplier-invoice-drop:hover,#supplierInvoiceEditorView .supplier-invoice-drop:focus-within{border-color:var(--accent);background:#f7f3ec}
+#supplierInvoiceEditorView .supplier-invoice-drop svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#supplierInvoiceEditorView .supplier-invoice-file-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+#supplierInvoiceEditorView .supplier-invoice-file-list{display:grid;gap:5px;margin-top:7px}
+#supplierInvoiceEditorView .supplier-invoice-file-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 7px;border:1px solid #e6ebe7;border-radius:4px;font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#supplierInvoiceEditorView .supplier-invoice-extra textarea{min-height:76px}
+#supplierInvoiceEditorView .supplier-invoice-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#supplierInvoiceEditorView .supplier-invoice-toolbar button{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:6px 9px;font-size:10px}
+#supplierInvoiceEditorView .supplier-invoice-toolbar .supplier-invoice-draft{margin-right:auto}
+#supplierInvoiceEditorView .supplier-invoice-toolbar .supplier-invoice-delete{color:#a35446}
+@media(max-width:980px){#supplierInvoiceEditorView .supplier-invoice-top{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){#supplierInvoiceEditorView .supplier-invoice-details-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#supplierInvoiceEditorView .supplier-invoice-details-grid>.field,#supplierInvoiceEditorView .supplier-invoice-details-grid>.field.detail-wide{grid-column:span 1}#supplierInvoiceEditorView .supplier-invoice-details-grid>.field.detail-full{grid-column:1/-1}#supplierInvoiceEditorView .supplier-invoice-finance{grid-template-columns:minmax(0,1fr)}#supplierInvoiceEditorView .supplier-invoice-toolbar{width:100%}#supplierInvoiceEditorView .supplier-invoice-toolbar button{flex:1;justify-content:center}#supplierInvoiceEditorView .supplier-invoice-toolbar .supplier-invoice-draft{margin-right:0}}
+@media(max-width:480px){#supplierInvoiceEditorView .supplier-invoice-card{padding:9px}#supplierInvoiceEditorView .supplier-invoice-details-grid{grid-template-columns:minmax(0,1fr)}#supplierInvoiceEditorView .supplier-invoice-details-grid>.field,#supplierInvoiceEditorView .supplier-invoice-details-grid>.field.detail-wide,#supplierInvoiceEditorView .supplier-invoice-details-grid>.field.detail-full{grid-column:1}#supplierInvoiceEditorView .supplier-payment-head{display:none}#supplierInvoiceEditorView .supplier-payment-row{grid-template-columns:1fr 1fr}}
+@media print{body.supplier-invoice-printing>*{visibility:hidden!important}body.supplier-invoice-printing #supplierInvoiceEditorView,body.supplier-invoice-printing #supplierInvoiceEditorView *{visibility:visible!important}body.supplier-invoice-printing #supplierInvoiceEditorView{position:absolute;inset:0;width:100%;padding:0!important}body.supplier-invoice-printing .supplier-invoice-toolbar,body.supplier-invoice-printing .supplier-invoice-remove{display:none!important}}

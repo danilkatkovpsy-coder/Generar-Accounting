@@ -1,0 +1,22 @@
+.register-page-footer{margin-top:10px}
+.register-page-numbers{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;color:#5e6c64;font-size:12px}
+.register-page-numbers button,#purchasesView .bank-payment-page-buttons button,#supplierInvoiceRegisterPage .supplier-pagination-pages button{min-width:30px;min-height:30px;padding:4px 8px;border:1px solid #ded5c6;border-radius:4px;color:#405148;background:#f7f3eb;font-size:12px}
+.register-page-numbers button[aria-current="page"],#purchasesView .bank-payment-page-buttons button[aria-current="page"],#supplierInvoiceRegisterPage .supplier-pagination-pages button[aria-current="page"]{border-color:#c7b596;color:#33463a;background:#e6dcc8}
+.register-page-numbers button:hover:not(:disabled),#purchasesView .bank-payment-page-buttons button:hover:not(:disabled),#supplierInvoiceRegisterPage .supplier-pagination-pages button:hover:not(:disabled){background:#eee5d5}
+.register-page-numbers button:disabled,#purchasesView .bank-payment-page-buttons button:disabled,#supplierInvoiceRegisterPage .supplier-pagination-pages button:disabled{opacity:.45;cursor:default}
+.register-page-numbers span,#purchasesView .bank-payment-page-buttons span,#supplierInvoiceRegisterPage .supplier-pagination-pages span{margin-left:4px;color:#5e6c64;font-size:12px;white-space:nowrap}
+.register-page-summary{width:min(400px,100%);margin:28px 0 0;padding:14px 18px;border:1px solid #e2dbd0;border-radius:5px;background:#f0ede6;color:#4f6158}
+.register-page-summary h3{margin:0 0 9px;padding-bottom:8px;border-bottom:1px solid #d7d3cb;color:#425c51;font-size:14px;font-weight:650}
+.register-page-summary dl{display:grid;gap:7px;margin:0}
+.register-page-summary dl>div{display:flex;justify-content:space-between;gap:16px;font-size:12px}
+.register-page-summary dt{color:#586b61}
+.register-page-summary dd{margin:0;font-variant-numeric:tabular-nums;text-align:right}
+@media(max-width:520px){.register-page-summary{width:100%;margin-top:20px;padding:12px}.register-page-numbers{justify-content:center}}
+#salesView .sales-register-page-footer .register-page-numbers{min-height:36px;margin-top:10px}
+#salesView .sales-register-page-footer .register-page-summary{margin-top:26px}
+#purchasesView .bank-payment-pagination{justify-content:center;position:relative;min-height:36px}
+#purchasesView .bank-payment-page-buttons{justify-content:center;flex-wrap:wrap}
+#purchasesView .bank-payment-pagination>.bank-payment-total{position:absolute;right:150px}
+#purchasesView .bank-payment-page-size{position:absolute;right:0}
+#purchasesView .bank-payment-page-summary{margin-top:28px}
+@media(max-width:760px){#purchasesView .bank-payment-pagination{align-items:center;justify-content:center;flex-wrap:wrap;padding-bottom:38px}#purchasesView .bank-payment-pagination>.bank-payment-total{right:auto;left:0;bottom:0}#purchasesView .bank-payment-page-size{right:0;bottom:0}}

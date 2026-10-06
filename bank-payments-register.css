@@ -1,0 +1,46 @@
+#purchasesView .bank-payments-heading{align-items:flex-start;flex-direction:row;justify-content:space-between;gap:16px;margin-bottom:14px}
+#purchasesView .bank-payments-title h1{margin:0 0 3px}
+#purchasesView .bank-payment-export-links{display:flex;gap:10px;margin-top:5px}
+#purchasesView .bank-payment-export-links button{padding:0;border:0;color:#35634d;background:transparent;font-size:11px;font-weight:650}
+#purchasesView .bank-payment-export-links button:hover{text-decoration:underline}
+#purchasesView .bank-payment-page-actions{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+#purchasesView .bank-payment-more-wrap,#purchasesView .bank-payment-help-wrap{position:relative}
+#purchasesView .bank-payment-more-menu,#purchasesView .bank-payment-help-panel{position:absolute;z-index:25;top:calc(100% + 6px);right:0;width:220px;padding:8px;border:1px solid #e3e9e5;border-radius:6px;background:#fff;box-shadow:0 10px 24px rgba(30,52,42,.12)}
+#purchasesView .bank-payment-more-menu[hidden],#purchasesView .bank-payment-help-panel[hidden]{display:none!important}
+#purchasesView .bank-payment-more-menu button{display:flex;align-items:center;gap:9px;width:100%;min-height:38px;padding:8px;border:0;border-radius:4px;color:var(--ink);background:transparent;text-align:left}
+#purchasesView .bank-payment-more-menu button:hover{background:#edf3ef}
+#purchasesView .bank-payment-more-wrap>button svg{width:16px;height:16px;flex:0 0 16px;fill:currentColor}
+#purchasesView .bank-payment-more-wrap>button svg{width:16px;height:16px;flex:0 0 16px;fill:currentColor}
+#purchasesView .bank-payment-more-menu svg,#purchasesView .bank-payment-help-wrap>button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#purchasesView .bank-payment-help-panel{width:260px;padding:12px;color:#53615a;font-size:12px;line-height:1.45}
+#purchasesView .bank-payment-filterbar{display:grid;grid-template-columns:minmax(130px,1.25fr) minmax(110px,.9fr) minmax(120px,.9fr) minmax(120px,.9fr) minmax(110px,.8fr) 36px auto;gap:8px;align-items:end;margin-bottom:12px;padding:10px 11px;border:1px solid #e5eae7;border-radius:6px;background:#fff}
+#purchasesView .bank-payment-filterbar .field{min-width:0;margin:0}
+#purchasesView .bank-payment-filterbar label{font-size:10px}
+#purchasesView .bank-payment-filterbar input,#purchasesView .bank-payment-filterbar select{width:100%;min-width:0;min-height:34px;padding:6px 8px;font-size:11px}
+#purchasesView .bank-payment-clear{display:grid;width:34px;min-width:34px;height:34px;place-items:center;padding:0;color:#66736b}
+#purchasesView .bank-payment-clear svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#purchasesView .bank-payment-apply{min-height:34px;padding:7px 12px;font-size:11px;white-space:nowrap}
+#purchasesView .bank-payment-table-wrap{max-width:100%;overflow-x:auto}
+#purchasesView .bank-payment-table{width:100%;min-width:1050px;table-layout:auto;border-collapse:collapse}
+#purchasesView .bank-payment-table th{padding:9px 8px;color:#58675f;background:#e8eeea;font-size:10px;text-transform:uppercase;white-space:nowrap}
+#purchasesView .bank-payment-table td{padding:9px 8px;border-bottom:1px solid #e7ebe8;font-size:11px;vertical-align:middle}
+#purchasesView .bank-payment-table tbody tr:nth-child(even) td{background:#fafbf9}
+#purchasesView .bank-payment-table tbody tr:hover td{background:#f0f5f1}
+#purchasesView .bank-payment-sort{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;color:inherit;background:transparent;font:inherit;font-weight:650;text-transform:inherit;white-space:nowrap}
+#purchasesView .bank-payment-sort-indicator{color:#7b8980;font-size:10px}
+#purchasesView .bank-payment-number,#purchasesView .bank-payment-amount,#purchasesView .bank-payment-currency,#purchasesView .bank-payment-entered{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+#purchasesView .bank-payment-counterparty{min-width:150px;font-weight:600}
+#purchasesView .bank-payment-description{min-width:260px;max-width:440px;white-space:normal;overflow-wrap:anywhere}
+#purchasesView .bank-payment-account{min-width:130px}
+#purchasesView .bank-payment-amount.is-negative{color:#b42318}
+#purchasesView .bank-payment-author{min-width:125px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#purchasesView .bank-payment-actions{display:flex;justify-content:flex-end;gap:4px}
+#purchasesView .bank-payment-delete{display:grid;width:28px;min-height:28px;place-items:center;padding:0;border:0;color:#78847d;background:transparent}
+#purchasesView .bank-payment-delete:hover{color:#a35446;background:#f8efed}
+#purchasesView .bank-payment-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;color:#66736b;font-size:11px}
+#purchasesView .bank-payment-page-buttons{display:flex;align-items:center;gap:4px}
+#purchasesView .bank-payment-page-size{display:flex;align-items:center;gap:7px}
+#purchasesView .bank-payment-page-size select{min-height:30px;padding:4px 7px;font-size:11px}
+#purchasesView .bank-payment-empty{padding:30px 12px;color:#78847d;text-align:center}
+@media(max-width:1100px){#purchasesView .bank-payment-filterbar{grid-template-columns:repeat(3,minmax(0,1fr))}#purchasesView .bank-payment-filterbar .bank-payment-clear{width:100%}}
+@media(max-width:760px){#purchasesView .bank-payments-heading{flex-direction:column;align-items:stretch}.bank-payment-page-actions{justify-content:flex-start}#purchasesView .bank-payment-filterbar{grid-template-columns:repeat(2,minmax(0,1fr))}#purchasesView .bank-payment-filterbar>.field{min-width:0}#purchasesView .bank-payment-clear,#purchasesView .bank-payment-apply{width:100%}#purchasesView .bank-payment-pagination{align-items:flex-start;flex-direction:column}#purchasesView .bank-payment-page-size{align-self:stretch;justify-content:space-between}}
