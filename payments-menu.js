@@ -30,6 +30,22 @@
     cashPaymentRecipient: "Получатель",
     cashPaymentAmount: "Сумма, EUR",
     cashPaymentNote: "Описание",
+    cashPaymentFormTitle: "Новый кассовый платеж",
+    cashPaymentNew: "＋ Добавить",
+    cashPaymentCancel: "Отмена",
+    cashPaymentAccount: "Касса",
+    cashPaymentReference: "Номер ордера",
+    cashPaymentSearch: "Контрагент или описание",
+    cashPaymentFrom: "С даты",
+    cashPaymentTo: "По дату",
+    cashPaymentAccountFilter: "Касса",
+    cashPaymentAccountAll: "Все кассы",
+    cashPaymentAuthor: "Кем внесено",
+    cashPaymentClear: "Очистить фильтры",
+    cashPaymentApply: "ФИЛЬТРОВАТЬ",
+    cashPaymentNoFilterResults: "По заданным фильтрам платежей нет.",
+    cashPaymentRows: "Строк на странице",
+    cashPaymentTotal: "Всего",
     cashPaymentSave: "Сохранить платеж",
     cashPaymentSaved: "Кассовый платеж сохранен.",
     cashPaymentInvalid: "Укажите дату, получателя и сумму больше нуля.",
@@ -72,6 +88,22 @@
     cashPaymentRecipient: "Saaja",
     cashPaymentAmount: "Summa, EUR",
     cashPaymentNote: "Kirjeldus",
+    cashPaymentFormTitle: "Uus sularahamakse",
+    cashPaymentNew: "＋ Lisa uus",
+    cashPaymentCancel: "Tühista",
+    cashPaymentAccount: "Kassa",
+    cashPaymentReference: "Order nr",
+    cashPaymentSearch: "Osapool või kirjeldus",
+    cashPaymentFrom: "Alates",
+    cashPaymentTo: "Kuni",
+    cashPaymentAccountFilter: "Kassa",
+    cashPaymentAccountAll: "Kõik kassad",
+    cashPaymentAuthor: "Sisestaja",
+    cashPaymentClear: "Tühjenda filtrid",
+    cashPaymentApply: "FILTREERI",
+    cashPaymentNoFilterResults: "Valitud filtritega makseid pole.",
+    cashPaymentRows: "Ridu lehel",
+    cashPaymentTotal: "Kokku",
     cashPaymentSave: "Salvesta makse",
     cashPaymentSaved: "Sularahamakse salvestati.",
     cashPaymentInvalid: "Sisestage kuupäev, saaja ja nullist suurem summa.",
@@ -224,12 +256,31 @@
   exportView.append(exportPanel);
 
   const cashView = makeView("cashPaymentsView", "paymentCashTitle", "paymentCashDescription");
+  const cashHeading = cashView.querySelector(":scope > .view-heading");
+  const cashHeadingContent = cashHeading.firstElementChild;
+  const cashBackButton = cashHeading.querySelector(":scope > button");
+  const cashHeadingActions = document.createElement("div");
+  cashHeadingActions.className = "inline-actions cash-payment-heading-actions";
+  const cashExports = document.createElement("div");
+  cashExports.className = "cash-payment-export-links";
+  cashExports.setAttribute("role", "group");
+  cashExports.setAttribute("aria-label", "Export formats");
+  cashExports.innerHTML = '<button type="button" data-cash-export="pdf">PDF</button><button type="button" data-cash-export="xls">XLS</button><button type="button" data-cash-export="csv">CSV</button>';
+  cashHeadingContent.append(cashExports);
+  const cashAddButton = document.createElement("button");
+  cashAddButton.type = "button";
+  cashAddButton.className = "primary-button cash-payment-add-button";
+  cashAddButton.dataset.i18n = "cashPaymentNew";
+  cashAddButton.textContent = translateCopy("＋ Lisa uus", "cashPaymentNew");
+  cashHeadingActions.append(cashAddButton, cashBackButton);
+  cashHeading.append(cashHeadingActions);
   const cashForm = document.createElement("form");
   cashForm.className = "data-panel cash-payment-form";
-  cashForm.innerHTML = `<div class="field"><label for="cashPaymentDate" data-i18n="cashPaymentDate">Kuupäev</label><input id="cashPaymentDate" type="date" required></div><div class="field"><label for="cashPaymentRecipient" data-i18n="cashPaymentRecipient">Saaja</label><input id="cashPaymentRecipient" required></div><div class="field"><label for="cashPaymentAmount" data-i18n="cashPaymentAmount">Summa, EUR</label><input id="cashPaymentAmount" type="number" min="0.01" step="0.01" required></div><div class="field cash-note-field"><label for="cashPaymentNote" data-i18n="cashPaymentNote">Kirjeldus</label><input id="cashPaymentNote"></div><button class="primary-button" type="submit" data-i18n="cashPaymentSave">Salvesta makse</button>`;
+  cashForm.hidden = true;
+  cashForm.innerHTML = `<div class="cash-payment-form-heading"><h2 data-i18n="cashPaymentFormTitle">Uus sularahamakse</h2><button class="text-button" id="cashPaymentCancel" type="button" data-i18n="cashPaymentCancel">Tühista</button></div><div class="cash-payment-form-fields"><div class="field"><label for="cashPaymentDate" data-i18n="cashPaymentDate">Kuupäev</label><input id="cashPaymentDate" type="date" required></div><div class="field"><label for="cashPaymentRecipient" data-i18n="cashPaymentRecipient">Saaja</label><input id="cashPaymentRecipient" required></div><div class="field"><label for="cashPaymentAccount" data-i18n="cashPaymentAccount">Kassa</label><select id="cashPaymentAccount"><option value="Kassa / Cash">Kassa / Cash</option></select></div><div class="field"><label for="cashPaymentAmount" data-i18n="cashPaymentAmount">Summa, EUR</label><input id="cashPaymentAmount" type="number" min="0.01" step="0.01" required></div><div class="field"><label for="cashPaymentReference" data-i18n="cashPaymentReference">Order nr</label><input id="cashPaymentReference"></div><div class="field cash-note-field"><label for="cashPaymentNote" data-i18n="cashPaymentNote">Kirjeldus</label><input id="cashPaymentNote"></div><button class="primary-button" type="submit" data-i18n="cashPaymentSave">Salvesta makse</button></div>`;
   const cashList = document.createElement("section");
-  cashList.className = "data-panel";
-  cashList.innerHTML = `<div class="table-wrap" id="cashPaymentsTable"></div>`;
+  cashList.className = "data-panel cash-payment-register";
+  cashList.innerHTML = `<div class="cash-payment-filterbar"><label class="field cash-payment-search-field"><span data-i18n="cashPaymentSearch">Osapool või kirjeldus</span><input id="cashPaymentSearch" type="search" placeholder="${translateCopy("Osapool või kirjeldus", "cashPaymentSearch")}"></label><label class="field"><span data-i18n="cashPaymentAccountFilter">Kassa</span><select id="cashPaymentAccountFilter"><option value="">Kassa / Cash</option></select></label><label class="field"><span data-i18n="cashPaymentFrom">Alates</span><input id="cashPaymentFrom" type="date"></label><label class="field"><span data-i18n="cashPaymentTo">Kuni</span><input id="cashPaymentTo" type="date"></label><label class="field"><span data-i18n="cashPaymentAuthor">Sisestaja</span><input id="cashPaymentAuthor" type="search" placeholder="${translateCopy("Sisestaja", "cashPaymentAuthor")}"></label><button class="text-button cash-payment-clear" id="cashPaymentClear" type="button" aria-label="${translateCopy("Tühjenda filtrid", "cashPaymentClear")}" title="${translateCopy("Tühjenda filtrid", "cashPaymentClear")}">×</button><button class="primary-button cash-payment-apply" id="cashPaymentApply" type="button" data-i18n="cashPaymentApply">FILTREERI</button></div><div class="table-wrap cash-payment-table-wrap" id="cashPaymentsTable"></div><div class="cash-payment-pagination"><nav class="register-page-numbers" id="cashPaymentPages" aria-label="Cash payment pages"></nav><span id="cashPaymentTotal"></span><label class="cash-payment-page-size"><span data-i18n="cashPaymentRows">Ridu lehel</span><select id="cashPaymentPageSize" aria-label="Rows per page"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option></select></label></div><section class="register-page-summary cash-payment-summary"><h3 data-i18n="pageSumsTitle">Lehekülje summad</h3><dl><div><dt data-i18n="pageSumRows">Ridu:</dt><dd id="cashPageRows">0</dd></div><div><dt data-i18n="pageSumTotal">Summa:</dt><dd id="cashPageAmount">0,00 EUR</dd></div></dl></section>`;
   cashView.append(cashForm, cashList);
 
   const parseDate = value => {
@@ -308,11 +359,189 @@
   };
   renderPurchases();
 
+  let cashCurrentPage = 1;
+  let cashPageSize = 25;
+  let cashSortKey = "date";
+  let cashSortDirection = -1;
+  const cashAccountFor = item => item.cashRegister || item.bankAccount || "Kassa / Cash";
+  const cashAuthorFor = item => item.enteredBy || item.createdBy || item.createdByEmail || "—";
+  const cashEnteredAtFor = item => {
+    const value = item.enteredAt || item.createdAt;
+    if (!value) return "—";
+    const date = new Date(value);
+    return Number.isNaN(date.valueOf()) ? String(value) : new Intl.DateTimeFormat(language === "et" ? "et-EE" : "ru-RU", { dateStyle: "short", timeStyle: "short" }).format(date);
+  };
+  const cashFilteredRows = () => {
+    const query = document.getElementById("cashPaymentSearch").value.trim().toLocaleLowerCase(language);
+    const authorQuery = document.getElementById("cashPaymentAuthor").value.trim().toLocaleLowerCase(language);
+    const account = document.getElementById("cashPaymentAccountFilter").value;
+    const from = document.getElementById("cashPaymentFrom").value;
+    const to = document.getElementById("cashPaymentTo").value;
+    return purchases.map((item, index) => ({ item, index })).filter(({ item }) => {
+      if (item.paymentMethod !== "cash" && item.category !== "cash") return false;
+      const searchText = `${item.supplier || item.counterparty || ""} ${item.note || item.description || ""} ${item.referenceNumber || item.orderNumber || ""}`.toLocaleLowerCase(language);
+      return isWithinDateRange(item.date, from, to)
+        && searchText.includes(query)
+        && cashAuthorFor(item).toLocaleLowerCase(language).includes(authorQuery)
+        && (!account || cashAccountFor(item) === account);
+    });
+  };
   const renderCashPayments = () => {
-    const rows = purchases.map((item, index) => ({ item, index })).filter(({ item }) => item.paymentMethod === "cash");
-    document.getElementById("cashPaymentsTable").innerHTML = rows.length ? `<table class="data-table"><thead><tr><th>${translateCopy("Дата", "paymentDateColumn")}</th><th>${translateCopy("Получатель", "paymentRecipientColumn")}</th><th>${translateCopy("Описание", "paymentDescriptionColumn")}</th><th>${translateCopy("Сумма", "paymentAmountColumn")}</th></tr></thead><tbody>${rows.map(({ item }) => `<tr><td>${escapeHtml(formatDate(item.date))}</td><td>${escapeHtml(item.supplier)}</td><td>${escapeHtml(item.note || "")}</td><td>${money(item.amount)} ${escapeHtml(item.currency || "EUR")}</td></tr>`).join("")}</tbody></table>` : `<p class="payments-empty" data-i18n="cashPaymentNoRows">${translateCopy("Кассовых платежей пока нет.", "cashPaymentNoRows")}</p>`;
+    const accountSelect = document.getElementById("cashPaymentAccountFilter");
+    const selectedAccount = accountSelect.value;
+    const cashAccounts = [...new Set(purchases.filter(item => item.paymentMethod === "cash" || item.category === "cash").map(cashAccountFor))];
+    if (!cashAccounts.length) cashAccounts.push("Kassa / Cash");
+    accountSelect.innerHTML = `<option value="">${translateCopy("Kõik kassad", "cashPaymentAccountAll")}</option>${cashAccounts.map(account => `<option value="${escapeHtml(account)}">${escapeHtml(account)}</option>`).join("")}`;
+    accountSelect.value = cashAccounts.includes(selectedAccount) ? selectedAccount : "";
+    const columns = [
+      ["number", "NR", record => record.index + 1, "cash-payment-number"],
+      ["counterparty", "TEINE OSAPOOL", record => record.item.supplier || record.item.counterparty || "—", "cash-payment-counterparty"],
+      ["description", "KIRJELDUS", record => record.item.note || record.item.description || "—", "cash-payment-description"],
+      ["account", "KASSA", record => cashAccountFor(record.item), "cash-payment-account"],
+      ["date", "KUUPÄEV", record => record.item.date || "", "cash-payment-date"],
+      ["amount", "SUMMA", record => Number(record.item.amount) || 0, "cash-payment-amount"],
+      ["currency", "€/$", record => record.item.currency || "EUR", "cash-payment-currency"],
+      ["reference", "ORDER NR", record => record.item.referenceNumber || record.item.orderNumber || "—", "cash-payment-reference"],
+      ["enteredAt", "SISESTATUD", record => record.item.enteredAt || record.item.createdAt || "", "cash-payment-entered"],
+      ["enteredBy", "SISESTAJA", record => cashAuthorFor(record.item), "cash-payment-author"]
+    ];
+    const rows = cashFilteredRows().sort((first, second) => {
+      const column = columns.find(entry => entry[0] === cashSortKey) || columns[4];
+      const a = column[2](first), b = column[2](second);
+      const comparison = typeof a === "number" && typeof b === "number" ? a - b : String(a).localeCompare(String(b), language, { numeric: true, sensitivity: "base" });
+      return comparison * cashSortDirection;
+    });
+    const pageCount = Math.max(1, Math.ceil(rows.length / cashPageSize));
+    if (cashCurrentPage > pageCount) cashCurrentPage = pageCount;
+    const visible = rows.slice((cashCurrentPage - 1) * cashPageSize, cashCurrentPage * cashPageSize);
+    const table = document.createElement("table");
+    table.className = "data-table cash-payment-table";
+    const header = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    for (const [key, title] of columns) {
+      const th = document.createElement("th");
+      const sortButton = document.createElement("button");
+      sortButton.type = "button";
+      sortButton.className = "cash-payment-sort";
+      sortButton.dataset.sort = key;
+      sortButton.innerHTML = `<span>${escapeHtml(key === "counterparty" ? translateCopy("Контрагент", "paymentRecipientColumn") : key === "description" ? translateCopy("Описание", "paymentDescriptionColumn") : key === "date" ? translateCopy("Дата", "paymentDateColumn") : key === "amount" ? translateCopy("Сумма", "paymentAmountColumn") : title)}</span><span class="cash-payment-sort-indicator">↕</span>`;
+      sortButton.addEventListener("click", () => {
+        cashSortDirection = cashSortKey === key ? -cashSortDirection : key === "date" ? -1 : 1;
+        cashSortKey = key;
+        renderCashPayments();
+      });
+      th.append(sortButton);
+      headerRow.append(th);
+    }
+    header.append(headerRow);
+    table.append(header);
+    const body = document.createElement("tbody");
+    if (visible.length) {
+      for (const record of visible) {
+        const values = columns.map(([key, , getValue]) => getValue(record));
+        const row = document.createElement("tr");
+        row.innerHTML = values.map((value, columnIndex) => {
+          const [key, , , className] = columns[columnIndex];
+          const content = key === "date" ? formatDate(value) || "—"
+            : key === "enteredAt" ? escapeHtml(cashEnteredAtFor(record.item))
+              : key === "amount" ? escapeHtml(money(value))
+                : escapeHtml(value ?? "—");
+          return `<td class="${className}">${content}</td>`;
+        }).join("");
+        body.append(row);
+      }
+    } else {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td class="empty-row" colspan="10">${translateCopy(rows.length ? "По заданным фильтрам платежей нет." : "Кассовых платежей пока нет.", rows.length ? "cashPaymentNoFilterResults" : "cashPaymentNoRows")}</td>`;
+      body.append(row);
+    }
+    table.append(body);
+    document.getElementById("cashPaymentsTable").replaceChildren(table);
+    table.querySelectorAll("[data-sort]").forEach(button => {
+      button.querySelector(".cash-payment-sort-indicator").textContent = button.dataset.sort === cashSortKey ? (cashSortDirection > 0 ? "↑" : "↓") : "↕";
+    });
+    const pageNav = document.getElementById("cashPaymentPages");
+    pageNav.replaceChildren();
+    const addPageButton = (label, target, active = false, disabled = false, ariaLabel = "") => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.disabled = disabled;
+      if (ariaLabel) button.setAttribute("aria-label", ariaLabel);
+      if (active) button.setAttribute("aria-current", "page");
+      button.addEventListener("click", () => { cashCurrentPage = target; renderCashPayments(); });
+      pageNav.append(button);
+    };
+    addPageButton("«", 1, false, cashCurrentPage === 1, "First page");
+    addPageButton("‹", Math.max(1, cashCurrentPage - 1), false, cashCurrentPage === 1, "Previous page");
+    const start = Math.max(1, Math.min(cashCurrentPage - 4, pageCount - 8));
+    for (let target = start; target <= Math.min(pageCount, start + 8); target++) addPageButton(String(target), target, target === cashCurrentPage);
+    addPageButton("›", Math.min(pageCount, cashCurrentPage + 1), false, cashCurrentPage === pageCount, "Next page");
+    addPageButton("»", pageCount, false, cashCurrentPage === pageCount, "Last page");
+    const pageLabel = document.createElement("span");
+    pageLabel.textContent = `${translateCopy("Страница", "salesPageOf")} ${cashCurrentPage} / ${pageCount}`;
+    pageNav.append(pageLabel);
+    document.getElementById("cashPaymentTotal").textContent = `${translateCopy("Всего", "cashPaymentTotal")}: ${rows.length}`;
+    document.getElementById("cashPaymentPageSize").value = String(cashPageSize);
+    const pageAmount = visible.reduce((sum, record) => sum + (Number(record.item.amount) || 0), 0);
+    document.getElementById("cashPageRows").textContent = String(visible.length);
+    document.getElementById("cashPageAmount").textContent = `${money(pageAmount)} EUR`;
     applyLanguage(language);
   };
+  const exportCashRegister = async format => {
+    if (!can("exportInvoices")) { denyAction("exportInvoices"); return; }
+    const rows = cashFilteredRows().sort((first, second) => String(second.item.date || "").localeCompare(String(first.item.date || "")));
+    if (!rows.length) { showMessage(translateCopy("По заданным фильтрам платежей нет.", "cashPaymentNoFilterResults"), true); return; }
+    const data = [["Nr", "Teine osapool", "Kirjeldus", "Kassa", "Kuupäev", "Summa", "Valuuta", "Order nr", "Sisestatud", "Sisestaja"], ...rows.map(({ item, index }) => [index + 1, item.supplier || "", item.note || "", cashAccountFor(item), item.date || "", Number(item.amount || 0).toFixed(2), item.currency || "EUR", item.referenceNumber || "", cashEnteredAtFor(item), cashAuthorFor(item)])];
+    let blob;
+    if (format === "csv") blob = new Blob(["\ufeff", data.map(row => row.map(csvCell).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" });
+    else if (format === "xls") {
+      const xml = data.map(row => `<Row>${row.map(value => `<Cell><Data ss:Type="String">${escapeHtml(value)}</Data></Cell>`).join("")}</Row>`).join("");
+      blob = new Blob([`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Kassamaksed"><Table>${xml}</Table></Worksheet></Workbook>`], { type: "application/vnd.ms-excel;charset=utf-8" });
+    } else {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1500; canvas.height = Math.max(500, 120 + rows.length * 32);
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#fff"; context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#29483d"; context.font = "bold 26px Arial";
+      context.fillText(translateCopy("Кассовые платежи", "paymentCashTitle"), 32, 42);
+      context.fillStyle = "#e8eeea"; context.fillRect(32, 62, 1436, 32);
+      const widths = [48, 190, 330, 150, 105, 95, 65, 100, 150, 160];
+      context.fillStyle = "#35483e"; context.font = "bold 11px Arial";
+      let x = 38; data[0].forEach((value, index) => { context.fillText(String(value), x, 83, widths[index] - 6); x += widths[index]; });
+      data.slice(1).forEach((row, rowIndex) => { const y = 94 + rowIndex * 32; context.fillStyle = rowIndex % 2 ? "#fafbf9" : "#fff"; context.fillRect(32, y, 1436, 32); context.fillStyle = "#26352e"; context.font = "11px Arial"; x = 38; row.forEach((value, index) => { context.fillText(String(value), x, y + 21, widths[index] - 6); x += widths[index]; }); });
+      blob = await createCanvasPdfBlob(canvas);
+    }
+    triggerBlobDownload(blob, `kassamaksed-${localDate()}.${format}`);
+  };
+  cashExports.querySelectorAll("[data-cash-export]").forEach(button => button.addEventListener("click", () => exportCashRegister(button.dataset.cashExport)));
+  cashAddButton.addEventListener("click", () => {
+    cashForm.hidden = false;
+    document.getElementById("cashPaymentDate").value = localDate();
+    document.getElementById("cashPaymentRecipient").focus();
+  });
+  document.getElementById("cashPaymentCancel").addEventListener("click", () => {
+    cashForm.reset();
+    document.getElementById("cashPaymentDate").value = localDate();
+    cashForm.hidden = true;
+  });
+  document.getElementById("cashPaymentApply").addEventListener("click", () => { cashCurrentPage = 1; renderCashPayments(); });
+  document.getElementById("cashPaymentClear").addEventListener("click", () => {
+    for (const id of ["cashPaymentSearch", "cashPaymentAuthor", "cashPaymentFrom", "cashPaymentTo"]) document.getElementById(id).value = "";
+    document.getElementById("cashPaymentAccountFilter").value = "";
+    cashCurrentPage = 1;
+    renderCashPayments();
+  });
+  ["cashPaymentSearch", "cashPaymentAuthor", "cashPaymentAccountFilter", "cashPaymentFrom", "cashPaymentTo"].forEach(id => {
+    document.getElementById(id).addEventListener("keydown", event => {
+      if (event.key === "Enter") { event.preventDefault(); cashCurrentPage = 1; renderCashPayments(); }
+    });
+  });
+  document.getElementById("cashPaymentPageSize").addEventListener("change", event => {
+    cashPageSize = Number(event.target.value) || 25;
+    cashCurrentPage = 1;
+    renderCashPayments();
+  });
   document.getElementById("paymentExportFrom").addEventListener("change", renderExportPreview);
   document.getElementById("paymentExportTo").addEventListener("change", renderExportPreview);
   document.getElementById("paymentExportAction").addEventListener("click", () => {
@@ -356,12 +585,22 @@
   });
   cashForm.addEventListener("submit", event => {
     event.preventDefault();
-    const item = { date: document.getElementById("cashPaymentDate").value, supplier: document.getElementById("cashPaymentRecipient").value.trim(), amount: parseAmount(document.getElementById("cashPaymentAmount").value), amountDue: 0, currency: "EUR", category: "cash", note: document.getElementById("cashPaymentNote").value.trim(), paymentMethod: "cash" };
+    const item = {
+      id: crypto.randomUUID(), date: document.getElementById("cashPaymentDate").value,
+      supplier: document.getElementById("cashPaymentRecipient").value.trim(),
+      amount: parseAmount(document.getElementById("cashPaymentAmount").value), amountDue: 0,
+      currency: "EUR", category: "cash", cashRegister: document.getElementById("cashPaymentAccount").value,
+      referenceNumber: document.getElementById("cashPaymentReference").value.trim(),
+      note: document.getElementById("cashPaymentNote").value.trim(), paymentMethod: "cash",
+      direction: "outgoing", enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—"
+    };
     if (!item.date || !item.supplier || item.amount <= 0) { showMessage(translateCopy("Укажите дату, получателя и сумму больше нуля.", "cashPaymentInvalid"), true); return; }
     const next = [item, ...purchases];
     try { saveList(STORAGE.purchases, next); purchases = next; }
     catch { showMessage(translateCopy("Не удалось сохранить кассовый платеж.", "paymentImportError"), true); return; }
     cashForm.reset(); document.getElementById("cashPaymentDate").value = localDate();
+    cashForm.hidden = true;
+    cashCurrentPage = 1;
     renderCashPayments(); renderPurchases(); renderDashboard(); renderReport();
     showMessage(translateCopy("Кассовый платеж сохранен.", "cashPaymentSaved"));
   });
