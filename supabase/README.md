@@ -1,6 +1,6 @@
 # Supabase backend
 
-The app stores clients, invoices, purchases, expenses, suppliers, supplier invoices, company details, invoice appearance settings, and invoice email templates in the organization database after all migrations are applied. Invoice email uses the `send-invoice` Edge Function and Resend; delivery remains unavailable until the server secrets are configured and the function is deployed.
+The app stores clients, invoices, purchases, expenses, suppliers, supplier invoices, Kontoplaan, opening balances, manual journal entries, company details, invoice appearance settings, and invoice email templates in the organization database after all migrations are applied. Invoice email uses the `send-invoice` Edge Function and Resend; delivery remains unavailable until the server secrets are configured and the function is deployed.
 
 ## First setup
 
@@ -16,11 +16,23 @@ The app stores clients, invoices, purchases, expenses, suppliers, supplier invoi
 10. Run `migrations/20261005000100_invoice_payment_status.sql` to add invoice payment status and payment date. This is required for the Paid/Unpaid control in Sales.
 11. Run `migrations/20261005000200_invoice_amount_due.sql` to add invoice balances, backfill unpaid amounts, and keep paid status synchronized with a zero balance.
 12. Run `migrations/20261005000300_invoice_payments.sql` to store invoice payment amounts, methods, and dates, and atomically update the remaining balance.
-13. In **Authentication > Sign In / Providers**, verify that the Email provider is enabled. Hosted Supabase projects require email confirmation by default. In **URL Configuration**, set the production Site URL to `https://arvesemu.ee/` and add `https://arvesemu.ee/**`, `https://www.arvesemu.ee/**`, and `http://127.0.0.1:8000/**` to the allowed redirect URLs. These allow the confirmation and password-reset links to return to the site.
-14. Open the project's **Connect** dialog or **Settings > API Keys** and copy the **Project URL** and public **publishable** key (or legacy `anon` key). These are intended for browser apps. Never share the database password, a `service_role` key, or a secret API key.
-15. Do not upload real client or accounting data until all ten migrations have been applied and authentication, database access, and email delivery have been tested.
+13. Run `migrations/20261005000400_seller_website.sql` to add the organization website field.
+14. Run `migrations/20261005000500_invoice_author_emails.sql` to add invoice creator and editor metadata.
+15. Run `migrations/20261005000600_invoice_item_discounts.sql` to persist invoice line discounts.
+16. Run `migrations/20261006000100_invoice_item_editor_fields.sql` to persist invoice line account, object, unit, and text-line details.
+17. Run `migrations/20261007000100_invoice_payment_bank_entry_reversal.sql` to support reversing linked bank entries when invoice payments are edited or removed.
+18. Run `migrations/20261007000200_sales_quotes_and_orders.sql` to store quotes and sales orders.
+19. Run `migrations/20261007000300_fixed_assets.sql` to allow organization-scoped fixed-asset data.
+20. Run `migrations/20261007000400_manual_journal_entries.sql` to allow organization-scoped manual journal entries.
+21. Run `migrations/20261007000500_unified_accounting_ledger.sql` to allow organization-scoped Kontoplaan and opening-balance records.
+22. Run `migrations/20261007000600_delete_organization.sql` to add the organization deletion verification store and role-checked deletion logic.
+23. Run `migrations/20261007000700_email_verified_organization_deletion.sql` only if it was not applied previously; it removes any legacy direct-delete RPC and completes the previous email-code rollout.
+24. Run `migrations/20261007000800_reauthenticated_organization_deletion.sql` to remove email-code storage and require fresh account reauthentication. Email/password users re-enter their password; Google users sign in through Google with `prompt=login`. The database accepts deletion only when `auth_time` is no older than five minutes, the user is an owner or administrator, and another organization remains.
+25. In **Authentication > Sign In / Providers**, verify that Email and Google providers are enabled. In **URL Configuration**, set the production Site URL to `https://arvesemu.ee/` and add `https://arvesemu.ee/**`, `https://www.arvesemu.ee/**`, `https://danilkatkovpsy-coder.github.io/**`, `http://127.0.0.1:8000/**`, and `http://127.0.0.1:8173/**` to the allowed redirect URLs. These permit sign-in and reauthentication callbacks to return to the app.
+26. Open the project's **Connect** dialog or **Settings > API Keys** and copy the **Project URL** and public **publishable** key (or legacy `anon` key). These are intended for browser apps. Never share the database password, a `service_role` key, or a secret API key.
+27. Do not upload real client or accounting data until all 22 migrations have been applied and authentication, database access, and email delivery have been tested.
 
-The `create_organization(name, registration_code)` RPC creates an organization for the signed-in user and makes that user its owner. Team invitations need a server-side endpoint; clients must not be allowed to write directly to `organization_members`.
+The `create_organization(name, registration_code)` RPC creates an organization for the signed-in user and makes that user its owner. Organization deletion requires recent reauthentication: email/password users re-enter their password, while Google users complete OAuth with `prompt=login`. The database verifies the fresh `auth_time`, permits only owners and administrators, and refuses to remove the user's last organization. Team invitations need a server-side endpoint; clients must not be allowed to write directly to `organization_members`.
 
 ## Google sign-in
 

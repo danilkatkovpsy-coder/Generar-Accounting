@@ -93,8 +93,6 @@
   };
   const menuItems = [
     { key: "salesMenuInvoices", icon: "invoices", view: "salesView" },
-    { key: labelKeys.quote, icon: "quote", view: viewIds.quote, kind: "quote" },
-    { key: labelKeys.order, icon: "order", view: viewIds.order, kind: "order" },
     { key: labelKeys.articles, icon: "articles", view: viewIds.articles },
     { key: labelKeys.clients, icon: "clients", view: viewIds.clients }
   ];

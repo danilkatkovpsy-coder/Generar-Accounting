@@ -13,6 +13,8 @@
   Object.assign(etTexts, { journalDocumentOrDescription: "Alusdokument või kirjeldus", journalPostingAmount: "Kande summa", journalDate: "KP", journalEnteredAt: "Sisestatud", journalEnteredBy: "Sisestaja", journalClearFilters: "Tühjenda filtrid", journalFilter: "FILTREERI", journalNoRows: "Valitud perioodil kandeid pole.", journalSort: "Sordi", journalNumberColumn: "NR", journalDocumentColumn: "ALUSDOKUMENT", journalDescriptionColumn: "KIRJELDUS", journalAmountColumn: "KANDE SUMMA", journalCurrencyColumn: "€/$", journalDateColumn: "KP", journalEnteredAtColumn: "SISESTATUD", journalEnteredByColumn: "SISESTAJA" });
   Object.assign(ruTexts, { journalAdd: "Добавить", journalMore: "Ещё", journalHelp: "Справка", journalRefresh: "Обновить список", journalOpenLedger: "Открыть главную книгу", journalHelpText: "Список включает сохранённые документы и ручные двойные проводки. Для старых записей без номера, времени или автора показано тире.", journalAllCurrencies: "Все валюты", journalLocalOnlySaved: "Проводка сохранена на этом устройстве. Примените миграцию для облачной синхронизации.", journalEntryTitle: "Новая проводка", journalEntryDate: "Дата проводки", journalEntryDocument: "Документ-основание", journalEntryDescription: "Описание", journalEntryAmount: "Сумма проводки", journalEntryDebit: "Счёт дебета", journalEntryCredit: "Счёт кредита", journalEntryCancel: "Отмена", journalEntrySave: "Сохранить проводку", journalEntrySameAccounts: "Выберите разные счета дебета и кредита.", journalEntrySaved: "Проводка сохранена." });
   Object.assign(etTexts, { journalAdd: "Lisa uus", journalMore: "Rohkem", journalHelp: "Abi", journalRefresh: "Värskenda nimekirja", journalOpenLedger: "Ava pearaamat", journalHelpText: "Loend sisaldab salvestatud dokumentidest tuletatud kandeid ja käsitsi lisatud tasakaalus kandeid. Vanadel kirjetel puuduv number, aeg või sisestaja kuvatakse kriipsuna.", journalAllCurrencies: "Kõik valuutad", journalLocalOnlySaved: "Kanne salvestati sellesse seadmesse. Pilvesünkroonimiseks rakendage migratsioon.", journalEntryTitle: "Uus pearaamatu kanne", journalEntryDate: "Kande kuupäev", journalEntryDocument: "Alusdokument", journalEntryDescription: "Kirjeldus", journalEntryAmount: "Kande summa", journalEntryDebit: "Deebetkonto", journalEntryCredit: "Kreeditkonto", journalEntryCancel: "Tühista", journalEntrySave: "Salvesta kanne", journalEntrySameAccounts: "Vali deebet- ja kreeditkontoks erinevad kontod.", journalEntrySaved: "Kanne salvestati." });
+  Object.assign(ruTexts, { journalEntryAccount: "Счёт", journalEntryDebitColumn: "Дебет", journalEntryCreditColumn: "Кредит", journalEntryLineDescription: "Описание", journalEntryObject: "Объект", journalEntryLines: "Строки проводки", journalEntryAddLine: "Добавить строку", journalEntryRemoveLine: "Удалить строку", journalEntryDebitTotal: "Итого дебет", journalEntryCreditTotal: "Итого кредит", journalEntryFiles: "Файлы", journalEntryAttach: "Прикрепить файл", journalEntryNoFile: "Файл не прикреплён", journalEntryInternal: "Внутренняя информация", journalEntryUnbalanced: "Итоги дебета и кредита должны совпадать; в каждой строке выберите счёт и только одну сторону.", journalEntryFileTooLarge: "Файл не должен превышать 3 МБ." });
+  Object.assign(etTexts, { journalEntryAccount: "Konto", journalEntryDebitColumn: "Deebet", journalEntryCreditColumn: "Kreedit", journalEntryLineDescription: "Kirjeldus", journalEntryObject: "Objekt", journalEntryLines: "Kanderidad", journalEntryAddLine: "Lisa uus rida", journalEntryRemoveLine: "Eemalda rida", journalEntryDebitTotal: "Deebet kokku", journalEntryCreditTotal: "Kreedit kokku", journalEntryFiles: "Failid", journalEntryAttach: "Lisa fail", journalEntryNoFile: "Faili pole lisatud", journalEntryInternal: "Siseinfo", journalEntryUnbalanced: "Deebet ja kreedit peavad võrduma; igal real vali konto ja ainult üks pool.", journalEntryFileTooLarge: "Fail ei tohi olla suurem kui 3 MB." });
   const wrapper = document.createElement("div");
   wrapper.className = "payments-nav-wrap ledger-nav-wrap";
   const trigger = document.createElement("button");
@@ -84,7 +86,14 @@
   journalEntryDialog.className = "ledger-journal-dialog";
   journalEntryDialog.setAttribute("aria-labelledby", "ledgerJournalEntryTitle");
   journalEntryDialog.innerHTML = `<form id="ledgerJournalEntryForm"><div class="ledger-journal-dialog-heading"><h2 id="ledgerJournalEntryTitle" data-i18n="journalEntryTitle">${copy("journalEntryTitle")}</h2><button type="button" class="icon-button" id="ledgerJournalEntryClose" aria-label="${copy("journalEntryCancel")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg></button></div><div class="ledger-journal-entry-grid"><label class="field"><span data-i18n="journalEntryDate">${copy("journalEntryDate")}</span><input id="ledgerJournalEntryDate" type="date" required></label><label class="field"><span data-i18n="journalEntryDocument">${copy("journalEntryDocument")}</span><input id="ledgerJournalEntryDocument" type="text" maxlength="180"></label><label class="field ledger-journal-entry-wide"><span data-i18n="journalEntryDescription">${copy("journalEntryDescription")}</span><input id="ledgerJournalEntryDescription" type="text" maxlength="300" required></label><label class="field"><span data-i18n="journalEntryAmount">${copy("journalEntryAmount")}</span><input id="ledgerJournalEntryAmount" type="number" min="0.01" step="0.01" required></label><label class="field"><span data-i18n="ledgerCurrencyLabel">${copy("ledgerCurrencyLabel")}</span><select id="ledgerJournalEntryCurrency"><option value="EUR">EUR</option></select></label><label class="field"><span data-i18n="journalEntryDebit">${copy("journalEntryDebit")}</span><select id="ledgerJournalDebitAccount" required></select></label><label class="field"><span data-i18n="journalEntryCredit">${copy("journalEntryCredit")}</span><select id="ledgerJournalCreditAccount" required></select></label></div><p id="ledgerJournalEntryError" class="ledger-journal-entry-error" role="alert" hidden></p><div class="ledger-journal-dialog-actions"><button type="button" class="secondary-button" id="ledgerJournalEntryCancel" data-i18n="journalEntryCancel">${copy("journalEntryCancel")}</button><button type="submit" class="primary-button" data-i18n="journalEntrySave">${copy("journalEntrySave")}</button></div></form>`;
-  journalEntryDialog.querySelector("#ledgerJournalEntryCurrency").closest(".field").remove();
+  const journalEntryGrid = journalEntryDialog.querySelector(".ledger-journal-entry-grid");
+  journalEntryGrid.innerHTML = `<label class="field"><span data-i18n="journalEntryDate">${copy("journalEntryDate")}</span><input id="ledgerJournalEntryDate" type="date" required></label><label class="field"><span data-i18n="journalEntryDocument">${copy("journalEntryDocument")}</span><input id="ledgerJournalEntryDocument" type="text" maxlength="180"></label><label class="field"><span data-i18n="ledgerCurrencyLabel">${copy("ledgerCurrencyLabel")}</span><select id="ledgerJournalEntryCurrency"><option value="EUR">EUR - Euro</option></select></label>`;
+  journalEntryGrid.insertAdjacentHTML("afterend", `<section class="ledger-journal-entry-lines"><div class="ledger-journal-entry-lines-heading"><h3 data-i18n="journalEntryTitle">${copy("journalEntryTitle")}</h3><button type="button" class="secondary-button" id="ledgerJournalEntryAddLine" data-i18n="journalEntryAddLine">${copy("journalEntryAddLine")}</button></div><div class="ledger-journal-entry-table-wrap"><table class="ledger-journal-entry-table"><thead><tr><th data-i18n="journalEntryAccount">${copy("journalEntryAccount")}</th><th data-i18n="journalEntryDebitColumn">${copy("journalEntryDebitColumn")}</th><th data-i18n="journalEntryCreditColumn">${copy("journalEntryCreditColumn")}</th><th data-i18n="journalEntryLineDescription">${copy("journalEntryLineDescription")}</th><th data-i18n="journalEntryObject">${copy("journalEntryObject")}</th><th></th></tr></thead><tbody id="ledgerJournalEntryRows"></tbody><tfoot><tr><th data-i18n="journalEntryDebitTotal">${copy("journalEntryDebitTotal")}</th><td id="ledgerJournalEntryDebitTotal">0,00 EUR</td><th data-i18n="journalEntryCreditTotal">${copy("journalEntryCreditTotal")}</th><td id="ledgerJournalEntryCreditTotal">0,00 EUR</td><td colspan="2"></td></tr></tfoot></table></div></section><div class="ledger-journal-entry-extras"><label class="field"><span data-i18n="journalEntryFiles">${copy("journalEntryFiles")}</span><input id="ledgerJournalEntryFile" type="file" accept=".pdf,image/*"><span id="ledgerJournalEntryFileName" class="ledger-journal-file-name" data-i18n="journalEntryAttach">${copy("journalEntryAttach")}</span></label><label class="field"><span data-i18n="journalEntryInternal">${copy("journalEntryInternal")}</span><textarea id="ledgerJournalEntryInternal" rows="2" maxlength="1000"></textarea></label></div>`);
+  const journalLinesTitle = journalEntryDialog.querySelector(".ledger-journal-entry-lines-heading h3");
+  journalLinesTitle.dataset.i18n = "journalEntryLines";
+  journalLinesTitle.textContent = copy("journalEntryLines");
+  const journalFilesField = journalEntryDialog.querySelector("#ledgerJournalEntryFile").closest(".field");
+  journalFilesField.innerHTML = `<span data-i18n="journalEntryFiles">${copy("journalEntryFiles")}</span><input id="ledgerJournalEntryFile" type="file" accept=".pdf,image/*" hidden><div class="ledger-journal-file-controls"><button type="button" class="secondary-button" id="ledgerJournalEntryChooseFile" data-i18n="journalEntryAttach">${copy("journalEntryAttach")}</button><span id="ledgerJournalEntryFileName" class="ledger-journal-file-name" data-i18n="journalEntryNoFile">${copy("journalEntryNoFile")}</span></div>`;
   document.body.append(journalEntryDialog);
   const journalSort = { key: "date", direction: -1 };
   let journalRows = [];
@@ -104,12 +113,13 @@
     const accounts = new Map(getLedgerAccounts().map(account => [account.code, account.label]));
     for (const item of manualJournalEntries) {
       if (!item.date || item.date < start || item.date > end) continue;
-      const amount = Number(item.amount) || 0;
       const common = { id: `manual-${item.id}`, journalNumber: item.number, date: item.date, documentNumber: item.documentNumber || "", description: item.description || "", currency: item.currency || "EUR", enteredAt: item.enteredAt, enteredBy: item.enteredBy };
-      entries.push(
-        { ...common, accountCode: item.debitAccount, account: accounts.get(item.debitAccount) || item.debitAccount, debit: amount, credit: 0 },
-        { ...common, accountCode: item.creditAccount, account: accounts.get(item.creditAccount) || item.creditAccount, debit: 0, credit: amount }
-      );
+      const lines = Array.isArray(item.lines) ? item.lines : [{ accountCode: item.debitAccount, debit: item.amount, credit: 0 }, { accountCode: item.creditAccount, debit: 0, credit: item.amount }];
+      lines.forEach(line => {
+        const accountCode = String(line.accountCode || "");
+        if (!accountCode) return;
+        entries.push({ ...common, accountCode, account: accounts.get(accountCode) || accountCode, description: line.description || common.description, object: line.object || "", debit: Number(line.debit) || 0, credit: Number(line.credit) || 0 });
+      });
     }
     return entries;
   };
@@ -168,12 +178,34 @@
     return true;
   };
   const journalForm = get("ledgerJournalEntryForm");
-  const journalAccountOptions = () => `<option value="">—</option>${getLedgerAccounts().map(account => `<option value="${escapeHtml(account.code)}">${escapeHtml(account.code)} · ${escapeHtml(account.label)}</option>`).join("")}`;
-  [get("ledgerJournalDebitAccount"), get("ledgerJournalCreditAccount")].forEach(select => { select.innerHTML = journalAccountOptions(); });
+  const journalLineAccountOptions = () => `<option value="">—</option>${getLedgerAccounts().map(account => `<option value="${escapeHtml(account.code)}">${escapeHtml(account.code)} · ${escapeHtml(account.label)}</option>`).join("")}`;
+  const updateJournalLineTotals = () => {
+    const lines = [...get("ledgerJournalEntryRows").querySelectorAll("tr")];
+    const debit = lines.reduce((sum, row) => sum + Math.round((Number(row.querySelector('[data-journal-line="debit"]').value) || 0) * 100), 0);
+    const credit = lines.reduce((sum, row) => sum + Math.round((Number(row.querySelector('[data-journal-line="credit"]').value) || 0) * 100), 0);
+    get("ledgerJournalEntryDebitTotal").textContent = `${money(debit / 100)} EUR`;
+    get("ledgerJournalEntryCreditTotal").textContent = `${money(credit / 100)} EUR`;
+  };
+  const addJournalEntryLine = () => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td><select data-journal-line="account" required aria-label="${copy("journalEntryAccount")}">${journalLineAccountOptions()}</select></td><td><input data-journal-line="debit" type="number" min="0" step="0.01" value="0" aria-label="${copy("journalEntryDebitColumn")}"></td><td><input data-journal-line="credit" type="number" min="0" step="0.01" value="0" aria-label="${copy("journalEntryCreditColumn")}"></td><td><input data-journal-line="description" type="text" maxlength="180" aria-label="${copy("journalEntryLineDescription")}"></td><td><input data-journal-line="object" type="text" maxlength="120" aria-label="${copy("journalEntryObject")}"></td><td><button type="button" class="ledger-journal-line-remove" data-journal-line-remove title="${copy("journalEntryRemoveLine")}" aria-label="${copy("journalEntryRemoveLine")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16m-10 4v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"></path></svg></button></td>`;
+    row.querySelectorAll("input,select").forEach(control => control.addEventListener("input", updateJournalLineTotals));
+    row.querySelector("[data-journal-line-remove]").addEventListener("click", () => { row.remove(); updateJournalLineTotals(); });
+    get("ledgerJournalEntryRows").append(row);
+    updateJournalLineTotals();
+  };
+  get("ledgerJournalEntryAddLine").addEventListener("click", addJournalEntryLine);
+  get("ledgerJournalEntryChooseFile").addEventListener("click", () => get("ledgerJournalEntryFile").click());
+  get("ledgerJournalEntryFile").addEventListener("change", event => { const name = event.target.files[0]?.name; get("ledgerJournalEntryFileName").textContent = name || copy("journalEntryNoFile"); get("ledgerJournalEntryFileName").removeAttribute("data-i18n"); });
   get("ledgerJournalAdd").addEventListener("click", () => {
     if (!can("reports")) { denyAction("reports"); return; }
     journalForm.reset();
+    get("ledgerJournalEntryRows").replaceChildren();
+    addJournalEntryLine();
+    addJournalEntryLine();
     get("ledgerJournalEntryDate").value = localDate();
+    get("ledgerJournalEntryFileName").textContent = copy("journalEntryNoFile");
+    get("ledgerJournalEntryFileName").dataset.i18n = "journalEntryNoFile";
     get("ledgerJournalEntryError").hidden = true;
     journalEntryDialog.showModal();
   });
@@ -181,19 +213,43 @@
   get("ledgerJournalEntryClose").addEventListener("click", closeJournalEntry);
   get("ledgerJournalEntryCancel").addEventListener("click", closeJournalEntry);
   journalEntryDialog.addEventListener("click", event => { if (event.target === journalEntryDialog) closeJournalEntry(); });
-  journalForm.addEventListener("submit", event => {
+  journalForm.addEventListener("submit", async event => {
     event.preventDefault();
     if (!can("reports")) { denyAction("reports"); return; }
     if (!journalForm.reportValidity()) return;
-    const debitAccount = get("ledgerJournalDebitAccount").value, creditAccount = get("ledgerJournalCreditAccount").value;
-    if (debitAccount === creditAccount) { get("ledgerJournalEntryError").textContent = copy("journalEntrySameAccounts"); get("ledgerJournalEntryError").hidden = false; return; }
-    const amount = Math.round(Number(get("ledgerJournalEntryAmount").value) * 100) / 100;
-    if (!Number.isFinite(amount) || amount <= 0) return;
+    const lines = [...get("ledgerJournalEntryRows").querySelectorAll("tr")].map(row => ({
+      accountCode: row.querySelector('[data-journal-line="account"]').value,
+      debit: Math.round((Number(row.querySelector('[data-journal-line="debit"]').value) || 0) * 100) / 100,
+      credit: Math.round((Number(row.querySelector('[data-journal-line="credit"]').value) || 0) * 100) / 100,
+      description: row.querySelector('[data-journal-line="description"]').value.trim(),
+      object: row.querySelector('[data-journal-line="object"]').value.trim()
+    }));
+    const activeLines = lines.filter(line => line.debit > 0 || line.credit > 0);
+    const debitTotal = Math.round(lines.reduce((sum, line) => sum + line.debit, 0) * 100);
+    const creditTotal = Math.round(lines.reduce((sum, line) => sum + line.credit, 0) * 100);
+    if (activeLines.length < 2 || activeLines.some(line => !line.accountCode || (line.debit > 0) === (line.credit > 0)) || debitTotal <= 0 || debitTotal !== creditTotal) {
+      get("ledgerJournalEntryError").textContent = copy("journalEntryUnbalanced");
+      get("ledgerJournalEntryError").hidden = false;
+      return;
+    }
+    const attachmentFile = get("ledgerJournalEntryFile").files[0];
+    if (attachmentFile && attachmentFile.size > 3 * 1024 * 1024) {
+      get("ledgerJournalEntryError").textContent = copy("journalEntryFileTooLarge");
+      get("ledgerJournalEntryError").hidden = false;
+      return;
+    }
+    let attachmentData = "";
+    if (attachmentFile) {
+      try { attachmentData = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = reject; reader.readAsDataURL(attachmentFile); }); }
+      catch { get("ledgerJournalEntryError").textContent = copy("journalEntryFileTooLarge"); get("ledgerJournalEntryError").hidden = false; return; }
+    }
     const entry = {
       id: crypto.randomUUID(), number: Math.max(0, ...manualJournalEntries.map(item => Number(item.number) || 0)) + 1,
       date: get("ledgerJournalEntryDate").value, documentNumber: get("ledgerJournalEntryDocument").value.trim(),
-      description: get("ledgerJournalEntryDescription").value.trim(), amount, currency: "EUR",
-      debitAccount, creditAccount, enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—"
+      description: [...new Set(lines.map(line => line.description).filter(Boolean))].join("; "),
+      amount: debitTotal / 100, currency: get("ledgerJournalEntryCurrency").value, lines,
+      internalInfo: get("ledgerJournalEntryInternal").value.trim(), attachmentName: attachmentFile?.name || "", attachmentData,
+      enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—"
     };
     const next = [...manualJournalEntries, entry];
     try { saveList(STORAGE.manualJournalEntries, next); }
@@ -411,6 +467,8 @@
     const fiscalStart = `${start.slice(0, 4)}-01-01`;
     const priorDay = value => { const date = new Date(`${value}T12:00:00`); date.setDate(date.getDate() - 1); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; };
     const selectedEntry = entry => !turnoverSelection.objects.size || turnoverSelection.objects.has(entry.object);
+    const hasOpeningBalances = window.hasLedgerOpeningBalances?.() === true;
+    const openingBalancesAtFiscalStart = window.getLedgerOpeningBalances?.(fiscalStart) || new Map();
     const fiscalEntries = start > fiscalStart ? createLedgerEntries(fiscalStart, end).filter(selectedEntry) : createLedgerEntries(start, end).filter(selectedEntry);
     const priorBalances = new Map();
     for (const entry of fiscalEntries) if (entry.date < start) priorBalances.set(entry.accountCode, (priorBalances.get(entry.accountCode) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0));
@@ -433,7 +491,7 @@
     for (const account of accounts) {
       const accountBuckets = [...buckets.values()].filter(bucket => bucket.code === account.code).sort((first, second) => first.period.localeCompare(second.period));
       if (!accountBuckets.length) accountBuckets.push({ code: account.code, label: account.label, period: "", debit: 0, credit: 0 });
-      const fiscalOpeningBalance = Number.isFinite(Number(account.openingBalance)) && account.openingBalance !== undefined ? Number(account.openingBalance) : null;
+      const fiscalOpeningBalance = hasOpeningBalances ? Number(openingBalancesAtFiscalStart.get(account.code)) || 0 : null;
       let runningBalance = fiscalOpeningBalance === null ? null : fiscalOpeningBalance + (priorBalances.get(account.code) || 0);
       for (const bucket of accountBuckets) {
         const openingBalance = runningBalance;

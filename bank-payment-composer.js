@@ -297,6 +297,9 @@
     const row = document.createElement("tr");
     row.dataset.extraLine = "true";
     row.innerHTML = `<td><input type="text" data-line-field="description" aria-label="${escapeHtml(copy("Kirjeldus", "bankComposerDescription"))}"></td><td><input type="number" min="0.01" step="0.01" value="1" data-line-field="quantity" aria-label="${escapeHtml(copy("Kogus", "bankComposerQuantity"))}"></td><td><input type="number" min="0" step="0.01" value="0" data-line-field="price" aria-label="${escapeHtml(copy("Hind", "bankComposerPrice"))}"></td><td class="bank-payment-extra-total"><output>0,00</output></td><td><select data-line-field="account" aria-label="${escapeHtml(copy("Konto", "bankComposerAccount"))}"><option value="">—</option><option value="4000">4000</option><option value="2100">2100</option><option value="1000">1000</option></select></td><td><input type="text" data-line-field="object" aria-label="${escapeHtml(copy("Objekt", "bankComposerObject"))}"></td><td><button type="button" class="bank-payment-remove-line" aria-label="${escapeHtml(copy("Eemalda rida", "bankComposerRemoveLine"))}" title="${escapeHtml(copy("Eemalda rida", "bankComposerRemoveLine"))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"></path></svg></button></td>`;
+    const lineAccount = row.querySelector('[data-line-field="account"]');
+    try { lineAccount.innerHTML = `<option value="">—</option>${getLedgerAccounts().filter(account => account.type === "expense").map(account => `<option value="${escapeHtml(account.code)}">${escapeHtml(account.code)} · ${escapeHtml(account.label)}</option>`).join("")}`; }
+    catch {}
     if (isCash) {
       const description = row.querySelector('[data-line-field="description"]');
       const descriptionArea = document.createElement("textarea");

@@ -233,7 +233,7 @@
   const euro = value => `${money(number(value))} EUR`;
   const accountChoices = () => {
     try {
-      const accounts = getLedgerAccounts();
+      const accounts = getLedgerAccounts().filter(account => account.type === "expense");
       if (accounts.length) return accounts.map(account => `<option value="${escapeHtml(account.code)}">${escapeHtml(account.code)} · ${escapeHtml(account.label || account.name || "")}</option>`).join("");
     } catch {}
     return '<option value="4000">4000 · Kaubad</option><option value="4200">4200 · Teenused</option><option value="4900">4900 · Muud kulud</option>';

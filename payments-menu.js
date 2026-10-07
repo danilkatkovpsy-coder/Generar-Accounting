@@ -16,6 +16,59 @@
     paymentImportChoose: "Выберите XML файл",
     paymentImportPreview: "Предварительный просмотр",
     paymentImportConfirm: "Импортировать платежи",
+    paymentImportSaveDraft: "Сохранить черновик",
+    paymentImportDeleteSelected: "Удалить выбранные",
+    paymentImportCancel: "Отменить",
+    paymentImportApplySelected: "Применить выбранные",
+    paymentImportFilterStatus: "Статус",
+    paymentImportFilterAll: "Все строки",
+    paymentImportFilterSelected: "Выбранные",
+    paymentImportFilterReview: "Требуют проверки",
+    paymentImportFilterDuplicates: "Дубликаты",
+    paymentImportFilterNoResults: "По заданным фильтрам строк нет.",
+    paymentImportSelectAll: "Выбрать видимые",
+    paymentImportSelectRow: "Выбрать строку",
+    paymentImportReadyStatus: "Готово к проверке",
+    paymentImportSavedStatus: "Черновик сохранен на этом устройстве",
+    paymentImportDuplicateStatus: "Дубликат",
+    paymentImportReviewStatus: "Проверить",
+    paymentImportRowReady: "Готово",
+    paymentImportAppliedCount: "Платежей применено",
+    paymentImportDiscardConfirm: "Отбросить текущий импорт и сохраненный черновик?",
+    paymentImportReplaceConfirm: "Заменить текущий черновик новой выпиской?",
+    paymentImportDeleteConfirm: "Удалить выбранные строки из черновика?",
+    paymentImportReference: "Референс",
+    paymentImportAccount: "Банковский счет",
+    paymentImportOpen: "Распределить платеж",
+    paymentImportClient: "Клиент",
+    paymentImportSupplier: "Поставщик",
+    paymentImportPartyName: "Контрагент",
+    paymentImportInvoiceSearch: "Поиск счета или контрагента",
+    paymentImportInvoice: "Счет",
+    paymentImportDueDate: "Срок оплаты",
+    paymentImportDue: "Не оплачено",
+    paymentImportAllocation: "Сумма платежа",
+    paymentImportNoInvoices: "Подходящих неоплаченных счетов не найдено.",
+    paymentImportAdvance: "Аванс",
+    paymentImportAdvanceDescription: "Описание аванса",
+    paymentImportExtraLine: "Дополнительная строка",
+    paymentImportAddExtraLine: "Добавить строку",
+    paymentImportExtraDescription: "Описание",
+    paymentImportAccountCode: "Счет учета",
+    paymentImportTotal: "Итого распределено",
+    paymentImportDifference: "Разница",
+    paymentImportAccountWarning: "Банковский счет не найден в настройках платежей.",
+    paymentImportSaveAllocation: "Сохранить",
+    paymentImportSaveNext: "Сохранить и далее",
+    paymentImportAllocationBalanceError: "Распределение должно совпадать с суммой операции.",
+    paymentImportAllocationDirectionError: "Направление платежа не совпадает с типом контрагента.",
+    paymentImportAllocationInvalidLine: "Заполните описание, сумму и счет каждой дополнительной строки.",
+    paymentImportInvoiceMissing: "Связанный счет больше не найден.",
+    paymentImportInvoiceAmountError: "Сумма платежа превышает остаток счета.",
+    paymentImportInvoiceDuplicateError: "Один счет нельзя выбрать дважды.",
+    paymentImportAccountTypeError: "Выберите счет учета с подходящим типом.",
+    paymentImportAlreadyAllocated: "Эта операция уже распределена и связана со счетом.",
+    paymentImportUseRowSave: "Сохраните распределение через кнопку в раскрытой строке.",
     paymentImportReady: "Готово к импорту",
     paymentImportEmpty: "Выберите XML файл для просмотра операций.",
     paymentImportInvalid: "Некорректный банковский XML: проверьте даты, суммы, валюту и направление операций.",
@@ -83,6 +136,59 @@
     paymentImportChoose: "Vali XML-fail",
     paymentImportPreview: "Eelvaade",
     paymentImportConfirm: "Impordi maksed",
+    paymentImportSaveDraft: "Salvesta mustand",
+    paymentImportDeleteSelected: "Kustuta valitud",
+    paymentImportCancel: "Katkesta",
+    paymentImportApplySelected: "Rakenda valitud",
+    paymentImportFilterStatus: "Olek",
+    paymentImportFilterAll: "Kõik read",
+    paymentImportFilterSelected: "Valitud",
+    paymentImportFilterReview: "Kontrollida",
+    paymentImportFilterDuplicates: "Duplikaadid",
+    paymentImportFilterNoResults: "Filtritele vastavaid ridu pole.",
+    paymentImportSelectAll: "Vali nähtavad",
+    paymentImportSelectRow: "Vali rida",
+    paymentImportReadyStatus: "Valmis kontrollimiseks",
+    paymentImportSavedStatus: "Mustand salvestati sellesse seadmesse",
+    paymentImportDuplicateStatus: "Duplikaat",
+    paymentImportReviewStatus: "Kontrollida",
+    paymentImportRowReady: "Valmis",
+    paymentImportAppliedCount: "Rakendatud makseid",
+    paymentImportDiscardConfirm: "Loobuda praegusest impordist ja salvestatud mustandist?",
+    paymentImportReplaceConfirm: "Asendada praegune mustand uue väljavõttega?",
+    paymentImportDeleteConfirm: "Kustutada valitud read mustandist?",
+    paymentImportReference: "Viide",
+    paymentImportAccount: "Pangakonto",
+    paymentImportOpen: "Jaota makse",
+    paymentImportClient: "Klient",
+    paymentImportSupplier: "Hankija",
+    paymentImportPartyName: "Osapool",
+    paymentImportInvoiceSearch: "Otsi arve või osapoole järgi",
+    paymentImportInvoice: "Arve",
+    paymentImportDueDate: "Tähtaeg",
+    paymentImportDue: "Maksmata",
+    paymentImportAllocation: "Makse summa",
+    paymentImportNoInvoices: "Sobivaid maksmata arveid ei leitud.",
+    paymentImportAdvance: "Ettemaks",
+    paymentImportAdvanceDescription: "Ettemaksu kirjeldus",
+    paymentImportExtraLine: "Lisatöö rida",
+    paymentImportAddExtraLine: "Lisa rida",
+    paymentImportExtraDescription: "Kirjeldus",
+    paymentImportAccountCode: "Konto",
+    paymentImportTotal: "Jaotatud kokku",
+    paymentImportDifference: "Erinevus",
+    paymentImportAccountWarning: "Pangakontot maksete seadetes ei leitud.",
+    paymentImportSaveAllocation: "Salvesta",
+    paymentImportSaveNext: "Salvesta ja edasi",
+    paymentImportAllocationBalanceError: "Jaotus peab võrduma pangatehingu summaga.",
+    paymentImportAllocationDirectionError: "Makse suund ei vasta osapoole tüübile.",
+    paymentImportAllocationInvalidLine: "Täitke iga lisarea kirjeldus, summa ja konto.",
+    paymentImportInvoiceMissing: "Seotud arvet ei leitud.",
+    paymentImportInvoiceAmountError: "Makse ületab arve jääki.",
+    paymentImportInvoiceDuplicateError: "Sama arvet ei saa valida kaks korda.",
+    paymentImportAccountTypeError: "Valige sobiva tüübiga konto.",
+    paymentImportAlreadyAllocated: "See tehing on juba arvega seotud.",
+    paymentImportUseRowSave: "Salvestage jaotus avatud rea nupu kaudu.",
     paymentImportReady: "Valmis importimiseks",
     paymentImportEmpty: "Valige XML-fail tehingute eelvaateks.",
     paymentImportInvalid: "Panga XML ei ole korrektne: kontrollige kuupäevi, summasid, valuutat ja tehingute suunda.",
@@ -231,6 +337,7 @@
     pages[id].hidden = false;
     if (id === "paymentExportView") renderExportPreview();
     if (id === "cashPaymentsView") renderCashPayments();
+    if (id === "paymentImportView") loadImportDraft();
     const mobileMenu = document.getElementById("mobileMenuToggle");
     if (mobileMenu?.getAttribute("aria-expanded") === "true") mobileMenu.click();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -264,7 +371,7 @@
   const importView = makeView("paymentImportView", "paymentImportTitle", "paymentImportDescription");
   const importPanel = document.createElement("section");
   importPanel.className = "data-panel";
-  importPanel.innerHTML = `<label class="payments-import-drop"><span data-i18n="paymentImportChoose">Vali XML-fail</span><input id="paymentImportFile" type="file" accept=".xml,application/xml,text/xml"></label><div class="payments-preview" id="paymentImportPreview"><p class="payments-empty" data-i18n="paymentImportEmpty">Valige XML-fail tehingute eelvaateks.</p></div><div class="payments-actions"><span id="paymentImportCount"></span><button class="primary-button" id="paymentImportConfirm" type="button" disabled data-i18n="paymentImportConfirm">Impordi maksed</button></div>`;
+  importPanel.innerHTML = `<label class="payments-import-drop"><span data-i18n="paymentImportChoose">Vali XML-fail</span><input id="paymentImportFile" type="file" accept=".xml,application/xml,text/xml"></label><div class="payment-import-workbench" id="paymentImportWorkbench" hidden><div class="payment-import-summary"><strong id="paymentImportFileName"></strong><span id="paymentImportDraftStatus" role="status" aria-live="polite"></span><span id="paymentImportCount"></span></div><div class="payment-import-filters"><label class="field"><span data-i18n="paymentImportFilterStatus">Olek</span><select id="paymentImportStatusFilter"><option value="all" data-i18n="paymentImportFilterAll">Kõik read</option><option value="selected" data-i18n="paymentImportFilterSelected">Valitud</option><option value="incoming" data-i18n="paymentImportIncoming">Laekumine</option><option value="outgoing" data-i18n="paymentImportOutgoing">Väljamakse</option><option value="review" data-i18n="paymentImportFilterReview">Kontrollida</option><option value="duplicates" data-i18n="paymentImportFilterDuplicates">Duplikaadid</option></select></label><label class="field"><span data-i18n="paymentExportFrom">Alates</span><input id="paymentImportFrom" type="date"></label><label class="field"><span data-i18n="paymentExportTo">Kuni</span><input id="paymentImportTo" type="date"></label><label class="field"><span data-i18n="paymentImportCounterparty">Osapool</span><input id="paymentImportPartyFilter" type="search" data-i18n-placeholder="paymentImportCounterparty" placeholder="Osapool"></label><label class="field"><span data-i18n="paymentDescriptionColumn">Kirjeldus</span><input id="paymentImportDescriptionFilter" type="search" data-i18n-placeholder="paymentDescriptionColumn" placeholder="Kirjeldus"></label><label class="payment-import-select-visible"><input id="paymentImportSelectVisible" type="checkbox"><span data-i18n="paymentImportSelectAll">Vali nähtavad</span></label></div><div class="payments-preview" id="paymentImportPreview"><p class="payments-empty" data-i18n="paymentImportEmpty">Valige XML-fail tehingute eelvaateks.</p></div><div class="payments-actions payment-import-actions"><button class="secondary-button" id="paymentImportSaveDraft" type="button" disabled data-i18n="paymentImportSaveDraft">Salvesta mustand</button><button class="secondary-button" id="paymentImportDeleteSelected" type="button" disabled data-i18n="paymentImportDeleteSelected">Kustuta valitud</button><button class="text-button" id="paymentImportCancel" type="button" disabled data-i18n="paymentImportCancel">Katkesta</button><button class="primary-button" id="paymentImportConfirm" type="button" disabled data-i18n="paymentImportApplySelected">Rakenda valitud</button></div></div>`;
   importView.append(importPanel);
 
   const exportView = makeView("paymentExportView", "paymentExportTitle", "paymentExportDescription");
@@ -681,14 +788,325 @@
   const importInput = document.getElementById("paymentImportFile");
   const importPreview = document.getElementById("paymentImportPreview");
   const importConfirm = document.getElementById("paymentImportConfirm");
+  const importWorkbench = document.getElementById("paymentImportWorkbench");
+  const importDraftStatus = document.getElementById("paymentImportDraftStatus");
+  const importSaveDraft = document.getElementById("paymentImportSaveDraft");
+  const importDeleteSelected = document.getElementById("paymentImportDeleteSelected");
+  const importCancel = document.getElementById("paymentImportCancel");
+  const importStatusFilter = document.getElementById("paymentImportStatusFilter");
+  const importFrom = document.getElementById("paymentImportFrom");
+  const importTo = document.getElementById("paymentImportTo");
+  const importPartyFilter = document.getElementById("paymentImportPartyFilter");
+  const importDescriptionFilter = document.getElementById("paymentImportDescriptionFilter");
+  const importSelectVisible = document.getElementById("paymentImportSelectVisible");
   let importedRows = [];
   let importGeneration = 0;
   let importedContext = "";
+  let importedFileName = "";
+  let importedSkipped = 0;
+  let importDraftSaved = false;
   const importContext = () => `${cloudWorkspace?.organizationId || activeCompanyId}:${STORAGE.purchases}`;
+  const importDraftKey = () => `accounting-bank-payment-import-draft-v1:${cloudWorkspace?.organizationId || activeCompanyId}`;
+  const markImportDraftDirty = () => { importDraftSaved = false; try { localStorage.removeItem(importDraftKey()); } catch {} };
+  const isImportDuplicate = item => item.duplicate || purchases.some(saved => saved.bankImportId && saved.bankImportId === item.bankImportId);
+  const isImportReview = item => item.isReversal || !item.bankAccount || item.supplier === translateCopy("Банковская операция", "paymentImportUnknownParty") || item.supplier === translateCopy("Pangatehing", "paymentImportUnknownParty");
+  const filteredImportRows = () => importedRows.filter(item => {
+    const status = importStatusFilter.value;
+    const date = String(item.date || "");
+    const party = String(item.supplier || "").toLocaleLowerCase();
+    const description = String(item.note || "").toLocaleLowerCase();
+    return (!importFrom.value || date >= importFrom.value) && (!importTo.value || date <= importTo.value)
+      && party.includes(importPartyFilter.value.trim().toLocaleLowerCase())
+      && description.includes(importDescriptionFilter.value.trim().toLocaleLowerCase())
+      && (status === "all" || status === "selected" && item.selected && !isImportDuplicate(item)
+        || status === "incoming" && item.direction === "incoming" || status === "outgoing" && item.direction === "outgoing"
+        || status === "review" && !isImportDuplicate(item) && isImportReview(item)
+        || status === "duplicates" && isImportDuplicate(item));
+  });
+  const allocationFor = item => item.allocation ||= {
+    recipientType: item.direction === "incoming" ? "client" : "supplier",
+    counterparty: item.supplier || "", bankAccount: item.bankAccount || "",
+    invoiceSearch: "", invoices: [], advanceAmount: "", advanceDescription: "", extraLines: []
+  };
+  const allocationInvoiceRecords = item => {
+    const allocation = allocationFor(item);
+    const records = allocation.recipientType === "client" ? invoices : supplierInvoices;
+    const query = String(allocation.invoiceSearch || "").trim().toLocaleLowerCase(language);
+    return records.map(record => {
+      const client = allocation.recipientType === "client";
+      const outstanding = client ? invoiceOutstandingAmount(record) : Math.max(0, Number(record.amountDue ?? record.amount) || 0);
+      return {
+        id: String(record.id || record.number), number: String(record.number || record.invoiceNumber || "—"),
+        name: client ? record.client?.name || "—" : record.supplierName || "—",
+        reference: String(client ? record.referenceNumber || record.reference || "" : record.referenceNumber || record.reference || record.paymentReference || ""),
+        date: record.dueDate || record.date || "", outstanding, record
+      };
+    }).filter(invoice => invoice.outstanding > 0 && (!query || `${invoice.name} ${invoice.number} ${invoice.reference}`.toLocaleLowerCase(language).includes(query)));
+  };
+  const allocationTotal = item => {
+    const allocation = allocationFor(item);
+    return allocation.invoices.reduce((sum, row) => sum + (Number(row.amount) || 0), 0)
+      + (Number(allocation.advanceAmount) || 0)
+      + allocation.extraLines.reduce((sum, line) => sum + (Number(line.amount) || 0), 0);
+  };
+  const renderImportAllocation = item => {
+    const allocation = allocationFor(item);
+    const configuredAccounts = [...(document.getElementById("purchaseBankAccount")?.options || [])].map(option => ({ value: option.value, label: option.textContent.trim() })).filter(option => option.value);
+    const accountFound = configuredAccounts.some(option => option.value === allocation.bankAccount);
+    const accounts = configuredAccounts.slice();
+    if (allocation.bankAccount && !accounts.some(option => option.value === allocation.bankAccount)) accounts.unshift({ value: allocation.bankAccount, label: allocation.bankAccount });
+    if (!accounts.length && item.bankAccount) accounts.push({ value: item.bankAccount, label: item.bankAccount });
+    const selectedInvoices = new Map(allocation.invoices.map(row => [String(row.invoiceId), row]));
+    const invoicesForType = allocationInvoiceRecords(item);
+    const amount = Math.abs(Number(item.amount) || 0);
+    const difference = Math.round((amount - allocationTotal(item)) * 100) / 100;
+    const accountOptions = accounts.map(option => `<option value="${escapeHtml(option.value)}" ${option.value === allocation.bankAccount ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("");
+    const invoiceRows = invoicesForType.map(invoice => {
+      const selected = selectedInvoices.get(invoice.id);
+      const selectedAmount = selected ? Number(selected.amount) || 0 : 0;
+      return `<tr><td><input type="checkbox" data-import-allocation-invoice="${escapeHtml(invoice.id)}" ${selected ? "checked" : ""} aria-label="${escapeHtml(translateCopy("Vali arve", "paymentImportInvoice"))} ${escapeHtml(invoice.number)}"></td><td>${escapeHtml(invoice.name)}</td><td>${escapeHtml(invoice.number)}</td><td>${escapeHtml(invoice.reference || "—")}</td><td>${escapeHtml(formatDate(invoice.date) || "—")}</td><td>${money(invoice.outstanding)} EUR</td><td><input type="number" min="0.01" max="${invoice.outstanding}" step="0.01" value="${selectedAmount ? selectedAmount.toFixed(2) : ""}" data-import-allocation-amount="${escapeHtml(invoice.id)}" aria-label="${escapeHtml(translateCopy("Сумма платежа", "paymentImportAllocation"))}" ${selected ? "" : "disabled"}></td></tr>`;
+    }).join("");
+    const lineAccounts = (() => { try { return getLedgerAccounts().filter(account => account.type === (item.direction === "incoming" ? "income" : "expense")); } catch { return []; } })();
+    const allocationReady = difference === 0 && accountFound && (allocation.recipientType === (item.direction === "incoming" ? "client" : "supplier"));
+    const alreadyAllocated = purchases.some(payment => payment.bankImportId === item.bankImportId && payment.relatedInvoiceId);
+    const lineOptions = account => lineAccounts.map(option => `<option value="${escapeHtml(option.code)}" ${String(account || "") === String(option.code) ? "selected" : ""}>${escapeHtml(option.code)} · ${escapeHtml(option.label)}</option>`).join("");
+    return `<div class="payment-import-allocation" data-import-allocation="${escapeHtml(item.bankImportId)}"><div class="payment-import-allocation-heading"><strong>${escapeHtml(translateCopy("Jaota makse", "paymentImportOpen"))}</strong><div class="payment-import-recipient-tabs" role="group" aria-label="${escapeHtml(translateCopy("Osapoole tüüp", "paymentImportPartyName"))}"><button type="button" data-import-recipient-type="client" aria-pressed="${allocation.recipientType === "client"}">${escapeHtml(translateCopy("Klient", "paymentImportClient"))}</button><button type="button" data-import-recipient-type="supplier" aria-pressed="${allocation.recipientType === "supplier"}">${escapeHtml(translateCopy("Hankija", "paymentImportSupplier"))}</button></div></div><div class="payment-import-allocation-fields"><label class="field"><span>${escapeHtml(translateCopy("Osapool", "paymentImportPartyName"))}</span><input type="text" data-import-allocation-field="counterparty" value="${escapeHtml(allocation.counterparty)}"></label><label class="field"><span>${escapeHtml(translateCopy("Pangakonto", "paymentImportAccount"))}</span><select data-import-allocation-field="bankAccount">${accountOptions || `<option value="">—</option>`}</select></label><label class="field payment-import-invoice-search"><span>${escapeHtml(translateCopy("Otsi arve või osapoole järgi", "paymentImportInvoiceSearch"))}</span><input type="search" data-import-allocation-field="invoiceSearch" value="${escapeHtml(allocation.invoiceSearch)}"></label></div>${!accountFound ? `<p class="payment-import-allocation-warning" role="status">${escapeHtml(translateCopy("Pangakontot maksete seadetes ei leitud.", "paymentImportAccountWarning"))}</p>` : ""}${alreadyAllocated ? `<p class="payment-import-allocation-warning" role="status">${escapeHtml(translateCopy("Эта операция уже распределена и связана со счетом.", "paymentImportAlreadyAllocated"))}</p>` : ""}<div class="table-wrap payment-import-matches-wrap"><table class="data-table payment-import-matches"><thead><tr><th></th><th>${escapeHtml(translateCopy("Osapool", "paymentImportPartyName"))}</th><th>${escapeHtml(translateCopy("Arve", "paymentImportInvoice"))}</th><th>${escapeHtml(translateCopy("Viide", "paymentImportReference"))}</th><th>${escapeHtml(translateCopy("Tähtaeg", "paymentImportDue"))}</th><th>${escapeHtml(translateCopy("Maksmata", "paymentImportDue"))}</th><th>${escapeHtml(translateCopy("Makse summa", "paymentImportAllocation"))}</th></tr></thead><tbody>${invoiceRows || `<tr><td colspan="7" class="payment-import-no-matches">${escapeHtml(translateCopy("Sobivaid maksmata arveid ei leitud.", "paymentImportNoInvoices"))}</td></tr>`}</tbody></table></div><div class="payment-import-distribution-extras"><label class="field"><span>${escapeHtml(translateCopy("Ettemaks", "paymentImportAdvance"))}</span><input type="number" min="0" step="0.01" data-import-allocation-field="advanceAmount" value="${escapeHtml(allocation.advanceAmount)}"></label><label class="field"><span>${escapeHtml(translateCopy("Ettemaksu kirjeldus", "paymentImportAdvanceDescription"))}</span><input type="text" data-import-allocation-field="advanceDescription" value="${escapeHtml(allocation.advanceDescription)}"></label><button type="button" class="secondary-button" data-import-add-line>${escapeHtml(translateCopy("Lisa rida", "paymentImportAddExtraLine"))}</button></div>${allocation.extraLines.map((line, index) => `<div class="payment-import-extra-line" data-import-extra-index="${index}"><label class="field"><span>${escapeHtml(translateCopy("Kirjeldus", "paymentImportDescription"))}</span><input type="text" data-import-extra-field="description" value="${escapeHtml(line.description || "")}"></label><label class="field"><span>${escapeHtml(translateCopy("Summa", "paymentImportAllocation"))}</span><input type="number" min="0.01" step="0.01" data-import-extra-field="amount" value="${escapeHtml(line.amount || "")}"></label><label class="field"><span>${escapeHtml(translateCopy("Konto", "paymentImportAccountCode"))}</span><select data-import-extra-field="account"><option value="">—</option>${lineOptions(line.account)}</select></label><button type="button" class="payment-import-remove-extra" data-import-remove-line="${index}" aria-label="${escapeHtml(translateCopy("Eemalda rida", "paymentImportDeleteSelected"))}">×</button></div>`).join("")}<div class="payment-import-allocation-total"><span>${escapeHtml(translateCopy("Jaotatud kokku", "paymentImportTotal"))}: <strong data-import-allocation-total>${money(allocationTotal(item))} EUR</strong></span><span class="${difference === 0 ? "is-balanced" : "is-unbalanced"}">${escapeHtml(translateCopy("Erinevus", "paymentImportDifference"))}: <strong data-import-allocation-difference>${money(difference)} EUR</strong></span><span>${escapeHtml(translateCopy("Makse summa", "paymentImportAllocation"))}: ${money(amount)} EUR</span></div><div class="payment-import-allocation-actions"><button type="button" class="secondary-button" data-import-allocation-action="save" ${allocationReady&&!alreadyAllocated?"":"disabled"}>${escapeHtml(translateCopy("Salvesta", "paymentImportSaveAllocation"))}</button><button type="button" class="primary-button" data-import-allocation-action="next" ${allocationReady&&!alreadyAllocated?"":"disabled"}>${escapeHtml(translateCopy("Salvesta ja edasi", "paymentImportSaveNext"))}</button></div></div>`;
+  };
+  const updateImportSummary = () => {
+    const importable = importedRows.filter(item => !isImportDuplicate(item)).length;
+    const duplicates = importedRows.length - importable;
+    const selected = importedRows.filter(item => item.selected && !isImportDuplicate(item)).length;
+    document.getElementById("paymentImportFileName").textContent = importedFileName || translateCopy("Сохраненный черновик", "paymentImportSavedStatus");
+    document.getElementById("paymentImportCount").textContent = [`${importable} ${translateCopy("Строк для импорта", "paymentImportCount")}`, selected ? `${selected} ${translateCopy("выбрано", "paymentImportFilterSelected")}` : "", duplicates ? `${duplicates} ${translateCopy("Уже импортировано", "paymentImportDuplicate")}` : "", importedSkipped ? `${translateCopy("Пропущено", "paymentImportSkipped")}: ${importedSkipped}` : ""].filter(Boolean).join(" · ");
+    importDraftStatus.textContent = translateCopy(importDraftSaved ? "Черновик сохранен на этом устройстве" : "Готово к проверке", importDraftSaved ? "paymentImportSavedStatus" : "paymentImportReadyStatus");
+    importWorkbench.hidden = !importedRows.length;
+    importSaveDraft.disabled = !importedRows.length || importDraftSaved;
+    importDeleteSelected.disabled = selected === 0;
+    importCancel.disabled = !importedRows.length;
+    importConfirm.disabled = selected === 0;
+    const visible = filteredImportRows();
+    const visibleSelectable = visible.filter(item => !isImportDuplicate(item));
+    const visibleSelected = visibleSelectable.filter(item => item.selected).length;
+    importSelectVisible.checked = visibleSelectable.length > 0 && visibleSelected === visibleSelectable.length;
+    importSelectVisible.indeterminate = visibleSelected > 0 && !importSelectVisible.checked;
+  };
+  const renderImportReview = () => {
+    const rows = filteredImportRows();
+    if (!rows.length) {
+      importPreview.innerHTML = `<p class="payments-empty">${translateCopy("По заданным фильтрам строк нет.", "paymentImportFilterNoResults")}</p>`;
+      updateImportSummary();
+      return;
+    }
+    importPreview.innerHTML = `<div class="table-wrap payment-import-table-wrap"><table class="data-table payment-import-table"><thead><tr><th><span class="sr-only">${translateCopy("Выбрать видимые", "paymentImportSelectAll")}</span></th><th>${translateCopy("Статус", "paymentImportFilterStatus")}</th><th>${translateCopy("Дата", "paymentDateColumn")}</th><th>${translateCopy("Контрагент", "paymentImportCounterparty")}</th><th>${translateCopy("Направление", "paymentImportDirection")}</th><th>${translateCopy("Референс", "paymentImportReference")}</th><th>${translateCopy("Описание", "paymentDescriptionColumn")}</th><th>${translateCopy("Банковский счет", "paymentImportAccount")}</th><th>${translateCopy("Сумма", "paymentAmountColumn")}</th></tr></thead><tbody>${rows.map(item => {
+      const duplicate = isImportDuplicate(item), review = !duplicate && isImportReview(item);
+      const status = duplicate ? "paymentImportDuplicateStatus" : review ? "paymentImportReviewStatus" : "paymentImportRowReady";
+      const statusClass = duplicate ? "duplicate" : review ? "review" : "ready";
+      const row = `<tr class="payment-import-row payment-import-row-${statusClass}${item.editorOpen ? " is-open" : ""}" data-payment-import-open="${escapeHtml(item.bankImportId)}" tabindex="0" aria-expanded="${Boolean(item.editorOpen)}" aria-label="${escapeHtml(translateCopy("Распределить платеж", "paymentImportOpen"))}"><td><input type="checkbox" data-payment-import-row="${escapeHtml(item.bankImportId)}" aria-label="${escapeHtml(translateCopy("Выбрать строку", "paymentImportSelectRow"))}" ${item.selected && !duplicate ? "checked" : ""} ${duplicate ? "disabled" : ""}></td><td><span class="payment-import-status payment-import-status-${statusClass}">${escapeHtml(translateCopy(status === "paymentImportDuplicateStatus" ? "Дубликат" : status === "paymentImportReviewStatus" ? "Проверить" : "Готово", status))}</span></td><td>${escapeHtml(formatDate(item.date))}</td><td>${escapeHtml(item.supplier)}</td><td>${escapeHtml(translateCopy(item.direction === "incoming" ? "Поступление" : "Выплата", item.direction === "incoming" ? "paymentImportIncoming" : "paymentImportOutgoing"))}</td><td>${escapeHtml(item.referenceNumber || item.bankReference || "—")}</td><td>${escapeHtml(item.note || "—")}</td><td>${escapeHtml(item.bankAccount || "—")}</td><td class="payment-import-amount">${item.direction === "incoming" ? "+" : "-"}${money(item.amount)} ${escapeHtml(item.currency)}</td></tr>`;
+      return row + (item.editorOpen ? `<tr class="payment-import-details-row"><td colspan="9">${renderImportAllocation(item)}</td></tr>` : "");
+    }).join("")}</tbody></table></div>`;
+    importPreview.querySelectorAll(".payment-import-matches thead th:nth-child(5)").forEach(header => {
+      header.dataset.i18n = "paymentImportDueDate";
+      header.textContent = translateCopy("Срок оплаты", "paymentImportDueDate");
+    });
+    importPreview.querySelectorAll('[data-import-extra-field="description"]').forEach(input => {
+      const label = input.closest("label"),caption = label?.querySelector("span");
+      if (caption) { caption.dataset.i18n = "paymentImportExtraDescription"; caption.textContent = translateCopy("Описание", "paymentImportExtraDescription"); }
+    });
+    updateImportSummary();
+  };
+  const saveImportDraft = (silent = false) => {
+    const companyId = cloudWorkspace?.organizationId || activeCompanyId;
+    try {
+      localStorage.setItem(importDraftKey(), JSON.stringify({ companyId, fileName: importedFileName, skipped: importedSkipped, rows: importedRows }));
+      importDraftSaved = true;
+      renderImportReview();
+      if (!silent) showMessage(translateCopy("Черновик сохранен на этом устройстве", "paymentImportSavedStatus"));
+      return true;
+    } catch {
+      showMessage(translateCopy("Не удалось сохранить черновик импорта.", "paymentImportError"), true);
+      return false;
+    }
+  };
+  function loadImportDraft() {
+    if (importedRows.length) { renderImportReview(); return; }
+    try {
+      const draft = JSON.parse(localStorage.getItem(importDraftKey()) || "null");
+      if (!draft || draft.companyId !== (cloudWorkspace?.organizationId || activeCompanyId) || !Array.isArray(draft.rows) || !draft.rows.length) return;
+      importedRows = draft.rows.filter(item => item && item.bankImportId).map(item => ({ ...item, duplicate: purchases.some(saved => saved.bankImportId === item.bankImportId), selected: Boolean(item.selected) && !purchases.some(saved => saved.bankImportId === item.bankImportId) }));
+      importedFileName = draft.fileName || "";
+      importedSkipped = Number(draft.skipped) || 0;
+      importedContext = importContext();
+      importDraftSaved = true;
+      renderImportReview();
+    } catch {}
+  }
+  const updateAllocationTotals = allocationPanel => {
+    const bankRow = importedRows.find(item => item.bankImportId === allocationPanel.dataset.importAllocation);
+    if (!bankRow) return;
+    const allocation = allocationFor(bankRow),total = allocationTotal(bankRow), difference = Math.round((Math.abs(Number(bankRow.amount) || 0) - total) * 100) / 100;
+    allocationPanel.querySelector("[data-import-allocation-total]").textContent = `${money(total)} EUR`;
+    const differenceNode = allocationPanel.querySelector("[data-import-allocation-difference]");
+    differenceNode.textContent = `${money(difference)} EUR`;
+    differenceNode.parentElement.classList.toggle("is-balanced", difference === 0);
+    differenceNode.parentElement.classList.toggle("is-unbalanced", difference !== 0);
+    const configuredAccount = [...(document.getElementById("purchaseBankAccount")?.options || [])].some(option => option.value && option.value === allocation.bankAccount);
+    const alreadyAllocated = purchases.some(payment => payment.bankImportId === bankRow.bankImportId && payment.relatedInvoiceId);
+    const ready = difference === 0 && configuredAccount && !alreadyAllocated && allocation.recipientType === (bankRow.direction === "incoming" ? "client" : "supplier");
+    allocationPanel.querySelectorAll('[data-import-allocation-action]').forEach(button => { button.disabled = !ready; });
+    markImportDraftDirty();
+  };
+  const saveImportAllocation = async (item, moveNext) => {
+    const start = importedRows.indexOf(item),nextItem = [...importedRows.slice(start + 1), ...importedRows.slice(0, start)].find(candidate => candidate !== item && !purchases.some(payment => payment.bankImportId === candidate.bankImportId && payment.relatedInvoiceId));
+    try {
+      await window.GENERAR_ACCOUNTING_APP?.applyBankPaymentAllocation(item, allocationFor(item));
+    } catch (error) {
+      showMessage(error.message || translateCopy("Не удалось сохранить распределение платежа.", "paymentImportError"), true);
+      return;
+    }
+    importedRows = importedRows.filter(candidate => candidate !== item);
+    markImportDraftDirty();
+    if (!importedRows.length) {
+      localStorage.removeItem(importDraftKey());
+      importedContext = ""; importedFileName = ""; importedSkipped = 0; importDraftSaved = false; importInput.value = "";
+      importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите XML файл для просмотра операций.", "paymentImportEmpty")}</p>`;
+      updateImportSummary();
+      showMessage(translateCopy("Платеж распределен и сохранен.", "paymentImportAllocationSaved"));
+      return;
+    }
+    importDraftSaved = false;
+    if (!saveImportDraft(true)) return;
+    if (moveNext && nextItem && importedRows.includes(nextItem)) nextItem.editorOpen = true;
+    renderImportReview();
+    showMessage(translateCopy("Платеж распределен и сохранен.", "paymentImportAllocationSaved"));
+  };
+  importPreview.addEventListener("click", event => {
+    const allocationPanel = event.target.closest("[data-import-allocation]");
+    const row = importedRows.find(item => item.bankImportId === (allocationPanel?.dataset.importAllocation || event.target.closest("[data-payment-import-open]")?.dataset.paymentImportOpen));
+    const recipientButton = event.target.closest("[data-import-recipient-type]");
+    if (row && recipientButton) {
+      allocationFor(row).recipientType = recipientButton.dataset.importRecipientType;
+      allocationFor(row).invoices = [];
+      row.editorOpen = true;
+      renderImportReview();
+      return;
+    }
+    const addLineButton = event.target.closest("[data-import-add-line]");
+    if (row && addLineButton) {
+      allocationFor(row).extraLines.push({ id: crypto.randomUUID(), description: "", amount: "", account: "" });
+      renderImportReview();
+      return;
+    }
+    const removeLineButton = event.target.closest("[data-import-remove-line]");
+    if (row && removeLineButton) {
+      allocationFor(row).extraLines.splice(Number(removeLineButton.dataset.importRemoveLine), 1);
+      renderImportReview();
+      return;
+    }
+    const actionButton = event.target.closest("[data-import-allocation-action]");
+    if (row && actionButton) { void saveImportAllocation(row, actionButton.dataset.importAllocationAction === "next"); return; }
+    const openRow = event.target.closest("[data-payment-import-open]");
+    if (!openRow || event.target.closest("button,input,select,textarea,a")) return;
+    const opened = importedRows.find(item => item.bankImportId === openRow.dataset.paymentImportOpen);
+    if (!opened) return;
+    opened.editorOpen = !opened.editorOpen;
+    if (opened.editorOpen) allocationFor(opened);
+    renderImportReview();
+  });
+  importPreview.addEventListener("keydown", event => {
+    const row = event.target.closest("[data-payment-import-open]");
+    if (!row || event.target.closest("input,button,select,textarea")) return;
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); row.click(); }
+  });
+  importPreview.addEventListener("input", event => {
+    const allocationPanel = event.target.closest("[data-import-allocation]");
+    if (!allocationPanel) return;
+    const row = importedRows.find(item => item.bankImportId === allocationPanel.dataset.importAllocation);
+    if (!row) return;
+    const allocation = allocationFor(row);
+    const field = event.target.dataset.importAllocationField;
+    if (field) allocation[field] = event.target.value;
+    const invoiceId = event.target.dataset.importAllocationAmount;
+    if (invoiceId) {
+      const match = allocation.invoices.find(entry => String(entry.invoiceId) === invoiceId);
+      if (match) match.amount = event.target.value;
+    }
+    const extraIndex = event.target.closest("[data-import-extra-index]")?.dataset.importExtraIndex;
+    const extraField = event.target.dataset.importExtraField;
+    if (extraIndex !== undefined && extraField) allocation.extraLines[Number(extraIndex)][extraField] = event.target.value;
+    if (field === "invoiceSearch") { markImportDraftDirty(); return; }
+    updateAllocationTotals(allocationPanel);
+  });
+  importPreview.addEventListener("change", event => {
+    if (event.target.matches('[data-import-allocation-field="invoiceSearch"]')) {
+      const allocationPanel = event.target.closest("[data-import-allocation]");
+      const row = importedRows.find(item => item.bankImportId === allocationPanel?.dataset.importAllocation);
+      if (row) renderImportReview();
+    }
+  });
+  importPreview.addEventListener("change", event => {
+    const allocationPanel = event.target.closest("[data-import-allocation]");
+    if (allocationPanel) {
+      const row = importedRows.find(item => item.bankImportId === allocationPanel.dataset.importAllocation);
+      const invoiceId = event.target.dataset.importAllocationInvoice;
+      if (row && invoiceId) {
+        const allocation = allocationFor(row),index = allocation.invoices.findIndex(entry => String(entry.invoiceId) === invoiceId);
+        if (event.target.checked && index < 0) allocation.invoices.push({ invoiceId, amount: "" });
+        else if (!event.target.checked && index >= 0) allocation.invoices.splice(index, 1);
+        renderImportReview();
+        return;
+      }
+      const invoiceAmount = event.target.dataset.importAllocationAmount;
+      if (row && invoiceAmount) {
+        const match = allocationFor(row).invoices.find(entry => String(entry.invoiceId) === invoiceAmount);
+        if (match) match.amount = event.target.value;
+        updateAllocationTotals(allocationPanel);
+        return;
+      }
+    }
+    const checkbox = event.target.closest("[data-payment-import-row]");
+    if (!checkbox) return;
+    const row = importedRows.find(item => item.bankImportId === checkbox.dataset.paymentImportRow);
+    if (!row || isImportDuplicate(row)) return;
+    row.selected = checkbox.checked;
+    markImportDraftDirty();
+    updateImportSummary();
+  });
+  importStatusFilter.addEventListener("change", renderImportReview);
+  [importFrom, importTo, importPartyFilter, importDescriptionFilter].forEach(input => input.addEventListener("input", renderImportReview));
+  importSelectVisible.addEventListener("change", () => {
+    for (const item of filteredImportRows()) if (!isImportDuplicate(item)) item.selected = importSelectVisible.checked;
+    markImportDraftDirty();
+    renderImportReview();
+  });
+  importSaveDraft.addEventListener("click", () => saveImportDraft());
+  importDeleteSelected.addEventListener("click", () => {
+    if (!window.confirm(translateCopy("Удалить выбранные строки из черновика?", "paymentImportDeleteConfirm"))) return;
+    const hadSavedDraft = importDraftSaved;
+    importedRows = importedRows.filter(item => !item.selected || isImportDuplicate(item));
+    markImportDraftDirty();
+    if (hadSavedDraft && importedRows.length) saveImportDraft(true);
+    else if (!importedRows.length) {
+      importedContext = ""; importedFileName = ""; importedSkipped = 0; importInput.value = "";
+      importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите XML файл для просмотра операций.", "paymentImportEmpty")}</p>`;
+      updateImportSummary();
+    } else renderImportReview();
+  });
+  importCancel.addEventListener("click", () => {
+    if (!window.confirm(translateCopy("Отбросить текущий импорт и сохраненный черновик?", "paymentImportDiscardConfirm"))) return;
+    localStorage.removeItem(importDraftKey());
+    importedRows = []; importedContext = ""; importedFileName = ""; importedSkipped = 0; importDraftSaved = false;
+    importInput.value = ""; importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите XML файл для просмотра операций.", "paymentImportEmpty")}</p>`;
+    updateImportSummary();
+  });
   importInput.addEventListener("change", async () => {
     const generation = ++importGeneration;
     const context = importContext();
+    if (importedRows.length && !window.confirm(translateCopy("Заменить текущий черновик новой выпиской?", "paymentImportReplaceConfirm"))) { importInput.value = ""; return; }
+    try { localStorage.removeItem(importDraftKey()); } catch {}
     importedRows = [];
+    importDraftSaved = false;
+    importedFileName = importInput.files[0]?.name || "";
+    importedSkipped = 0;
     importConfirm.disabled = true;
     document.getElementById("paymentImportCount").textContent = "";
     if (!can("payments")) { denyAction("payments"); return; }
@@ -699,33 +1117,40 @@
       if (generation !== importGeneration) return;
       if (context !== importContext()) throw new Error("paymentImportContextChanged");
       const knownIds = new Set(purchases.map(item => item.bankImportId).filter(Boolean));
-      importedRows = parsed.rows.filter(item => !knownIds.has(item.bankImportId));
+      importedRows = parsed.rows.map(item => ({ ...item, duplicate: knownIds.has(item.bankImportId), selected: !knownIds.has(item.bankImportId) }));
+      importedSkipped = parsed.skipped;
       importedContext = context;
-      const duplicates = parsed.rows.length - importedRows.length;
-      document.getElementById("paymentImportCount").textContent = [`${importedRows.length} ${translateCopy("Строк для импорта", "paymentImportCount")}`, parsed.skipped ? `${translateCopy("Пропущено", "paymentImportSkipped")}: ${parsed.skipped}` : "", duplicates ? `${translateCopy("Уже импортировано", "paymentImportDuplicate")}: ${duplicates}` : ""].filter(Boolean).join(" · ");
-      importPreview.innerHTML = importedRows.length ? `<table class="data-table"><thead><tr><th>${translateCopy("Дата", "paymentDateColumn")}</th><th>${translateCopy("Контрагент", "paymentImportCounterparty")}</th><th>${translateCopy("Направление", "paymentImportDirection")}</th><th>${translateCopy("Описание", "paymentDescriptionColumn")}</th><th>${translateCopy("Сумма", "paymentAmountColumn")}</th></tr></thead><tbody>${importedRows.slice(0, 50).map(item => `<tr><td>${escapeHtml(formatDate(item.date))}</td><td>${escapeHtml(item.supplier)}</td><td>${translateCopy(item.direction === "incoming" ? "Поступление" : "Выплата", item.direction === "incoming" ? "paymentImportIncoming" : "paymentImportOutgoing")}</td><td>${escapeHtml(item.note)}</td><td>${money(item.amount)} ${escapeHtml(item.currency)}</td></tr>`).join("")}</tbody></table>` : `<p class="payments-empty">${translateCopy("Новых проведенных операций нет.", "paymentImportNoRows")}</p>`;
-      importConfirm.disabled = !importedRows.length;
+      renderImportReview();
     } catch (error) {
       if (generation !== importGeneration) return;
-      importedRows = []; importConfirm.disabled = true;
+      importedRows = []; importDraftSaved = false; importedFileName = ""; importedSkipped = 0; importConfirm.disabled = true;
       importPreview.innerHTML = `<p class="payments-empty">${escapeHtml(translateCopy("Не удалось прочитать XML файл.", /^paymentImport/.test(error.message) ? error.message : "paymentImportReadError"))}</p>`;
+      updateImportSummary();
     }
   });
   importConfirm.addEventListener("click", () => {
     if (!can("payments")) { denyAction("payments"); return; }
-    if (!importedRows.length) return;
+    const selectedRows = importedRows.filter(item => item.selected && !isImportDuplicate(item));
+    if (!selectedRows.length) return;
+    if (selectedRows.some(item => item.allocation && (item.allocation.invoices?.length || Number(item.allocation.advanceAmount) > 0 || item.allocation.extraLines?.some(line => Number(line.amount) > 0)))) {
+      showMessage(translateCopy("Сохраните распределение через кнопку в раскрытой строке.", "paymentImportUseRowSave"), true);
+      return;
+    }
     if (importedContext !== importContext()) { importedRows = []; importConfirm.disabled = true; showMessage(translateCopy("Компания изменилась. Загрузите XML заново.", "paymentImportContextChanged"), true); return; }
     const knownIds = new Set(purchases.map(item => item.bankImportId).filter(Boolean));
-    const rows = importedRows.filter(item => !knownIds.has(item.bankImportId)).map(item => ({ ...item, id: crypto.randomUUID(), category: "bank", amountDue: 0, paymentMethod: "bank", paymentOrigin: "bank-import", enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—" }));
-    if (!rows.length) { importedRows = []; importConfirm.disabled = true; showMessage(translateCopy("Новых операций нет.", "paymentImportNoRows")); return; }
+    const rows = selectedRows.filter(item => !knownIds.has(item.bankImportId)).map(item => ({ ...item, id: crypto.randomUUID(), category: "bank", amountDue: 0, paymentMethod: "bank", paymentOrigin: "bank-import", enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—" }));
+    if (!rows.length) { importedRows = importedRows.map(item => ({ ...item, duplicate: true, selected: false })); renderImportReview(); showMessage(translateCopy("Новых операций нет.", "paymentImportNoRows")); return; }
     const next = [...rows, ...purchases];
     try { saveList(STORAGE.purchases, next); purchases = next; }
     catch { showMessage(translateCopy("Не удалось сохранить импортированные платежи.", "paymentImportError"), true); return; }
-    importedRows = []; importInput.value = ""; importConfirm.disabled = true;
-    importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите XML файл для просмотра операций.", "paymentImportEmpty")}</p>`;
-    document.getElementById("paymentImportCount").textContent = "";
+    const appliedIds = new Set(rows.map(item => item.bankImportId));
+    importedRows = importedRows.filter(item => !appliedIds.has(item.bankImportId) && !isImportDuplicate(item)).map(item => ({ ...item, selected: false }));
+    importDraftSaved = false;
+    if (importedRows.length) saveImportDraft(true);
+    else { localStorage.removeItem(importDraftKey()); importInput.value = ""; importedFileName = ""; importedSkipped = 0; }
+    renderImportReview();
     renderPurchases(); renderDashboard(); renderReport();
-    showMessage(translateCopy("Платежи импортированы.", "paymentImportSaved"));
+    showMessage(`${rows.length} ${translateCopy("Платежей применено", "paymentImportAppliedCount")}.`);
   });
   cashForm.addEventListener("cash-payment-saved", () => {
     cashCurrentPage = 1;

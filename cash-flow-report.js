@@ -47,6 +47,14 @@
   const methodFor = value => value === "transfer" ? "bank" : value || "bank";
   let lastRows = [];
   const collectPayments = () => {
+    if (typeof window.createAccountingLedgerEntries === "function") {
+      const cashAccounts = new Map(getLedgerAccounts().filter(account => ["bank", "cash"].includes(account.reportGroup)).map(account => [String(account.code), account.reportGroup === "cash" ? "cash" : "bank"]));
+      const records = window.createAccountingLedgerEntries(get("cashFlowStart").value || "0001-01-01", get("cashFlowEnd").value || localDate())
+        .map(entry => ({ entry, signedAmount: Math.round(((Number(entry.debit) || 0) - (Number(entry.credit) || 0)) * 100) / 100 }))
+        .filter(({ entry, signedAmount }) => entry.sourceType !== "openingBalance" && cashAccounts.has(String(entry.accountCode)) && signedAmount !== 0)
+        .map(({ entry, signedAmount }) => ({ date: entry.date, amount: Math.abs(signedAmount), incoming: signedAmount > 0, party: entry.party || entry.object || "—", description: entry.description || entry.documentNumber || "", method: cashAccounts.get(String(entry.accountCode)), currency: entry.currency || "EUR" }));
+      return { records, excluded: 0 };
+    }
     const records = [];
     const linkedIds = new Set();
     const linkedKeys = new Map();
