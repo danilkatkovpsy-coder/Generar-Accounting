@@ -16,7 +16,7 @@
   const roundMoney = value => Math.round((Number(value) || 0) * 100) / 100;
   const isDate = value => /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
   const normalizedDate = value => String(value || "").slice(0, 10);
-  const cashAccountFor = item => item?.paymentMethod === "cash" || item?.payment_method === "cash" || item?.cashRegister ? "1100" : "1000";
+  const cashAccountFor = item => item?.paymentMethod === "cash" || item?.payment_method === "cash" || item?.method === "cash" || item?.cashRegister ? "1100" : "1000";
   const descriptionFor = item => String(item?.description || item?.note || item?.category || "").trim();
   const objectFor = item => String(item?.objectName || item?.object || item?.project || "").trim();
   const amountForLine = item => roundMoney((Number(item.quantity) || 0) * (Number(item.price) || 0) * (1 - Math.min(100, Math.max(0, Number(item.discountPercent) || 0)) / 100) * (1 + Math.max(0, Number(item.taxRate) || 0) / 100));
@@ -93,11 +93,12 @@
     const kind = linkedKind || (record.direction === "incoming" ? "client" : "supplier");
     const id = `payment-${record.relatedInvoicePaymentId || record.id || paymentFingerprint(kind, invoiceId, date, amount, record.paymentMethod || record.payment_method)}`;
     const description = record.note || record.description || record.category || (kind === "client" ? "Laekumine" : "Makse");
-    const common = voucherCommon(id, sourceType, record, date, record.documentReference || record.referenceNumber || record.invoiceNumber || invoiceId, description, record.objectName || record.object);
+    const sourceDocument = record.documentReference || record.referenceNumber || record.invoiceNumber || invoiceId || record.bankReference || record.bankImportId || record.id;
+    const common = voucherCommon(id, sourceType, record, date, sourceDocument, description, record.objectName || record.object);
     const cashCode = validAccount(cashAccountFor(record), "1000");
     if (invoiceId && kind === "client") addVoucher(entries, common, [makeLine(common, cashCode, amount, 0), makeLine(common, "1200", 0, amount)]);
     else if (invoiceId && kind === "supplier") addVoucher(entries, common, [makeLine(common, "2000", amount, 0), makeLine(common, cashCode, 0, amount)]);
-    else if (record.paymentOrigin === "bank-import-advance") addVoucher(entries, common, record.direction === "incoming"
+    else if (record.paymentOrigin === "bank-import-advance" || String(record.paymentOrigin || "").endsWith("-payment-advance")) addVoucher(entries, common, record.direction === "incoming"
       ? [makeLine(common, cashCode, amount, 0), makeLine(common, "2000", 0, amount)]
       : [makeLine(common, "1200", amount, 0), makeLine(common, cashCode, 0, amount)]);
     else {
@@ -168,7 +169,7 @@
 
     for (const manual of manualJournalEntries) {
       if (!isDate(manual.date)) continue;
-      const common = voucherCommon(`manual-${manual.id}`, "manual", manual, manual.date, manual.documentNumber, manual.description || manual.internalInfo, manual.object);
+      const common = { ...voucherCommon(`manual-${manual.id}`, "manual", manual, manual.date, manual.documentNumber, manual.description || manual.internalInfo, manual.object), correctionOf: String(manual.correctionOf || ""), correctionDocument: String(manual.correctionDocument || "") };
       const lines = Array.isArray(manual.lines) ? manual.lines : [{ accountCode: manual.debitAccount, debit: manual.amount }, { accountCode: manual.creditAccount, credit: manual.amount }];
       addVoucher(entries, common, lines.map(line => makeLine(common, validAccount(line.accountCode, ""), line.debit, line.credit, { description: line.description || common.description, object: line.object || common.object })));
     }
@@ -205,14 +206,32 @@
   const baseGenerateGeneralLedger = generateGeneralLedger;
   generateGeneralLedger = (...args) => {
     const start = document.getElementById("ledgerStartDate")?.value || "";
-    const result = baseGenerateGeneralLedger(...args);
+    const originalCreateLedgerEntries = createLedgerEntries;
+    const openingAtPeriodStart = !ledgerDemoMode && isDate(start) && ledgerOpeningBalances.effectiveDate === start;
+    if (openingAtPeriodStart) createLedgerEntries = (from, to) => originalCreateLedgerEntries(from, to).filter(entry => entry.sourceType !== "openingBalance" || entry.date !== start);
+    let result;
+    try { result = baseGenerateGeneralLedger(...args); }
+    finally { createLedgerEntries = originalCreateLedgerEntries; }
     if (!start || !Array.isArray(lastLedgerEntries)) return result;
     const balances = window.getLedgerOpeningBalances(start);
+    if (openingAtPeriodStart) {
+      for (const entry of buildAccountingLedgerEntries(start, start)) {
+        if (entry.sourceType !== "openingBalance") continue;
+        const accountCode = String(entry.accountCode || "");
+        balances.set(accountCode, roundMoney((balances.get(accountCode) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0)));
+      }
+    }
+    const openingRows = [...balances.entries()].filter(([, value]) => value !== 0).map(([accountCode, value]) => ({
+      id: `opening-display-${start}-${accountCode}`, sourceType: "openingBalanceDisplay", date: start,
+      documentNumber: "ALG", object: "", description: translateCopy("Начальное сальдо", "ledgerOpeningBalancesTitle"),
+      accountCode, account: accountFor(accountCode)?.label || accountCode, debit: 0, credit: 0, balance: value
+    }));
     for (const entry of lastLedgerEntries) {
       const accountCode = String(entry.accountCode || "");
       balances.set(accountCode, roundMoney((balances.get(accountCode) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0)));
       entry.balance = balances.get(accountCode);
     }
+    lastLedgerEntries = [...openingRows, ...lastLedgerEntries];
     const body = document.getElementById("ledgerTableRows");
     if (body) body.innerHTML = lastLedgerEntries.map(entry => `<tr><td>${escapeHtml(formatDate(entry.date))}</td><td>${escapeHtml(entry.documentNumber || "")}</td><td>${escapeHtml(entry.object || "")}</td><td>${escapeHtml(entry.accountCode)} · ${escapeHtml(entry.account || "")}</td><td>${escapeHtml(entry.description || "")}</td><td>${entry.debit ? money(entry.debit) : "—"}</td><td>${entry.credit ? money(entry.credit) : "—"}</td><td>${money(entry.balance || 0)} EUR</td></tr>`).join("") || `<tr><td colspan="8" class="empty-row">${escapeHtml(translateCopy("Нет проводок за выбранный период.", "ledgerEmpty"))}</td></tr>`;
     return result;
@@ -240,7 +259,7 @@
     purchases: purchases.map(item => [item.id, item.date, item.amount, item.amountDue, item.accountCode, item.category, item.status, item.direction, item.paymentOrigin, item.relatedInvoiceId, item.paymentMethod, item.payment_method, item.invoiceNumber, item.supplier, item.note]),
     supplierInvoices: supplierInvoices.map(item => [item.id, item.date, item.amount, item.status, item.accountCode, item.invoiceLine, item.invoiceNumber, item.supplierName, (item.items || []).map(line => [line.accountCode, line.quantity, line.price, line.discountPercent, line.taxRate, line.isTextLine]), (item.payments || []).map(payment => [payment.id, payment.date, payment.amount, payment.status])]),
     expenses: expenses.map(item => [item.id, item.date, item.amount, item.status, item.accountCode, item.invoiceNumber, item.supplierName]),
-    journals: manualJournalEntries.map(item => [item.id, item.date, item.lines]),
+    journals: manualJournalEntries.map(item => [item.id, item.date, item.lines, item.correctionOf, item.correctionDocument]),
     depreciation: readStorage(STORAGE.fixedAssets, []).map(asset => [asset.id, (asset.depreciationEntries || []).map(item => [item.id, item.date, item.amount, item.expenseAccount, item.depreciationAccount, item.assetAccount])]),
     opening: ledgerOpeningBalances,
     accounts: accountPlanEntries.map(account => [account.code, account.type, account.active, account.reportGroup, account.annualReportLine])
@@ -367,9 +386,130 @@
     const totals = monthlyLedgerSummary(period.start, period.end), costs = totals.buy + totals.cost;
     return { ...period, ...totals, purchases: totals.buy, supplierInvoices: 0, otherExpenses: totals.cost, costs, result: totals.sales - costs };
   };
-  summarizeBalancePeriod = period => {
-    const totals = summarizeProfitPeriod(period);
-    return { ...period, ...totals, totalExpenses: totals.costs };
+  Object.assign(ruTexts, {
+    balanceSheetAssets: "Активы",
+    balanceSheetLiabilities: "Обязательства",
+    balanceSheetEquity: "Капитал",
+    balanceSheetRetained: "Накопленная прибыль / убыток",
+    balanceSheetLiabilitiesEquity: "Обязательства и капитал",
+    balanceSheetDifference: "Разница (должна быть 0)",
+    balanceSheetBalanced: "Баланс сходится: активы равны обязательствам и капиталу.",
+    balanceSheetUnbalanced: "Баланс не сходится. Проверьте начальные остатки и проводки.",
+    balanceSheetNoOpening: "Начальные остатки не заданы; баланс может быть неполным.",
+    balanceDisclaimer: "Сальдо на выбранную дату рассчитано по бухгалтерским проводкам."
+  });
+  Object.assign(etTexts, {
+    balanceSheetAssets: "Aktiva",
+    balanceSheetLiabilities: "Kohustised",
+    balanceSheetEquity: "Omakapital",
+    balanceSheetRetained: "Jaotamata kasum / kahjum",
+    balanceSheetLiabilitiesEquity: "Kohustised ja omakapital",
+    balanceSheetDifference: "Erinevus (peab olema 0)",
+    balanceSheetBalanced: "Bilanss klapib: aktiva võrdub kohustiste ja omakapitaliga.",
+    balanceSheetUnbalanced: "Bilanss ei klapi. Kontrollige algsaldo ja kanded üle.",
+    balanceSheetNoOpening: "Algsaldod puuduvad; bilanss võib olla mittetäielik.",
+    balanceDisclaimer: "Valitud kuupäeva saldod arvutatakse pearaamatu kannetest."
+  });
+  const balanceSheetAt = date => {
+    if (!isDate(date)) return null;
+    const accounts = getLedgerAccounts(), balances = new Map();
+    for (const entry of buildAccountingLedgerEntries("0001-01-01", date)) {
+      const code = String(entry.accountCode || "");
+      balances.set(code, roundMoney((balances.get(code) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0)));
+    }
+    const accountBalances = Object.fromEntries(accounts.map(account => [account.code, balances.get(account.code) || 0]));
+    const assetAccounts = accounts.filter(account => account.type === "asset");
+    const liabilityAccounts = accounts.filter(account => account.type === "liability" && account.reportGroup !== "balance");
+    const equityAccounts = accounts.filter(account => account.type === "liability" && account.reportGroup === "balance");
+    const total = (items, normalSide) => roundMoney(items.reduce((sum, account) => {
+      const balance = accountBalances[account.code] || 0;
+      return sum + (normalSide === "credit" ? -balance : balance);
+    }, 0));
+    const retainedEarnings = roundMoney(accounts.reduce((sum, account) => {
+      if (account.type !== "income" && account.type !== "expense") return sum;
+      return sum - (accountBalances[account.code] || 0);
+    }, 0));
+    const assets = total(assetAccounts, "debit");
+    const liabilities = total(liabilityAccounts, "credit");
+    const equity = roundMoney(total(equityAccounts, "credit") + retainedEarnings);
+    const liabilitiesAndEquity = roundMoney(liabilities + equity);
+    return {
+      date,
+      accounts,
+      accountBalances,
+      assetAccounts,
+      liabilityAccounts,
+      equityAccounts,
+      assets,
+      liabilities,
+      retainedEarnings,
+      equity,
+      liabilitiesAndEquity,
+      difference: roundMoney(assets - liabilitiesAndEquity),
+      balanced: Math.round(assets * 100) === Math.round(liabilitiesAndEquity * 100),
+      hasOpeningBalances: isDate(ledgerOpeningBalances.effectiveDate) && ledgerOpeningBalances.effectiveDate <= date && Object.keys(ledgerOpeningBalances.accounts || {}).length > 0
+    };
+  };
+  window.calculateAccountingBalanceSheet = balanceSheetAt;
+  summarizeBalancePeriod = period => ({ ...period, ...balanceSheetAt(period.end) });
+  let lastBalanceSheets = [];
+  generateBalanceReport = () => {
+    const periods = balancePeriodRanges().map(period => ({ ...period, ...balanceSheetAt(period.end) }));
+    if (periods.some(period => !period.accounts)) return false;
+    lastBalanceSheets = periods;
+    const showZero = document.getElementById("balanceShowZeroRows").checked;
+    const columns = periods.length + 1;
+    const formatRow = (label, values, className = "") => `<tr${className ? ` class="${className}"` : ""}><th scope="row">${escapeHtml(label)}</th>${values.map(value => `<td>${money(value)} EUR</td>`).join("")}</tr>`;
+    const sectionRow = label => `<tr class="balance-sheet-section"><th colspan="${columns}">${escapeHtml(label)}</th></tr>`;
+    const accountRows = (key, accountList, normalSide) => accountList
+      .filter(account => showZero || periods.some(period => (period.accountBalances[account.code] || 0) !== 0))
+      .map(account => formatRow(`${account.code} · ${account.label}`, periods.map(period => {
+        const balance = period.accountBalances[account.code] || 0;
+        return normalSide === "credit" ? -balance : balance;
+      }), `balance-sheet-account ${key}`)).join("");
+    const rows = [sectionRow(copy("balanceSheetAssets")), accountRows("asset-account", periods[0].assetAccounts, "debit"), formatRow(copy("balanceSheetAssets"), periods.map(period => period.assets), "balance-sheet-total"), sectionRow(copy("balanceSheetLiabilities")), accountRows("liability-account", periods[0].liabilityAccounts, "credit"), formatRow(copy("balanceSheetLiabilities"), periods.map(period => period.liabilities), "balance-sheet-total"), sectionRow(copy("balanceSheetEquity")), accountRows("equity-account", periods[0].equityAccounts, "credit"), formatRow(copy("balanceSheetRetained"), periods.map(period => period.retainedEarnings), "balance-sheet-account"), formatRow(copy("balanceSheetEquity"), periods.map(period => period.equity), "balance-sheet-total"), formatRow(copy("balanceSheetLiabilitiesEquity"), periods.map(period => period.liabilitiesAndEquity), "balance-sheet-total"), formatRow(copy("balanceSheetDifference"), periods.map(period => period.difference), "balance-sheet-difference")].join("");
+    document.getElementById("balanceResultTitle").textContent = copy("balanceTitle");
+    document.getElementById("balanceResultPeriod").textContent = periods.map(period => `${period.label} · ${formatDate(period.end)}`).join(" · ");
+    document.getElementById("balanceTableHead").innerHTML = `<tr><th>${escapeHtml(copy("ledgerAccountLabel"))}</th>${periods.map(period => `<th>${escapeHtml(period.label)}</th>`).join("")}</tr>`;
+    document.getElementById("balanceTableRows").innerHTML = rows;
+    let status = document.getElementById("balanceEquationStatus");
+    if (!status) {
+      status = document.createElement("p");
+      status.id = "balanceEquationStatus";
+      status.className = "hint balance-equation-status";
+      document.getElementById("balanceResults").querySelector(".table-wrap")?.before(status);
+    }
+    const allBalanced = periods.every(period => period.balanced);
+    status.textContent = `${copy(allBalanced ? "balanceSheetBalanced" : "balanceSheetUnbalanced")}${periods.some(period => !period.hasOpeningBalances) ? ` ${copy("balanceSheetNoOpening")}` : ""}`;
+    status.classList.toggle("is-error", !allBalanced);
+    document.getElementById("balanceResults").hidden = false;
+    return true;
+  };
+  exportBalanceReport = () => {
+    if (!can("exportReports")) { denyAction("exportReports"); return; }
+    if (document.getElementById("balanceResults").hidden || !lastBalanceSheets.length) generateBalanceReport();
+    const periods = lastBalanceSheets;
+    if (!periods.length) return;
+    const reportRows = [];
+    const append = (label, values) => reportRows.push([label, ...values.map(value => Number(value || 0).toFixed(2))]);
+    for (const [label, list, normalSide] of [[copy("balanceSheetAssets"), periods[0].assetAccounts, "debit"], [copy("balanceSheetLiabilities"), periods[0].liabilityAccounts, "credit"], [copy("balanceSheetEquity"), periods[0].equityAccounts, "credit"]]) {
+      reportRows.push([label, ...periods.map(() => "")]);
+      for (const account of list) append(`${account.code} · ${account.label}`, periods.map(period => {
+        const value = period.accountBalances[account.code] || 0;
+        return normalSide === "credit" ? -value : value;
+      }));
+      append(label, periods.map(period => label === copy("balanceSheetAssets") ? period.assets : label === copy("balanceSheetLiabilities") ? period.liabilities : period.equity));
+      if (label === copy("balanceSheetEquity")) append(copy("balanceSheetRetained"), periods.map(period => period.retainedEarnings));
+    }
+    append(copy("balanceSheetLiabilitiesEquity"), periods.map(period => period.liabilitiesAndEquity));
+    append(copy("balanceSheetDifference"), periods.map(period => period.difference));
+    const cell = value => {
+      let text = String(value ?? "");
+      if (/^[\s]*[=+@-]/.test(text)) text = `'${text}`;
+      return `"${text.replaceAll('"', '""')}"`;
+    };
+    const data = [[copy("ledgerAccountLabel"), ...periods.map(period => `${period.label} · ${period.end}`)], ...reportRows];
+    triggerBlobDownload(new Blob(["\ufeff", data.map(row => row.map(cell).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" }), `bilanss-${localDate()}.csv`);
   };
 
   const getAccountPlanPanel = () => document.getElementById("accountPlanPanel");

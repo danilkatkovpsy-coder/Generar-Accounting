@@ -37,7 +37,7 @@
     bankComposerRecipientRequired: "Укажите получателя платежа.",
     bankComposerAccountRequired: "Выберите банковский счет.",
     bankComposerInvalidAmount: "Сумма оплаты превышает остаток счета.",
-    bankComposerInvalidLine: "Для каждой строки с суммой укажите описание и положительную цену.",
+    bankComposerInvalidLine: "Для каждой строки с суммой укажите описание, положительную цену и счёт учета.",
     bankComposerSaved: "Банковский платеж сохранен.", bankComposerSaveError: "Не удалось сохранить банковский платеж.",
     bankComposerIncoming: "Поступление от клиента", bankComposerOutgoing: "Платеж поставщику", bankComposerClientAdvance: "Аванс клиента",
     bankComposerDetailsTitle: "Детали банковского платежа", bankComposerEdit: "Изменить", bankComposerCancelEdit: "Отмена",
@@ -68,7 +68,7 @@
     bankComposerRecipientRequired: "Sisestage makse saaja.",
     bankComposerAccountRequired: "Valige pangakonto.",
     bankComposerInvalidAmount: "Makse ületab arve jäägi.",
-    bankComposerInvalidLine: "Täitke iga summaga rea kirjeldus ja hind.",
+    bankComposerInvalidLine: "Täitke iga summaga rea kirjeldus, hind ja konto.",
     bankComposerSaved: "Pangamakse salvestati.", bankComposerSaveError: "Pangamakset ei saanud salvestada.",
     bankComposerIncoming: "Laekumine kliendilt", bankComposerOutgoing: "Makse hankijale", bankComposerClientAdvance: "Kliendi ettemakse",
     bankComposerDetailsTitle: "Pangamakse üksikasjad", bankComposerEdit: "Muuda", bankComposerCancelEdit: "Tühista",
@@ -293,12 +293,18 @@
     updateTotal();
   };
 
+  const populateExtraLineAccount = (select, selectedValue = "") => {
+    const type = recipientType === "client" ? "income" : "expense";
+    const accounts = getLedgerAccounts().filter(account => account.type === type);
+    select.innerHTML = `<option value="">—</option>${accounts.map(account => `<option value="${escapeHtml(account.code)}">${escapeHtml(account.code)} · ${escapeHtml(account.label)}</option>`).join("")}`;
+    select.value = accounts.some(account => String(account.code) === String(selectedValue)) ? String(selectedValue) : "";
+  };
   const addExtraLine = () => {
     const row = document.createElement("tr");
     row.dataset.extraLine = "true";
     row.innerHTML = `<td><input type="text" data-line-field="description" aria-label="${escapeHtml(copy("Kirjeldus", "bankComposerDescription"))}"></td><td><input type="number" min="0.01" step="0.01" value="1" data-line-field="quantity" aria-label="${escapeHtml(copy("Kogus", "bankComposerQuantity"))}"></td><td><input type="number" min="0" step="0.01" value="0" data-line-field="price" aria-label="${escapeHtml(copy("Hind", "bankComposerPrice"))}"></td><td class="bank-payment-extra-total"><output>0,00</output></td><td><select data-line-field="account" aria-label="${escapeHtml(copy("Konto", "bankComposerAccount"))}"><option value="">—</option><option value="4000">4000</option><option value="2100">2100</option><option value="1000">1000</option></select></td><td><input type="text" data-line-field="object" aria-label="${escapeHtml(copy("Objekt", "bankComposerObject"))}"></td><td><button type="button" class="bank-payment-remove-line" aria-label="${escapeHtml(copy("Eemalda rida", "bankComposerRemoveLine"))}" title="${escapeHtml(copy("Eemalda rida", "bankComposerRemoveLine"))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"></path></svg></button></td>`;
     const lineAccount = row.querySelector('[data-line-field="account"]');
-    try { lineAccount.innerHTML = `<option value="">—</option>${getLedgerAccounts().filter(account => account.type === "expense").map(account => `<option value="${escapeHtml(account.code)}">${escapeHtml(account.code)} · ${escapeHtml(account.label)}</option>`).join("")}`; }
+    try { populateExtraLineAccount(lineAccount); }
     catch {}
     if (isCash) {
       const description = row.querySelector('[data-line-field="description"]');
@@ -312,6 +318,7 @@
   };
   const setRecipientType = type => {
     recipientType = type;
+    extraBody.querySelectorAll('[data-line-field="account"]').forEach(select => populateExtraLineAccount(select, select.value));
     clientTab.setAttribute("aria-pressed", String(type === "client"));
     supplierTab.setAttribute("aria-pressed", String(type === "supplier"));
     const labelKey = type === "client" ? "bankComposerClientAdvanceLabel" : "bankComposerSupplierAdvanceLabel";
@@ -393,7 +400,7 @@
     const advanceValue = Math.round((Number(advanceAmount.value) || 0) * 100) / 100;
     const advanceText = advanceDescription.value.trim();
     const activeLines = lines.filter(line => line.description || line.amount > 0);
-    if (activeLines.some(line => !line.description || line.amount <= 0) || (advanceValue > 0 && !advanceText)) {
+    if (activeLines.some(line => !line.description || line.amount <= 0 || !line.account) || (advanceValue > 0 && !advanceText)) {
       showMessage(copy("Täitke iga summaga rea kirjeldus ja hind.", "bankComposerInvalidLine"), true);
       return;
     }

@@ -1,0 +1,120 @@
+{
+  "organization": {
+    "profile": "small-ou-non-vat-payer",
+    "financialYear": 2025,
+    "vatRegistered": false
+  },
+  "openingBalances": {
+    "effectiveDate": "2025-01-01",
+    "accounts": {
+      "1000": { "debit": 1000, "credit": 0 },
+      "2900": { "debit": 0, "credit": 1000 }
+    }
+  },
+  "accounts": [
+    { "code": "3010", "descriptionEt": "Teenustulu", "descriptionEn": "Service revenue", "type": "income", "annualReportLine": "Revenue", "reportGroup": "sales", "active": true },
+    { "code": "6100", "descriptionEt": "Sidekulud", "descriptionEn": "Communications", "type": "expense", "annualReportLine": "OtherOperatingExpense", "reportGroup": "expenses", "active": true },
+    { "code": "6200", "descriptionEt": "Tarkvara", "descriptionEn": "Software", "type": "expense", "annualReportLine": "OtherOperatingExpense", "reportGroup": "expenses", "active": true }
+  ],
+  "salesInvoices": [
+    {
+      "id": "qa-sale-a", "number": "QA-001", "date": "2025-01-10", "total": 1000, "status": "sent", "currency": "EUR",
+      "client": { "name": "QA Client A" },
+      "items": [
+        { "description": "Consulting", "quantity": 1, "price": 600, "taxRate": 0, "accountCode": "3000", "discountPercent": 0 },
+        { "description": "Service", "quantity": 1, "price": 400, "taxRate": 0, "accountCode": "3010", "discountPercent": 0 }
+      ],
+      "payments": [
+        { "id": "qa-sale-pay-1", "date": "2025-02-01", "amount": 400, "method": "bank" },
+        { "id": "qa-sale-pay-2", "date": "2025-03-01", "amount": 250, "method": "cash" }
+      ]
+    },
+    {
+      "id": "qa-sale-b", "number": "QA-002", "date": "2025-06-15", "total": 500, "status": "sent", "currency": "EUR",
+      "client": { "name": "QA Client A" },
+      "items": [{ "description": "Monthly service", "quantity": 1, "price": 500, "taxRate": 0, "accountCode": "3010", "discountPercent": 0 }],
+      "payments": []
+    },
+    {
+      "id": "qa-sale-paid", "number": "QA-2025-005", "date": "2025-12-01", "total": 100, "status": "sent", "currency": "EUR", "emailSent": false,
+      "client": { "name": "QA-2025 Client A" },
+      "items": [{ "description": "QA fully paid service", "quantity": 1, "price": 100, "taxRate": 0, "accountCode": "3010", "discountPercent": 0 }],
+      "payments": [{ "id": "qa-paid-cash-5", "date": "2025-12-15", "amount": 100, "method": "cash", "payment_method": "cash", "paid_at": "2025-12-15T10:00:00.000Z" }]
+    {
+      "id": "qa-sale-c", "number": "QA-003", "date": "2025-09-01", "total": 300, "status": "sent", "currency": "EUR",
+      "client": { "name": "QA Client B" },
+    { "id": "qa-paid-cash-5", "date": "2025-12-15", "amount": 100, "direction": "incoming", "paymentOrigin": "client-invoice-payment", "paymentMethod": "cash", "relatedInvoiceId": "qa-sale-paid", "relatedInvoicePaymentId": "qa-paid-cash-5", "accountCode": "3010", "supplier": "QA-2025 Client A", "note": "QA-2025-005 paid in cash" },
+    { "id": "qa-paid-cash-6", "date": "2025-12-15", "amount": 100, "direction": "incoming", "paymentOrigin": "client-invoice-payment", "paymentMethod": "cash", "relatedInvoiceId": "qa-sale-paid", "relatedInvoicePaymentId": "qa-paid-cash-5", "accountCode": "3010", "supplier": "QA-2025 Client A", "note": "QA-2025-005 paid in cash" }
+      "payments": []
+    },
+    {
+      "id": "qa-sale-save-path", "number": "QA-2025-004", "date": "2025-11-01", "total": 50, "status": "sent", "currency": "EUR", "emailSent": false,
+      "client": { "name": "QA-2025 Client B" },
+      "items": [{ "description": "QA saved sale", "quantity": 1, "price": 50, "taxRate": 0, "accountCode": "3000", "discountPercent": 0 }],
+      "payments": []
+    },
+    {
+      "id": "qa-sale-paid", "number": "QA-2025-005", "date": "2025-12-01", "total": 100, "status": "sent", "currency": "EUR", "emailSent": false,
+      "client": { "name": "QA-2025 Client A" },
+      "items": [{ "description": "QA fully paid service", "quantity": 1, "price": 100, "taxRate": 0, "accountCode": "3010", "discountPercent": 0 }],
+      "payments": [{ "id": "qa-paid-cash-5", "date": "2025-12-15", "amount": 100, "method": "cash", "payment_method": "cash", "paid_at": "2025-12-15T10:00:00.000Z" }]
+    }
+  ],
+  "supplierInvoices": [
+    {
+      "id": "qa-sup-rent", "invoiceNumber": "QA-P-001", "date": "2025-01-05", "amount": 200, "status": "unpaid", "invoiceLine": "expense", "accountCode": "6000", "supplierName": "QA Rent",
+      "items": [{ "description": "Rent", "quantity": 1, "price": 200, "taxRate": 0, "accountCode": "6000", "discountPercent": 0 }],
+      "payments": [{ "id": "qa-rent-paid", "date": "2025-01-15", "amount": 200, "method": "bank" }]
+    },
+    {
+      "id": "qa-sup-internet", "invoiceNumber": "QA-P-002", "date": "2025-02-05", "amount": 100, "status": "unpaid", "invoiceLine": "expense", "accountCode": "6100", "supplierName": "QA Internet",
+      "items": [{ "description": "Internet", "quantity": 1, "price": 100, "taxRate": 0, "accountCode": "6100", "discountPercent": 0 }],
+      "payments": []
+    },
+    {
+      "id": "qa-sup-software", "invoiceNumber": "QA-P-003", "date": "2025-03-05", "amount": 80, "status": "unpaid", "invoiceLine": "expense", "accountCode": "6200", "supplierName": "QA Software",
+      "items": [{ "description": "Software", "quantity": 1, "price": 80, "taxRate": 0, "accountCode": "6200", "discountPercent": 0 }],
+      "payments": [{ "id": "qa-software-paid", "date": "2025-04-05", "amount": 30, "method": "cash" }]
+    }
+  ],
+  "bankCashMovements": [
+    { "id": "qa-bank-fee", "bankImportId": "qa-fee", "date": "2025-05-01", "amount": 25, "direction": "outgoing", "paymentOrigin": "bank-import-allocation", "paymentMethod": "bank", "accountCode": "6100", "supplier": "QA Bank", "note": "Unmatched bank fee, manually allocated" },
+    { "id": "qa-cash-sale", "date": "2025-09-01", "amount": 60, "direction": "incoming", "paymentOrigin": "cash-register", "paymentMethod": "cash", "accountCode": "3000", "supplier": "QA walk-in", "note": "Cash sale" },
+    { "id": "qa-cash-expense", "date": "2025-10-01", "amount": 10, "direction": "outgoing", "paymentOrigin": "cash-register", "paymentMethod": "cash", "accountCode": "6200", "supplier": "QA petty cash", "note": "Cash office supply" },
+    { "id": "qa-paid-cash-5", "date": "2025-12-15", "amount": 100, "direction": "incoming", "paymentOrigin": "client-invoice-payment", "paymentMethod": "cash", "relatedInvoiceId": "qa-sale-paid", "relatedInvoicePaymentId": "qa-paid-cash-5", "accountCode": "3010", "supplier": "QA-2025 Client A", "note": "QA-2025-005 paid in cash" }
+  ],
+  "manualCorrections": [
+    {
+      "id": "qa-correction-1", "number": 1, "date": "2025-08-01", "documentNumber": "QA-ADJ-001", "correctionOf": "payment-qa-bank-fee", "correctionDocument": "QA-BANK-001", "description": "Reclassify bank fee", "currency": "EUR",
+      "lines": [
+        { "accountCode": "6000", "debit": 25, "credit": 0, "description": "Bank fee expense" },
+        { "accountCode": "6100", "debit": 0, "credit": 25, "description": "Reverse previous classification" }
+      ]
+    },
+    {
+      "id": "qa-correction-2", "number": 2, "date": "2025-08-02", "documentNumber": "QA-ADJ-002", "correctionOf": "supplier-invoice-qa-sup-internet", "correctionDocument": "QA-P-002", "description": "Reclassify internet expense", "currency": "EUR",
+      "lines": [
+        { "accountCode": "6200", "debit": 10, "credit": 0, "description": "Internet expense correction" },
+        { "accountCode": "6100", "debit": 0, "credit": 10, "description": "Reverse previous classification" }
+      ]
+    }
+  ],
+  "expected": {
+    "voucherCount": 19,
+    "journalLineCount": 39,
+    "debitTotal": 4440,
+    "creditTotal": 4440,
+    "turnoverDebit": 3440,
+    "turnoverCredit": 3440,
+    "bankClosing": 1175,
+    "cashClosing": 370,
+    "accountsReceivable": 1200,
+    "accountsPayable": 150,
+    "revenue": 2010,
+    "expenses": 415,
+    "profit": 1595,
+    "assets": 2745,
+    "liabilitiesAndEquity": 2745,
+    "annualReportUnmappedAccounts": []
+  }
+}

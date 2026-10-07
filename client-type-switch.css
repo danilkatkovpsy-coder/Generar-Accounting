@@ -1,0 +1,4 @@
+.client-type-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid #dfe6e2;border-radius:6px;background:#f1f4f2}
+.client-type-option{display:flex;min-width:0;min-height:38px;align-items:center;justify-content:center;padding:8px 10px;border:0;border-radius:4px;color:#59665f;background:transparent;font-size:13px;font-weight:550;line-height:1.25;text-align:center;cursor:pointer;transition:color .16s,background-color .16s,box-shadow .16s}
+.client-type-option[aria-checked="true"]{color:#fff;background:#203c34;font-weight:650;box-shadow:0 1px 3px rgba(20,43,35,.2)}
+.client-type-option:focus-visible{outline:2px solid #987453;outline-offset:2px}

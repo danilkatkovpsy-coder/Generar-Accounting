@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
+  <BkToCstmrStmt>
+    <GrpHdr><MsgId>TEST-ARVESEMU-2026-10</MsgId><CreDtTm>2026-10-07T12:00:00Z</CreDtTm></GrpHdr>
+    <Stmt>
+      <Id>TEST-STATEMENT-2026-10</Id>
+      <ElctrncSeqNb>1</ElctrncSeqNb>
+      <CreDtTm>2026-10-07T12:00:00Z</CreDtTm>
+      <Acct><Id><IBAN>EE000000000000000000</IBAN></Id><Ccy>EUR</Ccy></Acct>
+      <Ntry>
+        <Amt Ccy="EUR">100.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-10-06</Dt></BookgDt><AcctSvcrRef>TEST-BANK-2026-001</AcctSvcrRef>
+        <NtryDtls><TxDtls><Refs><AcctSvcrRef>TEST-BANK-2026-001</AcctSvcrRef></Refs>
+          <RltdPties><Dbtr><Pty><Nm>TEST CUSTOMER</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>TEST PAYMENT INV-TEST-2026-001</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">60.00</Amt><CdtDbtInd>DBIT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-10-06</Dt></BookgDt><AcctSvcrRef>TEST-BANK-2026-002</AcctSvcrRef>
+        <NtryDtls><TxDtls><Refs><AcctSvcrRef>TEST-BANK-2026-002</AcctSvcrRef></Refs>
+          <RltdPties><Cdtr><Pty><Nm>TEST SUPPLIER</Nm></Pty></Cdtr></RltdPties>
+          <RmtInf><Ustrd>TEST PAYMENT SUP-TEST-2026-001</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

@@ -1,0 +1,10 @@
+.registry-autocomplete-field{position:relative}
+.registry-company-results{position:absolute;z-index:30;top:100%;inset-inline:0;max-height:280px;margin-top:4px;padding:4px;overflow:auto;border:1px solid #d8cfc1;border-radius:5px;background:#fff;box-shadow:0 8px 24px rgba(48,40,32,.16)}
+.registry-company-results[hidden]{display:none!important}
+.registry-company-option{display:grid;width:100%;gap:3px;padding:9px 10px;border:0;border-radius:3px;color:#1d2b27;background:#fff;text-align:left;cursor:pointer}
+.registry-company-option+.registry-company-option{border-top:1px solid #eee8df}
+.registry-company-option:hover,.registry-company-option:focus-visible{background:#f4f1e9;outline:0}
+.registry-company-name{font-size:13px;font-weight:650;overflow-wrap:anywhere}
+.registry-company-meta{color:#75695c;font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+.registry-company-contacts{color:#75695c;font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+.registry-company-message{margin:0;padding:10px;color:#75695c;font-size:12px;line-height:1.4}

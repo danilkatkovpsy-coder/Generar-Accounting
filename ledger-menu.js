@@ -10,6 +10,8 @@
   Object.assign(ruTexts, { navLedger: "Главная книга", ledgerEntriesMenu: "Проводки главной книги", ledgerBookMenu: "Главная книга", ledgerTurnoverMenu: "Оборотная ведомость", ledgerAdvancedTitle: "Дополнительные настройки", ledgerPrintRelated: "Показывать связанные счета при печати", ledgerOnlyTransactions: "Показывать только счета с операциями", ledgerOptionsApply: "Применить", ledgerOptionsCancel: "Отмена", ledgerDemoMode: "Тестовые данные", ledgerLiveMode: "Обычные данные", ledgerTurnoverNotice: "Обороты по счетам за выбранный период.", ledgerReportBlock: "Отчет", ledgerAccountsBlock: "Счета", ledgerObjectsBlock: "Объекты", ledgerGroupDays: "Группировка", ledgerNoGrouping: "Без группировки", ledgerByDay: "По дням", ledgerByWeek: "По неделям", ledgerByMonth: "По месяцам", ledgerAvailableList: "Доступные", ledgerSelectedList: "Выбранные", ledgerAddAll: "Добавить все", ledgerRemoveAll: "Убрать все", ledgerAddItem: "Добавить", ledgerRemoveItem: "Убрать", ledgerChooseAccount: "Выберите хотя бы один счет.", ledgerNoSelection: "Ничего не выбрано.", ledgerEur: "EUR" });
   Object.assign(etTexts, { navLedger: "Pearaamat", ledgerEntriesMenu: "Pearaamatu kanded", ledgerBookMenu: "Pearaamat", ledgerTurnoverMenu: "Käibeandmik", ledgerAdvancedTitle: "Täpsemad seaded", ledgerPrintRelated: "Kuva väljarükil seotud kontod", ledgerOnlyTransactions: "Kuva ainult tehingutega kontod", ledgerOptionsApply: "Rakenda", ledgerOptionsCancel: "Tühista", ledgerDemoMode: "Näidisandmed", ledgerLiveMode: "Tegelikud andmed", ledgerTurnoverNotice: "Kontode käibeandmik valitud perioodi kohta.", ledgerReportBlock: "Aruanne", ledgerAccountsBlock: "Kontod", ledgerObjectsBlock: "Objektid", ledgerGroupDays: "Rühmitamine", ledgerNoGrouping: "Ära rühmita", ledgerByDay: "Päeva kaupa", ledgerByWeek: "Nädala kaupa", ledgerByMonth: "Kuu kaupa", ledgerAvailableList: "Kõik", ledgerSelectedList: "Valitud", ledgerAddAll: "Lisa kõik", ledgerRemoveAll: "Eemalda kõik", ledgerAddItem: "Lisa", ledgerRemoveItem: "Eemalda", ledgerChooseAccount: "Vali vähemalt üks konto.", ledgerNoSelection: "Valikuid pole.", ledgerEur: "EUR" });
   const copy = key => translateCopy(key, key);
+  Object.assign(ruTexts, { journalEntryCorrectionOf: "Исправляет операцию", journalEntryNoCorrection: "Без корректировки", journalEntryCorrectionMissing: "Исходная операция не найдена за дату корректировки." });
+  Object.assign(etTexts, { journalEntryCorrectionOf: "Parandab tehingut", journalEntryNoCorrection: "Paranduseta", journalEntryCorrectionMissing: "Algset tehingut ei leitud paranduse kuupäevaks." });
   Object.assign(ruTexts, { journalDocumentOrDescription: "Документ или описание", journalPostingAmount: "Сумма проводки", journalDate: "КП", journalEnteredAt: "Внесено", journalEnteredBy: "Внесший", journalClearFilters: "Сбросить фильтры", journalFilter: "ФИЛЬТРОВАТЬ", journalNoRows: "Нет проводок за выбранный период.", journalSort: "Сортировать", journalNumberColumn: "№", journalDocumentColumn: "ДОКУМЕНТ-ОСНОВАНИЕ", journalDescriptionColumn: "ОПИСАНИЕ", journalAmountColumn: "СУММА ПРОВОДКИ", journalCurrencyColumn: "€/$", journalDateColumn: "КП", journalEnteredAtColumn: "ВНЕСЕНО", journalEnteredByColumn: "ВНЕСШИЙ" });
   Object.assign(etTexts, { journalDocumentOrDescription: "Alusdokument või kirjeldus", journalPostingAmount: "Kande summa", journalDate: "KP", journalEnteredAt: "Sisestatud", journalEnteredBy: "Sisestaja", journalClearFilters: "Tühjenda filtrid", journalFilter: "FILTREERI", journalNoRows: "Valitud perioodil kandeid pole.", journalSort: "Sordi", journalNumberColumn: "NR", journalDocumentColumn: "ALUSDOKUMENT", journalDescriptionColumn: "KIRJELDUS", journalAmountColumn: "KANDE SUMMA", journalCurrencyColumn: "€/$", journalDateColumn: "KP", journalEnteredAtColumn: "SISESTATUD", journalEnteredByColumn: "SISESTAJA" });
   Object.assign(ruTexts, { journalAdd: "Добавить", journalMore: "Ещё", journalHelp: "Справка", journalRefresh: "Обновить список", journalOpenLedger: "Открыть главную книгу", journalHelpText: "Список включает сохранённые документы и ручные двойные проводки. Для старых записей без номера, времени или автора показано тире.", journalAllCurrencies: "Все валюты", journalLocalOnlySaved: "Проводка сохранена на этом устройстве. Примените миграцию для облачной синхронизации.", journalEntryTitle: "Новая проводка", journalEntryDate: "Дата проводки", journalEntryDocument: "Документ-основание", journalEntryDescription: "Описание", journalEntryAmount: "Сумма проводки", journalEntryDebit: "Счёт дебета", journalEntryCredit: "Счёт кредита", journalEntryCancel: "Отмена", journalEntrySave: "Сохранить проводку", journalEntrySameAccounts: "Выберите разные счета дебета и кредита.", journalEntrySaved: "Проводка сохранена." });
@@ -90,6 +92,14 @@
   const journalEntryGrid = journalEntryDialog.querySelector(".ledger-journal-entry-grid");
   journalEntryGrid.innerHTML = `<label class="field"><span data-i18n="journalEntryDate">${copy("journalEntryDate")}</span><input id="ledgerJournalEntryDate" type="date" required></label><label class="field"><span data-i18n="journalEntryDocument">${copy("journalEntryDocument")}</span><input id="ledgerJournalEntryDocument" type="text" maxlength="180"></label><label class="field"><span data-i18n="ledgerCurrencyLabel">${copy("ledgerCurrencyLabel")}</span><select id="ledgerJournalEntryCurrency"><option value="EUR">EUR - Euro</option></select></label>`;
   journalEntryGrid.insertAdjacentHTML("afterend", `<section class="ledger-journal-entry-lines"><div class="ledger-journal-entry-lines-heading"><h3 data-i18n="journalEntryTitle">${copy("journalEntryTitle")}</h3><button type="button" class="secondary-button" id="ledgerJournalEntryAddLine" data-i18n="journalEntryAddLine">${copy("journalEntryAddLine")}</button></div><div class="ledger-journal-entry-table-wrap"><table class="ledger-journal-entry-table"><thead><tr><th data-i18n="journalEntryAccount">${copy("journalEntryAccount")}</th><th data-i18n="journalEntryDebitColumn">${copy("journalEntryDebitColumn")}</th><th data-i18n="journalEntryCreditColumn">${copy("journalEntryCreditColumn")}</th><th data-i18n="journalEntryLineDescription">${copy("journalEntryLineDescription")}</th><th data-i18n="journalEntryObject">${copy("journalEntryObject")}</th><th></th></tr></thead><tbody id="ledgerJournalEntryRows"></tbody><tfoot><tr><th data-i18n="journalEntryDebitTotal">${copy("journalEntryDebitTotal")}</th><td id="ledgerJournalEntryDebitTotal">0,00 EUR</td><th data-i18n="journalEntryCreditTotal">${copy("journalEntryCreditTotal")}</th><td id="ledgerJournalEntryCreditTotal">0,00 EUR</td><td colspan="2"></td></tr></tfoot></table></div></section><div class="ledger-journal-entry-extras"><label class="field"><span data-i18n="journalEntryFiles">${copy("journalEntryFiles")}</span><input id="ledgerJournalEntryFile" type="file" accept=".pdf,image/*"><span id="ledgerJournalEntryFileName" class="ledger-journal-file-name" data-i18n="journalEntryAttach">${copy("journalEntryAttach")}</span></label><label class="field"><span data-i18n="journalEntryInternal">${copy("journalEntryInternal")}</span><textarea id="ledgerJournalEntryInternal" rows="2" maxlength="1000"></textarea></label></div>`);
+  const correctionField = document.createElement("label"), correctionLabel = document.createElement("span"), correctionSelect = document.createElement("select");
+  correctionField.className = "field ledger-journal-entry-wide";
+  correctionLabel.dataset.i18n = "journalEntryCorrectionOf";
+  correctionLabel.textContent = copy("journalEntryCorrectionOf");
+  correctionSelect.id = "ledgerJournalCorrectionOf";
+  correctionSelect.innerHTML = `<option value="">${escapeHtml(copy("journalEntryNoCorrection"))}</option>`;
+  correctionField.append(correctionLabel, correctionSelect);
+  journalEntryGrid.append(correctionField);
   const journalLinesTitle = journalEntryDialog.querySelector(".ledger-journal-entry-lines-heading h3");
   journalLinesTitle.dataset.i18n = "journalEntryLines";
   journalLinesTitle.textContent = copy("journalEntryLines");
@@ -171,11 +181,15 @@
     for (const entry of createLedgerEntries(rangeStart, rangeEnd)) {
       const source = journalSourceFor(entry) || {};
       const row = groups.get(entry.id) || { number: entry.journalNumber || entry.entryNumber || source.journalNumber || source.entryNumber || "—", document: entry.documentNumber || "", description: entry.description || "", date: entry.date || "", currency: entry.currency || source.currency || "EUR", debit: 0, credit: 0, enteredAt: journalEnteredAt(entry.enteredAt || entry.createdAt || source.enteredAt || source.createdAt || source.created_at), enteredBy: entry.enteredBy || entry.createdByEmail || entry.authorEmail || source.enteredBy || source.createdBy || source.createdByEmail || source.author || "—" };
+      if (entry.correctionOf || source.correctionOf) {
+        row.correctionOf = entry.correctionOf || source.correctionOf;
+        row.correctionDocument = entry.correctionDocument || source.correctionDocument || row.correctionOf;
+      }
       row.debit += Number(entry.debit) || 0;
       row.credit += Number(entry.credit) || 0;
       groups.set(entry.id, row);
     }
-    journalRows = [...groups.values()].map(row => ({ ...row, amount: row.debit || row.credit })).sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.number).localeCompare(String(b.number), undefined, { numeric: true }) || String(a.document).localeCompare(String(b.document), undefined, { numeric: true }));
+    journalRows = [...groups.values()].map(row => ({ ...row, document: row.correctionOf ? `${row.document || "—"} ↶ ${row.correctionDocument}` : row.document, amount: row.debit || row.credit })).sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.number).localeCompare(String(b.number), undefined, { numeric: true }) || String(a.document).localeCompare(String(b.document), undefined, { numeric: true }));
     renderJournalRows();
     return true;
   };
@@ -199,9 +213,20 @@
   get("ledgerJournalEntryAddLine").addEventListener("click", addJournalEntryLine);
   get("ledgerJournalEntryChooseFile").addEventListener("click", () => get("ledgerJournalEntryFile").click());
   get("ledgerJournalEntryFile").addEventListener("change", event => { const name = event.target.files[0]?.name; get("ledgerJournalEntryFileName").textContent = name || copy("journalEntryNoFile"); get("ledgerJournalEntryFileName").removeAttribute("data-i18n"); });
+  const refreshCorrectionSources = () => {
+    const select = get("ledgerJournalCorrectionOf"), selected = select.value, vouchers = new Map();
+    for (const entry of createLedgerEntries("0001-01-01", localDate())) if (!vouchers.has(entry.id)) vouchers.set(entry.id, entry);
+    select.innerHTML = `<option value="">${escapeHtml(copy("journalEntryNoCorrection"))}</option>${[...vouchers.values()].sort((first, second) => first.date.localeCompare(second.date) || first.id.localeCompare(second.id)).map(entry => {
+      const documentNumber = entry.documentNumber || entry.id;
+      const label = `${formatDate(entry.date)} · ${documentNumber} · ${entry.description || entry.account || ""}`.trim();
+      return `<option value="${escapeHtml(entry.id)}" data-correction-document="${escapeHtml(documentNumber)}">${escapeHtml(label)}</option>`;
+    }).join("")}`;
+    select.value = selected;
+  };
   get("ledgerJournalAdd").addEventListener("click", () => {
     if (!can("reports")) { denyAction("reports"); return; }
     journalForm.reset();
+    refreshCorrectionSources();
     get("ledgerJournalEntryRows").replaceChildren();
     addJournalEntryLine();
     addJournalEntryLine();
@@ -245,9 +270,17 @@
       try { attachmentData = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = reject; reader.readAsDataURL(attachmentFile); }); }
       catch { get("ledgerJournalEntryError").textContent = copy("journalEntryFileTooLarge"); get("ledgerJournalEntryError").hidden = false; return; }
     }
+    const correctionOf = get("ledgerJournalCorrectionOf").value;
+    const correctionEntry = correctionOf ? createLedgerEntries("0001-01-01", get("ledgerJournalEntryDate").value).find(item => item.id === correctionOf) : null;
+    if (correctionOf && !correctionEntry) {
+      get("ledgerJournalEntryError").textContent = copy("journalEntryCorrectionMissing");
+      get("ledgerJournalEntryError").hidden = false;
+      return;
+    }
     const entry = {
       id: crypto.randomUUID(), number: Math.max(0, ...manualJournalEntries.map(item => Number(item.number) || 0)) + 1,
       date: get("ledgerJournalEntryDate").value, documentNumber: get("ledgerJournalEntryDocument").value.trim(),
+      correctionOf, correctionDocument: correctionEntry ? correctionEntry.documentNumber || correctionEntry.id : "",
       description: [...new Set(lines.map(line => line.description).filter(Boolean))].join("; "),
       amount: debitTotal / 100, currency: get("ledgerJournalEntryCurrency").value, lines,
       internalInfo: get("ledgerJournalEntryInternal").value.trim(), attachmentName: attachmentFile?.name || "", attachmentData,
@@ -471,8 +504,13 @@
     const priorDay = value => { const date = new Date(`${value}T12:00:00`); date.setDate(date.getDate() - 1); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; };
     const selectedEntry = entry => !turnoverSelection.objects.size || turnoverSelection.objects.has(entry.object);
     const hasOpeningBalances = window.hasLedgerOpeningBalances?.() === true;
-    const openingBalancesAtFiscalStart = window.getLedgerOpeningBalances?.(fiscalStart) || new Map();
-    const fiscalEntries = start > fiscalStart ? createLedgerEntries(fiscalStart, end).filter(selectedEntry) : createLedgerEntries(start, end).filter(selectedEntry);
+    const openingBalancesAtFiscalStart = new Map(window.getLedgerOpeningBalances?.(fiscalStart) || []);
+    const sourceEntries = (start > fiscalStart ? createLedgerEntries(fiscalStart, end) : createLedgerEntries(start, end)).filter(selectedEntry);
+    for (const entry of sourceEntries) {
+      if (entry.sourceType !== "openingBalance" || entry.date !== fiscalStart) continue;
+      openingBalancesAtFiscalStart.set(entry.accountCode, Math.round(((openingBalancesAtFiscalStart.get(entry.accountCode) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0)) * 100) / 100);
+    }
+    const fiscalEntries = sourceEntries.filter(entry => entry.sourceType !== "openingBalance" || entry.date !== fiscalStart);
     const priorBalances = new Map();
     for (const entry of fiscalEntries) if (entry.date < start) priorBalances.set(entry.accountCode, (priorBalances.get(entry.accountCode) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0));
     const groupingKey = dateValue => {

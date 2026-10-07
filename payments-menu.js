@@ -15,7 +15,7 @@
     paymentCashDescription: "Платежи, проведенные наличными.",
     paymentImportChoose: "Выберите XML файл",
     paymentImportPreview: "Предварительный просмотр",
-    paymentImportConfirm: "Импортировать платежи",
+    paymentImportConfirm: "Проверить выбранные",
     paymentImportSaveDraft: "Сохранить черновик",
     paymentImportDeleteSelected: "Удалить выбранные",
     paymentImportCancel: "Отменить",
@@ -69,6 +69,7 @@
     paymentImportAccountTypeError: "Выберите счет учета с подходящим типом.",
     paymentImportAlreadyAllocated: "Эта операция уже распределена и связана со счетом.",
     paymentImportUseRowSave: "Сохраните распределение через кнопку в раскрытой строке.",
+    paymentImportAllocationRequired: "Сначала распределите операцию по счетам или укажите счёт дохода/расхода. Без этого проводка не создаётся.",
     paymentImportReady: "Готово к импорту",
     paymentImportEmpty: "Выберите XML файл для просмотра операций.",
     paymentImportInvalid: "Некорректный банковский XML: проверьте даты, суммы, валюту и направление операций.",
@@ -135,7 +136,7 @@
     paymentCashDescription: "Sularahas tehtud maksed.",
     paymentImportChoose: "Vali XML-fail",
     paymentImportPreview: "Eelvaade",
-    paymentImportConfirm: "Impordi maksed",
+    paymentImportConfirm: "Kontrolli valitud",
     paymentImportSaveDraft: "Salvesta mustand",
     paymentImportDeleteSelected: "Kustuta valitud",
     paymentImportCancel: "Katkesta",
@@ -189,6 +190,7 @@
     paymentImportAccountTypeError: "Valige sobiva tüübiga konto.",
     paymentImportAlreadyAllocated: "See tehing on juba arvega seotud.",
     paymentImportUseRowSave: "Salvestage jaotus avatud rea nupu kaudu.",
+    paymentImportAllocationRequired: "Jaotage tehing esmalt arvetele või määrake tulu-/kulukonto. Ilma selleta kannet ei looda.",
     paymentImportReady: "Valmis importimiseks",
     paymentImportEmpty: "Valige XML-fail tehingute eelvaateks.",
     paymentImportInvalid: "Panga XML ei ole korrektne: kontrollige kuupäevi, summasid, valuutat ja tehingute suunda.",
@@ -809,7 +811,7 @@
   const importDraftKey = () => `accounting-bank-payment-import-draft-v1:${cloudWorkspace?.organizationId || activeCompanyId}`;
   const markImportDraftDirty = () => { importDraftSaved = false; try { localStorage.removeItem(importDraftKey()); } catch {} };
   const isImportDuplicate = item => item.duplicate || purchases.some(saved => saved.bankImportId && saved.bankImportId === item.bankImportId);
-  const isImportReview = item => item.isReversal || !item.bankAccount || item.supplier === translateCopy("Банковская операция", "paymentImportUnknownParty") || item.supplier === translateCopy("Pangatehing", "paymentImportUnknownParty");
+  const isImportReview = item => item.isReversal || !item.bankAccount || !item.accountCode || item.supplier === translateCopy("Банковская операция", "paymentImportUnknownParty") || item.supplier === translateCopy("Pangatehing", "paymentImportUnknownParty");
   const filteredImportRows = () => importedRows.filter(item => {
     const status = importStatusFilter.value;
     const date = String(item.date || "");
@@ -1132,25 +1134,11 @@
     if (!can("payments")) { denyAction("payments"); return; }
     const selectedRows = importedRows.filter(item => item.selected && !isImportDuplicate(item));
     if (!selectedRows.length) return;
-    if (selectedRows.some(item => item.allocation && (item.allocation.invoices?.length || Number(item.allocation.advanceAmount) > 0 || item.allocation.extraLines?.some(line => Number(line.amount) > 0)))) {
-      showMessage(translateCopy("Сохраните распределение через кнопку в раскрытой строке.", "paymentImportUseRowSave"), true);
-      return;
-    }
     if (importedContext !== importContext()) { importedRows = []; importConfirm.disabled = true; showMessage(translateCopy("Компания изменилась. Загрузите XML заново.", "paymentImportContextChanged"), true); return; }
-    const knownIds = new Set(purchases.map(item => item.bankImportId).filter(Boolean));
-    const rows = selectedRows.filter(item => !knownIds.has(item.bankImportId)).map(item => ({ ...item, id: crypto.randomUUID(), category: "bank", amountDue: 0, paymentMethod: "bank", paymentOrigin: "bank-import", enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—" }));
-    if (!rows.length) { importedRows = importedRows.map(item => ({ ...item, duplicate: true, selected: false })); renderImportReview(); showMessage(translateCopy("Новых операций нет.", "paymentImportNoRows")); return; }
-    const next = [...rows, ...purchases];
-    try { saveList(STORAGE.purchases, next); purchases = next; }
-    catch { showMessage(translateCopy("Не удалось сохранить импортированные платежи.", "paymentImportError"), true); return; }
-    const appliedIds = new Set(rows.map(item => item.bankImportId));
-    importedRows = importedRows.filter(item => !appliedIds.has(item.bankImportId) && !isImportDuplicate(item)).map(item => ({ ...item, selected: false }));
-    importDraftSaved = false;
-    if (importedRows.length) saveImportDraft(true);
-    else { localStorage.removeItem(importDraftKey()); importInput.value = ""; importedFileName = ""; importedSkipped = 0; }
+    const nextRow = selectedRows.find(item => !item.accountCode) || selectedRows[0];
+    nextRow.editorOpen = true;
     renderImportReview();
-    renderPurchases(); renderDashboard(); renderReport();
-    showMessage(`${rows.length} ${translateCopy("Платежей применено", "paymentImportAppliedCount")}.`);
+    showMessage(translateCopy("Сначала распределите операцию по счетам или укажите счёт дохода/расхода. Без этого проводка не создаётся.", "paymentImportAllocationRequired"), true);
   });
   cashForm.addEventListener("cash-payment-saved", () => {
     cashCurrentPage = 1;

@@ -8,7 +8,7 @@
     annualOfficialDraft: "Сформирован · заблокирован", annualOfficialSave: "Сохранить черновик", annualOfficialCheck: "Проверить XBRL",
     annualOfficialReady: "Техническая проверка XBRL пройдена. Приём отчета проверяет e-äriregister.",
     annualOfficialIncomplete: "Суммы рассчитаны по проводкам и заблокированы. Перед экспортом добавьте примечания и отчет руководства.",
-    annualOfficialUnavailable: "Сервис формирования отчетов недоступен.", annualOfficialLoadError: "Не удалось загрузить официальную структуру.",
+    annualOfficialUnavailable: "Сервис формирования отчетов недоступен.", annualOfficialLocalAccess: "Откройте приложение по адресу http://127.0.0.1:8173/ и запустите локальный сервис отчетов на порту 8765.", annualOfficialLoadError: "Не удалось загрузить официальную структуру.",
     annualOfficialSaved: "Черновик сохранен.", annualOfficialError: "Проверка не пройдена.", annualOfficialDownloads: "Скачать",
     annualOfficialConfirmed: "Данные основных отчетов проверены", annualOfficialNewState: "Данные изменены. Проверка требуется повторно.",
     annualOfficialMappingRequired: "Не назначена строка годового отчета для счетов:", annualOfficialYear: "Отчётный год", annualOfficialGenerate: "Сформировать", annualOfficialWaiting: "Не сформирован", annualOfficialCreated: "Сформирован · заблокирован", annualOfficialUpdated: "Данные изменились, отчёт пересчитан.", annualOfficialExported: "Файл отчёта подготовлен.", annualOfficialAssets: "Активы", annualOfficialRevenue: "Выручка", annualOfficialProfit: "Прибыль / убыток за год", annualOfficialLine: "Статья", annualOfficialNoRows: "Нет строк с суммами за выбранный период."
@@ -20,7 +20,7 @@
     annualOfficialDraft: "Koostatud · lukustatud", annualOfficialSave: "Salvesta mustand", annualOfficialCheck: "Kontrolli XBRL",
     annualOfficialReady: "XBRL tehniline kontroll läbitud. Aruande vastuvõtmist kontrollib e-äriregister.",
     annualOfficialIncomplete: "Summad arvutatakse kannete põhjal ja on lukustatud. Enne eksporti lisage lisad ja tegevusaruanne.",
-    annualOfficialUnavailable: "Aruandeteenus pole saadaval.", annualOfficialLoadError: "Ametlikku struktuuri ei saanud laadida.",
+    annualOfficialUnavailable: "Aruandeteenus pole saadaval.", annualOfficialLocalAccess: "Avage rakendus aadressil http://127.0.0.1:8173/ ja käivitage kohalik aruandeteenus pordil 8765.", annualOfficialLoadError: "Ametlikku struktuuri ei saanud laadida.",
     annualOfficialSaved: "Mustand salvestati.", annualOfficialError: "Kontroll ebaõnnestus.", annualOfficialDownloads: "Laadi alla",
     annualOfficialConfirmed: "Põhiaruannete andmed on kontrollitud", annualOfficialNewState: "Andmed on muutunud. Kontroll on vajalik uuesti.",
     annualOfficialMappingRequired: "Aastaaruande rida on määramata kontodele:", annualOfficialYear: "Aruandeaasta", annualOfficialGenerate: "Koosta", annualOfficialWaiting: "Koostamata", annualOfficialCreated: "Koostatud · lukustatud", annualOfficialUpdated: "Andmed muutusid; aruanne arvutati uuesti.", annualOfficialExported: "Aruande fail on valmis.", annualOfficialAssets: "Varad", annualOfficialRevenue: "Müügitulu", annualOfficialProfit: "Aruandeaasta kasum / kahjum", annualOfficialLine: "Kirje", annualOfficialNoRows: "Valitud perioodil summadega aruanderidu pole."
@@ -158,10 +158,16 @@
     let response;
     try {
       response = await fetch(`${api}/api/annual-report/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-    } catch { throw new Error(copy("annualOfficialUnavailable")); }
+    } catch {
+      const message = location.protocol === "file:" ? copy("annualOfficialLocalAccess") : copy("annualOfficialUnavailable");
+      throw new Error(message);
+    }
     if (!response.ok) {
       let result;
-      try { result = await response.json(); } catch { throw new Error(copy("annualOfficialUnavailable")); }
+      try { result = await response.json(); } catch {
+        const message = location.protocol === "file:" ? copy("annualOfficialLocalAccess") : copy("annualOfficialUnavailable");
+        throw new Error(message);
+      }
       throw new Error([...(result.errors || []), ...(result.messages || [])].slice(0, 6).join("\n") || copy("annualOfficialError"));
     }
     return response;

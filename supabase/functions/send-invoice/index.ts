@@ -4,7 +4,9 @@ const allowedOrigins = new Set([
   "https://arvesemu.ee",
   "https://www.arvesemu.ee",
   "https://danilkatkovpsy-coder.github.io",
-  "http://127.0.0.1:8000"
+  "http://127.0.0.1:8000",
+  "http://127.0.0.1:8173",
+  "http://localhost:8173"
 ]);
 
 function jsonResponse(status: number, body: Record<string, unknown>, headers: Headers) {
