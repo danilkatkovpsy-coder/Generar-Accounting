@@ -14,7 +14,9 @@
     supplierInvoiceSectionExtra: "Дополнительно",
     supplierInvoiceLateFee: "Пени (% в день)",
     supplierInvoiceCurrency: "Валюта",
-    supplierInvoiceLine: "Статья счета",
+    supplierInvoiceLine: "Классификация",
+    supplierInvoiceClassChoose: "Выберите классификацию", supplierInvoiceClassGoods: "Товар",
+    supplierInvoiceClassService: "Услуга", supplierInvoiceClassOther: "Прочее", supplierInvoiceClassExpense: "Расход",
     supplierInvoiceObject: "Объект",
     supplierInvoiceAccount: "Счет учета",
     supplierInvoiceWarehouse: "Склад",
@@ -47,7 +49,9 @@
     supplierInvoiceSectionDetails: "Arve andmed",
     supplierInvoiceLateFee: "Viivis (% päevas)",
     supplierInvoiceCurrency: "Valuuta",
-    supplierInvoiceLine: "Arverida",
+    supplierInvoiceLine: "Liigitus",
+    supplierInvoiceClassChoose: "Vali liigitus", supplierInvoiceClassGoods: "Kaup",
+    supplierInvoiceClassService: "Teenus", supplierInvoiceClassOther: "Muu", supplierInvoiceClassExpense: "Kulu",
     supplierInvoiceObject: "Objekt",
     supplierInvoiceAccount: "Konto",
     supplierInvoiceWarehouse: "Ladu",
@@ -93,10 +97,12 @@
   const amountInput = byId("supplierInvoiceAmount");
   const lineRoot = document.createElement("div");
   const paymentRoot = document.createElement("div");
+  const paymentSource = new WeakMap();
   const fileList = document.createElement("div");
   const draftKey = () => `accounting-supplier-invoice-draft-v1:${activeCompanyId}`;
   let attachments = [];
   let fileRead = Promise.resolve();
+  let legacyPaidAmount = 0;
 
   const makeSection = (step, key, title, extraClass = "") => {
     const section = document.createElement("section");
@@ -141,7 +147,7 @@
     dueField,
     makeField("supplierInvoiceLateFee", "Viivis (% päevas)", "supplierInvoiceLateFee", "number"),
     makeField("supplierInvoiceCurrency", "Valuuta", "supplierInvoiceCurrency", "select", '<option value="EUR">EUR - Euro</option>'),
-    makeField("supplierInvoiceLine", "Arverida", "supplierInvoiceLine", "select", '<option value="">Vali arverida</option><option value="goods">Kaup</option><option value="service">Teenus</option><option value="other">Muu</option>'),
+    makeField("supplierInvoiceLine", "Liigitus", "supplierInvoiceLine", "select", '<option value="" data-i18n="supplierInvoiceClassChoose">Vali liigitus</option><option value="goods" data-i18n="supplierInvoiceClassGoods">Kaup</option><option value="service" data-i18n="supplierInvoiceClassService">Teenus</option><option value="expense" data-i18n="supplierInvoiceClassExpense">Kulu</option><option value="other" data-i18n="supplierInvoiceClassOther">Muu</option>'),
     makeField("supplierInvoiceObject", "Objekt", "supplierInvoiceObject", "text", "", "detail-wide"),
     makeField("supplierInvoiceAccount", "Konto", "supplierInvoiceAccount", "select", '<option value="">Vali konto</option><option value="4000">4000 · Kaubad</option><option value="4200">4200 · Teenused</option><option value="4900">4900 · Muud kulud</option>', "detail-wide"),
     makeField("supplierInvoiceWarehouse", "Ladu", "supplierInvoiceWarehouse", "text", "", "detail-wide"),
@@ -259,7 +265,7 @@
     }
     const rounding = number(byId("supplierInvoiceRounding").value);
     const total = Math.max(0, subtotal + taxTotal + rounding);
-    const paid = [...paymentRoot.querySelectorAll(".supplier-payment-amount")].reduce((sum, input) => sum + number(input.value), 0);
+    const paid = legacyPaidAmount + [...paymentRoot.querySelectorAll(".supplier-payment-amount")].reduce((sum, input) => sum + number(input.value), 0);
     byId("supplierInvoiceSubtotal").textContent = euro(subtotal);
     byId("supplierInvoiceVatTotal").textContent = euro(taxTotal);
     byId("supplierInvoiceGrandTotal").textContent = euro(total);
@@ -311,9 +317,10 @@
   const addPayment = (payment = {}) => {
     const row = document.createElement("div");
     row.className = "supplier-payment-row";
-    row.innerHTML = `<input class="supplier-payment-date" type="date" aria-label="Kuupäev" value="${escapeHtml(payment.date || localDate())}"><select class="supplier-payment-method" aria-label="${translateCopy("Способ оплаты","supplierInvoicePaymentMethod")}"><option value="bank">Pangaülekanne</option><option value="cash">Sularaha</option><option value="card">Kaart</option></select><input class="supplier-payment-amount" type="number" min="0" step="0.01" aria-label="${translateCopy("Сумма, EUR","amountEurLabel")}" value="${escapeHtml(payment.amount ?? 0)}">`;
+    paymentSource.set(row, { ...payment });
+    row.innerHTML = `<input class="supplier-payment-date" type="date" aria-label="Kuupäev" value="${escapeHtml(payment.date || String(payment.paid_at || "").slice(0, 10) || localDate())}"><select class="supplier-payment-method" aria-label="${translateCopy("Способ оплаты","supplierInvoicePaymentMethod")}"><option value="bank">Pangaülekanne</option><option value="cash">Sularaha</option><option value="card">Kaart</option></select><input class="supplier-payment-amount" type="number" min="0" step="0.01" aria-label="${translateCopy("Сумма, EUR","amountEurLabel")}" value="${escapeHtml(payment.amount ?? 0)}">`;
     row.append(makeRemove(translateCopy("Удалить","supplierInvoiceRemove")));
-    row.querySelector(".supplier-payment-method").value = payment.method || "bank";
+    row.querySelector(".supplier-payment-method").value = payment.method || (payment.payment_method === "transfer" ? "bank" : payment.payment_method) || "bank";
     row.addEventListener("input", recalculate);
     row.addEventListener("change", recalculate);
     row.querySelector(".supplier-invoice-remove").addEventListener("click", () => { row.remove(); recalculate(); });
@@ -334,16 +341,20 @@
           accountCode: row.querySelector(".supplier-line-account").value,
           objectName: row.querySelector(".supplier-line-object").value.trim()
         });
-    const payments = [...paymentRoot.querySelectorAll(".supplier-payment-row")].map(row => ({
-      date: row.querySelector(".supplier-payment-date").value,
-      method: row.querySelector(".supplier-payment-method").value,
-      amount: number(row.querySelector(".supplier-payment-amount").value)
-    }));
+    const payments = [...paymentRoot.querySelectorAll(".supplier-payment-row")].map(row => {
+      const source = paymentSource.get(row) || {};
+      const date = row.querySelector(".supplier-payment-date").value;
+      const method = row.querySelector(".supplier-payment-method").value;
+      const payment = { ...source, date, method, amount: number(row.querySelector(".supplier-payment-amount").value) };
+      if ("payment_method" in source) payment.payment_method = method === "bank" ? "transfer" : method;
+      if ("paid_at" in source) payment.paid_at = String(source.paid_at || "").slice(0, 10) === date ? source.paid_at : date ? new Date(`${date}T12:00:00`).toISOString() : null;
+      return payment;
+    });
     const subtotal = items.filter(item => !item.isTextLine).reduce((sum, item) => sum + item.quantity * item.price * (1 - Math.min(100, Math.max(0, item.discountPercent)) / 100), 0);
     const taxTotal = items.filter(item => !item.isTextLine).reduce((sum, item) => sum + item.quantity * item.price * (1 - Math.min(100, Math.max(0, item.discountPercent)) / 100) * item.taxRate / 100, 0);
     const rounding = number(byId("supplierInvoiceRounding").value);
     const amount = Math.round(Math.max(0, subtotal + taxTotal + rounding) * 100) / 100;
-    const paid = payments.reduce((sum, item) => sum + item.amount, 0);
+    const paid = legacyPaidAmount + payments.reduce((sum, item) => sum + item.amount, 0);
     return {
       items, payments, subtotal, taxTotal, rounding, amount,
       amountDue: Math.round(Math.max(0, amount - paid) * 100) / 100, currency: "EUR",
@@ -447,8 +458,14 @@
     byId("supplierInvoiceAccount").value = draft.accountCode || "";
     byId("supplierInvoiceWarehouse").value = draft.warehouseName || "";
     byId("supplierInvoiceRounding").value = draft.rounding ?? "0.00";
+    const existingPaid = Math.max(0, number(draft.amount) - number(draft.amountDue ?? (draft.paymentStatus === "paid" || draft.status === "paid" ? 0 : draft.amount)));
+    const recordedPaid = (draft.payments || []).reduce((sum, payment) => sum + number(payment.amount), 0);
+    legacyPaidAmount = Math.max(0, existingPaid - recordedPaid);
+    const fallbackItems = number(draft.amount) > 0
+      ? [{ description: draft.description || draft.invoiceNumber || "", quantity: 1, price: Math.max(0, number(draft.amount) - number(draft.rounding)), taxRate: 0, accountCode: draft.accountCode || "", objectName: draft.objectName || "" }]
+      : [{}, {}];
     lineRoot.replaceChildren();
-    (draft.items?.length ? draft.items : [{}, {}]).forEach(item => item.isTextLine ? addTextLine(item.description) : addLine(item));
+    (draft.items?.length ? draft.items : fallbackItems).forEach(item => item.isTextLine ? addTextLine(item.description) : addLine(item));
     paymentRoot.replaceChildren();
     (draft.payments?.length ? draft.payments : [{}]).forEach(addPayment);
     attachments = (draft.attachments || []).map(file => ({ ...file }));
@@ -458,6 +475,7 @@
   const originalReset = resetSupplierInvoiceForm;
   resetSupplierInvoiceForm = () => {
     originalReset();
+    legacyPaidAmount = 0;
     supplierAddress.textContent = "";
     lineRoot.replaceChildren();
     addLine();
@@ -482,6 +500,36 @@
     applyDraft({ ...invoice, items: invoice.items, payments: invoice.payments, attachments: invoice.attachments?.length ? invoice.attachments : invoice.data ? [{ id: invoice.id, name: invoice.fileName || "Invoice", type: invoice.fileType || "application/pdf", size: 0, data: invoice.data }] : [] });
   };
 
+  const registerRows = byId("supplierInvoiceRows");
+  const decorateInvoiceRows = () => {
+    registerRows.querySelectorAll("tr[data-supplier-invoice-id]").forEach(row => {
+      row.classList.add("supplier-invoice-open-row");
+      row.tabIndex = 0;
+      const invoice = supplierInvoices.find(item => String(item.id) === row.dataset.supplierInvoiceId);
+      row.setAttribute("aria-label", `${translateCopy("Изменить счет поставщика", "supplierInvoiceRowEdit")} ${invoice?.invoiceNumber || ""}`);
+    });
+  };
+  const baseRenderSupplierInvoices = renderSupplierInvoices;
+  renderSupplierInvoices = (...args) => { baseRenderSupplierInvoices(...args); decorateInvoiceRows(); };
+  const openInvoiceRow = row => {
+    if (denyAction("expenses")) return;
+    editSupplierInvoice(row.dataset.supplierInvoiceId);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  registerRows.addEventListener("click", event => {
+    if (event.target.closest("a,button,input,select,textarea,label,[contenteditable]")) return;
+    const row = event.target.closest("tr[data-supplier-invoice-id]");
+    if (row) openInvoiceRow(row);
+  });
+  registerRows.addEventListener("keydown", event => {
+    const row = event.target.closest("tr[data-supplier-invoice-id]");
+    if (!row || event.target !== row || !["Enter", " "].includes(event.key)) return;
+    event.preventDefault();
+    openInvoiceRow(row);
+  });
+  document.querySelectorAll("[data-language]").forEach(button => button.addEventListener("click", () => requestAnimationFrame(decorateInvoiceRows)));
+  decorateInvoiceRows();
+
   const saveDraft = () => {
     try {
       localStorage.setItem(draftKey(), JSON.stringify(collectDraft()));
@@ -490,6 +538,113 @@
       showMessage(translateCopy("Не удалось сохранить черновик.", "supplierInvoiceDraftError"), true);
     }
   };
+  Object.assign(ruTexts, {
+    supplierPostingTitle: "Проводка", supplierPostingDocument: "Основание", supplierPostingCurrency: "Валюта",
+    supplierPostingAccount: "Счет учета", supplierPostingDebit: "Дебет", supplierPostingCredit: "Кредит",
+    supplierPostingDescription: "Описание", supplierPostingObject: "Объект", supplierPostingTotal: "Итого",
+    supplierPostingFiles: "Файлы", supplierPostingNote: "Примечание", supplierPostingEdit: "Изменить",
+    supplierPostingClose: "Закрыть", supplierPostingNoFiles: "Файлы не прикреплены.",
+    supplierPostingEmpty: "Проводка отсутствует.", supplierPostingFileError: "Не удалось скачать файл.",
+    supplierPostingPrint: "Печать / PDF"
+  });
+  Object.assign(etTexts, {
+    supplierPostingTitle: "Kanne", supplierPostingDocument: "Alusdokument", supplierPostingCurrency: "Valuuta",
+    supplierPostingAccount: "Konto", supplierPostingDebit: "Deebet", supplierPostingCredit: "Kreedit",
+    supplierPostingDescription: "Kirjeldus", supplierPostingObject: "Objekt", supplierPostingTotal: "Kokku",
+    supplierPostingFiles: "Failid", supplierPostingNote: "Siseinfo", supplierPostingEdit: "Muuda",
+    supplierPostingClose: "Sulge", supplierPostingNoFiles: "Faile pole lisatud.",
+    supplierPostingEmpty: "Kanne puudub.", supplierPostingFileError: "Faili ei saanud alla laadida.",
+    supplierPostingPrint: "Prindi / PDF"
+  });
+  const postingCopy = key => translateCopy(key, key);
+  const postingIcon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${{
+    ledger: '<path d="M4 3h16v18H4zM9 3v18M12 7h5M12 12h5M12 17h5"></path>',
+    pdf: '<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7"></path>',
+    edit: '<path d="m4 16-1 5 5-1L20 8a2.1 2.1 0 0 0-3-3L4 16zM14 6l4 4"></path>',
+    close: '<path d="m6 6 12 12M18 6 6 18"></path>',
+    download: '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"></path>'
+  }[name]}</svg>`;
+  const postingDialog = document.createElement("dialog");
+  postingDialog.id = "supplierPostingDialog";
+  postingDialog.className = "supplier-posting-dialog";
+  postingDialog.setAttribute("aria-labelledby", "supplierPostingTitle");
+  postingDialog.innerHTML = `<header class="supplier-posting-heading"><div><h2 id="supplierPostingTitle" data-i18n="supplierPostingTitle">${postingCopy("supplierPostingTitle")}</h2><p id="supplierPostingAudit" hidden></p></div><div class="supplier-posting-actions"><button type="button" class="secondary-button" id="supplierPostingPdf">${postingIcon("pdf")}<span>PDF</span></button><button type="button" class="secondary-button" id="supplierPostingEdit">${postingIcon("edit")}<span data-i18n="supplierPostingEdit">${postingCopy("supplierPostingEdit")}</span></button><button type="button" class="supplier-posting-close" id="supplierPostingClose" aria-label="${postingCopy("supplierPostingClose")}">${postingIcon("close")}</button></div></header><div class="supplier-posting-body"><p id="supplierPostingError" class="supplier-posting-error" role="alert" hidden></p><dl class="supplier-posting-meta"><div><dt data-i18n="supplierInvoiceDate">${translateCopy("Kuupäev", "supplierInvoiceDate")}</dt><dd id="supplierPostingDate"></dd></div><div><dt data-i18n="supplierPostingDocument">${postingCopy("supplierPostingDocument")}</dt><dd id="supplierPostingDocument"></dd></div><div><dt data-i18n="supplierPostingCurrency">${postingCopy("supplierPostingCurrency")}</dt><dd id="supplierPostingCurrency"></dd></div></dl><div class="supplier-posting-table-wrap"><table class="data-table supplier-posting-table"><thead><tr><th data-i18n="supplierPostingAccount">${postingCopy("supplierPostingAccount")}</th><th class="supplier-posting-amount" data-i18n="supplierPostingDebit">${postingCopy("supplierPostingDebit")}</th><th class="supplier-posting-amount" data-i18n="supplierPostingCredit">${postingCopy("supplierPostingCredit")}</th><th data-i18n="supplierPostingDescription">${postingCopy("supplierPostingDescription")}</th><th data-i18n="supplierPostingObject">${postingCopy("supplierPostingObject")}</th></tr></thead><tbody id="supplierPostingRows"></tbody><tfoot><tr><th data-i18n="supplierPostingTotal">${postingCopy("supplierPostingTotal")}</th><td class="supplier-posting-amount" id="supplierPostingDebitTotal"></td><td class="supplier-posting-amount" id="supplierPostingCreditTotal"></td><td colspan="2"></td></tr></tfoot></table></div><div class="supplier-posting-footer"><section><h3 data-i18n="supplierPostingFiles">${postingCopy("supplierPostingFiles")}</h3><div class="supplier-posting-files" id="supplierPostingFiles"></div></section><section><h3 data-i18n="supplierPostingNote">${postingCopy("supplierPostingNote")}</h3><textarea id="supplierPostingNote" rows="3" readonly></textarea><div class="supplier-posting-print-note" id="supplierPostingPrintNote"></div></section></div></div>`;
+  document.body.append(postingDialog);
+  const openPosting = async () => {
+    if (denyAction("expenses")) return;
+    await fileRead;
+    const saved = supplierInvoices.find(invoice => invoice.id === editingSupplierInvoiceId);
+    const draft = collectDraft();
+    const invoice = { ...saved, ...draft, id: saved?.id || "preview", supplierName: byId("supplierPicker").value ? draft.supplierName : saved?.supplierName || "" };
+    const entries = createSupplierInvoiceLedgerEntries(invoice);
+    byId("supplierPostingError").hidden = true;
+    byId("supplierPostingDate").textContent = formatDate(invoice.date) || "—";
+    byId("supplierPostingDocument").textContent = invoice.invoiceNumber || "—";
+    byId("supplierPostingCurrency").textContent = invoice.currency || "EUR";
+    const changedAt = saved?.updatedAt || saved?.enteredAt || saved?.createdAt;
+    const author = saved?.updatedByEmail || saved?.updatedBy || saved?.enteredBy || saved?.createdByEmail;
+    byId("supplierPostingAudit").textContent = [changedAt ? formatDate(String(changedAt).slice(0, 10)) : "", author].filter(Boolean).join(" · ");
+    byId("supplierPostingAudit").hidden = !changedAt && !author;
+    byId("supplierPostingRows").innerHTML = entries.map(entry => `<tr><td>${escapeHtml([entry.accountCode, entry.account].filter(Boolean).join(" · "))}</td><td class="supplier-posting-amount">${money(entry.debit)}</td><td class="supplier-posting-amount">${money(entry.credit)}</td><td>${escapeHtml(entry.credit ? invoice.supplierName || entry.description : entry.description)}</td><td>${escapeHtml(invoice.objectName || "—")}</td></tr>`).join("") || `<tr><td colspan="5" class="supplier-posting-empty">${escapeHtml(postingCopy("supplierPostingEmpty"))}</td></tr>`;
+    byId("supplierPostingDebitTotal").textContent = money(entries.reduce((sum, entry) => sum + entry.debit, 0));
+    byId("supplierPostingCreditTotal").textContent = money(entries.reduce((sum, entry) => sum + entry.credit, 0));
+    byId("supplierPostingNote").value = invoice.note || "";
+    byId("supplierPostingPrintNote").textContent = invoice.note || "—";
+    byId("supplierPostingFiles").replaceChildren();
+    const files = invoice.attachments?.length ? invoice.attachments : invoice.data ? [{ name: invoice.fileName || "Invoice", data: invoice.data }] : [];
+    for (const file of files) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "supplier-posting-file";
+      button.innerHTML = postingIcon("download");
+      const name = document.createElement("span");
+      name.textContent = file.name || "Invoice";
+      button.append(name);
+      button.disabled = !file.data;
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try {
+          const url = new URL(file.data, location.href);
+          if (!["data:", "blob:", "http:", "https:"].includes(url.protocol)) throw new Error("Invalid file URL");
+          const response = await fetch(url.href);
+          if (!response.ok) throw new Error("Unable to read file");
+          triggerBlobDownload(await response.blob(), file.name || "invoice-document");
+        } catch {
+          byId("supplierPostingError").textContent = postingCopy("supplierPostingFileError");
+          byId("supplierPostingError").hidden = false;
+        } finally { button.disabled = false; }
+      });
+      byId("supplierPostingFiles").append(button);
+    }
+    if (!files.length) {
+      const empty = document.createElement("p");
+      empty.textContent = postingCopy("supplierPostingNoFiles");
+      byId("supplierPostingFiles").append(empty);
+    }
+    byId("supplierPostingPdf").disabled = !entries.length || !can("exportReports");
+    byId("supplierPostingPdf").title = postingCopy("supplierPostingPrint");
+    byId("supplierPostingEdit").disabled = !can("expenses");
+    byId("supplierPostingClose").setAttribute("aria-label", postingCopy("supplierPostingClose"));
+    byId("supplierPostingClose").title = postingCopy("supplierPostingClose");
+    byId("supplierPostingNote").setAttribute("aria-label", postingCopy("supplierPostingNote"));
+    applyLanguage(language);
+    if (!postingDialog.open) postingDialog.showModal();
+  };
+  byId("supplierPostingClose").addEventListener("click", () => postingDialog.close());
+  byId("supplierPostingEdit").addEventListener("click", () => { postingDialog.close(); byId("supplierInvoiceNumber").focus(); });
+  postingDialog.addEventListener("click", event => {
+    if (event.target !== postingDialog) return;
+    const bounds = postingDialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) postingDialog.close();
+  });
+  byId("supplierPostingPdf").addEventListener("click", () => {
+    if (!can("exportReports")) return;
+    document.body.classList.add("supplier-posting-printing");
+    const cleanup = () => document.body.classList.remove("supplier-posting-printing");
+    window.addEventListener("afterprint", cleanup, { once: true });
+    try { window.print(); } catch { cleanup(); }
+  });
+  postingDialog.addEventListener("close", () => document.body.classList.remove("supplier-posting-printing"));
   const addToolbar = () => {
     const editor = byId("supplierInvoiceEditorView");
     const toolbar = editor?.querySelector(".invoice-editor-actions");
@@ -520,7 +675,13 @@
       applyDraft({ ...draftData, invoiceNumber: "" });
       setSupplierInvoicePage(true);
     });
-    toolbar.insertBefore(draft, save);
+    const posting = makeButton("supplierInvoiceKanneButton", "supplierPostingTitle", "Kanne", openPosting);
+    posting.removeAttribute("data-i18n");
+    posting.innerHTML = `${postingIcon("ledger")}<span data-i18n="supplierPostingTitle">${postingCopy("supplierPostingTitle")}</span>`;
+    const draftGroup = document.createElement("div");
+    draftGroup.className = "supplier-invoice-draft-group";
+    draftGroup.append(draft, posting);
+    toolbar.insertBefore(draftGroup, save);
     toolbar.insertBefore(print, save);
     toolbar.insertBefore(copy, save);
     const remove = byId("deleteSupplierInvoiceButton");

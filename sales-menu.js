@@ -74,6 +74,8 @@
   wrapper.append(trigger);
   trigger.setAttribute("aria-haspopup", "menu");
   trigger.setAttribute("aria-expanded", "false");
+  trigger.setAttribute("aria-controls", "salesNavMenu");
+  trigger.insertAdjacentHTML("beforeend", '<svg class="payments-nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"></path></svg>');
   const menu = document.createElement("div");
   menu.className = "payments-nav-menu sales-nav-menu";
   menu.id = "salesNavMenu";
@@ -287,6 +289,12 @@
   const showDocumentList = kind => { renderDocumentList(kind); switchView(viewIds[kind]); };
   const showArticles = () => { renderArticles(); switchView(viewIds.articles); };
   const showClients = () => { renderClients(); switchView(viewIds.clients); };
+  window.openSalesMenuSection = kind => {
+    if (kind === "invoices") switchView("salesView");
+    else if (kind === "quote" || kind === "order") showDocumentList(kind);
+    else if (kind === "articles") showArticles();
+    else if (kind === "clients") showClients();
+  };
 
   editorView.querySelector("#salesDocumentBack").addEventListener("click", () => showDocumentList(editingDocumentType));
   editorView.querySelector("#salesDocumentAddRow").addEventListener("click", () => addDocumentLine());

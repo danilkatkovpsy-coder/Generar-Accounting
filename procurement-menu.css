@@ -1,0 +1,17 @@
+.procurement-nav-wrap[hidden]{display:none!important}
+.procurement-subview{width:min(100%,1440px)}
+#procurementSuppliersView .data-panel{max-width:none}
+#procurementSuppliersView .view-heading{align-items:center;gap:16px}
+#procurementAddSupplier{display:inline-flex;align-items:center;gap:7px}
+#procurementAddSupplier svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.procurement-supplier-search{width:min(420px,100%);margin:0 0 14px}
+#procurementSuppliersView .procurement-suppliers-table{width:100%;min-width:850px;border-collapse:collapse}
+#procurementSuppliersView .procurement-suppliers-table th{padding:9px 10px;background:#e8eeea;color:#58675f;font-size:11px}
+#procurementSuppliersView .procurement-suppliers-table td{padding:10px;border-bottom:1px solid #e6ebe8;font-size:12px;overflow-wrap:anywhere}
+.procurement-suppliers-table tr[data-procurement-supplier]{cursor:pointer}
+.procurement-suppliers-table tr[data-procurement-supplier]:hover{background:#f0f5f1}
+.procurement-suppliers-table tr[data-procurement-supplier]:focus-visible{outline:2px solid #718c72;outline-offset:-2px}
+#procurementSuppliersView .procurement-suppliers-table .procurement-empty{padding:28px 12px;text-align:center;color:#78847d}
+.procurement-total{margin:14px 0 0;color:#66736b;font-size:12px}
+.procurement-import-status{margin:0 0 14px;color:#78847d;font-size:12px}
+@media(max-width:760px){#procurementSuppliersView .view-heading{align-items:flex-start;flex-wrap:wrap}#procurementSuppliersView .procurement-suppliers-table .procurement-empty{text-align:left}.procurement-subview .table-wrap{max-width:100%;overflow-x:auto}}

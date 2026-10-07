@@ -1,0 +1,32 @@
+#annualReportPanel .annual-official-workspace{margin-top:24px;padding-top:20px;border-top:1px solid #e6ebe8}
+.annual-official-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.annual-official-heading h2{margin:0;font-size:19px;color:#234337}
+.annual-draft-badge{flex:0 0 auto;padding:4px 8px;border-radius:4px;color:#916520;background:#faf1db;font-size:11px}
+.annual-official-settings{display:grid;grid-template-columns:1.1fr 1.4fr 1fr 1fr 1fr;gap:12px;align-items:end}
+.annual-official-settings .field{min-width:0;margin:0}
+.annual-official-settings input,.annual-official-settings select{width:100%;min-width:0;min-height:36px;padding:7px 9px;font-size:12px}
+.annual-official-settings label{font-size:11px}
+.annual-taxonomy-source{grid-column:1/-1;display:flex;align-items:center;gap:12px;color:#6d7b72;font-size:11px}
+.annual-taxonomy-source a{color:#35674d}
+.annual-report-warning{padding:10px 12px;border-left:3px solid #bf963c;background:#fcf6e9;color:#80642b;font-size:12px}
+.annual-taxonomy-form{margin:20px 0}
+.annual-taxonomy-form h3{margin:0 0 10px;color:#425c51;font-size:15px}
+#annualReportPanel .annual-official-table{width:100%;min-width:650px;border-collapse:collapse}
+#annualReportPanel .annual-official-table th{padding:9px 10px;color:#58675f;background:#e8eeea;font-size:11px;text-align:left}
+#annualReportPanel .annual-official-table th:not(:first-child){width:175px;text-align:right}
+#annualReportPanel .annual-official-table td{padding:7px 10px;border-bottom:1px solid #e6ebe8;font-size:12px}
+#annualReportPanel .annual-official-table .annual-taxonomy-group td{background:#f7f9f6;color:#425c51;font-weight:650}
+.annual-official-table input{width:100%;min-width:110px;min-height:32px;padding:5px 8px;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.annual-confirmation{display:flex;align-items:center;gap:8px;color:#58675f;font-size:12px}
+.annual-confirmation input{width:16px;min-height:16px;height:16px;margin:0;accent-color:#577d69}
+.annual-report-actions{display:flex;align-items:center;gap:10px;margin-top:16px}
+.annual-official-status{margin-top:14px;padding:10px 12px;border:1px solid #dce7df;border-radius:5px;color:#35674d;background:#f4f8f4;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.annual-official-status.is-error{color:#a35446;border-color:#ecd9d4;background:#fcf4f2}
+.annual-official-status[hidden]{display:none!important}
+.annual-report-downloads{margin-top:20px;padding-top:16px;border-top:1px solid #e6ebe8}
+.annual-report-downloads h3{margin:0 0 10px;color:#425c51;font-size:14px}
+.annual-download-controls{display:flex;gap:10px;flex-wrap:wrap}
+.annual-download-controls button{display:inline-flex;align-items:center;gap:7px}
+.annual-download-controls svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:1100px){.annual-official-settings{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.annual-official-heading{align-items:flex-start;flex-wrap:wrap}.annual-official-settings{grid-template-columns:minmax(0,1fr)}.annual-report-actions{flex-wrap:wrap}.annual-taxonomy-form .table-wrap{max-width:100%;overflow-x:auto}}

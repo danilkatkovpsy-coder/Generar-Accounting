@@ -10,15 +10,24 @@
     paymentImportTitle: "Импорт банковских платежей",
     paymentExportTitle: "Экспорт платежных поручений",
     paymentCashTitle: "Кассовые платежи",
-    paymentImportDescription: "Загрузите CSV выписку с датой, получателем, суммой и описанием.",
+    paymentImportDescription: "Банковская XML-выписка ISO 20022 CAMT.053 / CAMT.054.",
     paymentExportDescription: "Сформируйте файл платежных поручений за выбранный период.",
     paymentCashDescription: "Платежи, проведенные наличными.",
-    paymentImportChoose: "Выберите CSV файл",
+    paymentImportChoose: "Выберите XML файл",
     paymentImportPreview: "Предварительный просмотр",
     paymentImportConfirm: "Импортировать платежи",
     paymentImportReady: "Готово к импорту",
-    paymentImportEmpty: "Выберите CSV файл для просмотра строк.",
-    paymentImportInvalid: "В CSV должны быть столбцы: дата, получатель и сумма.",
+    paymentImportEmpty: "Выберите XML файл для просмотра операций.",
+    paymentImportInvalid: "Некорректный банковский XML: проверьте даты, суммы, валюту и направление операций.",
+    paymentImportUnsupported: "Поддерживаются только XML-выписки CAMT.053 / CAMT.054.",
+    paymentImportBatchError: "Пакетная операция содержит неоднозначные суммы. Импорт остановлен.",
+    paymentImportTooLarge: "Максимальный размер XML файла — 20 МБ.",
+    paymentImportReadError: "Не удалось прочитать XML файл.",
+    paymentImportCurrencyError: "Сейчас импортируются только операции в EUR. Пересчет других валют не настроен.",
+    paymentImportSkipped: "Пропущено операций", paymentImportDuplicate: "Уже импортировано",
+    paymentImportIncoming: "Поступление", paymentImportOutgoing: "Выплата", paymentImportDirection: "Направление",
+    paymentImportCounterparty: "Контрагент", paymentImportUnknownParty: "Банковская операция",
+    paymentImportNoRows: "Новых проведенных операций для импорта нет.", paymentImportContextChanged: "Компания изменилась. Загрузите XML файл заново.",
     paymentImportSaved: "Платежи импортированы.",
     paymentImportError: "Не удалось сохранить импортированные платежи.",
     paymentExportFrom: "С даты",
@@ -68,15 +77,24 @@
     paymentImportTitle: "Pangamaksete import",
     paymentExportTitle: "Maksekorralduste eksport",
     paymentCashTitle: "Kassamaksed",
-    paymentImportDescription: "Laadige CSV väljavõte kuupäeva, saaja, summa ja kirjeldusega.",
+    paymentImportDescription: "ISO 20022 CAMT.053 / CAMT.054 pangaväljavõtte XML-fail.",
     paymentExportDescription: "Koostage maksekorralduste fail valitud perioodi kohta.",
     paymentCashDescription: "Sularahas tehtud maksed.",
-    paymentImportChoose: "Vali CSV-fail",
+    paymentImportChoose: "Vali XML-fail",
     paymentImportPreview: "Eelvaade",
     paymentImportConfirm: "Impordi maksed",
     paymentImportReady: "Valmis importimiseks",
-    paymentImportEmpty: "Valige CSV-fail ridade eelvaateks.",
-    paymentImportInvalid: "CSV peab sisaldama veerge: kuupäev, saaja ja summa.",
+    paymentImportEmpty: "Valige XML-fail tehingute eelvaateks.",
+    paymentImportInvalid: "Panga XML ei ole korrektne: kontrollige kuupäevi, summasid, valuutat ja tehingute suunda.",
+    paymentImportUnsupported: "Toetatud on ainult CAMT.053 / CAMT.054 XML-väljavõtted.",
+    paymentImportBatchError: "Koondtehingu summad on ebaselged. Import peatati.",
+    paymentImportTooLarge: "XML-faili suurus võib olla kuni 20 MB.",
+    paymentImportReadError: "XML-faili ei saanud lugeda.",
+    paymentImportCurrencyError: "Praegu saab importida ainult EUR-tehinguid. Teiste valuutade ümberarvestus pole seadistatud.",
+    paymentImportSkipped: "Vahele jäetud tehinguid", paymentImportDuplicate: "Juba imporditud",
+    paymentImportIncoming: "Laekumine", paymentImportOutgoing: "Väljamakse", paymentImportDirection: "Suund",
+    paymentImportCounterparty: "Osapool", paymentImportUnknownParty: "Pangatehing",
+    paymentImportNoRows: "Uusi broneeritud tehinguid importimiseks pole.", paymentImportContextChanged: "Ettevõte on muutunud. Laadige XML-fail uuesti.",
     paymentImportSaved: "Maksed imporditi.",
     paymentImportError: "Imporditud makseid ei saanud salvestada.",
     paymentExportFrom: "Alates",
@@ -246,7 +264,7 @@
   const importView = makeView("paymentImportView", "paymentImportTitle", "paymentImportDescription");
   const importPanel = document.createElement("section");
   importPanel.className = "data-panel";
-  importPanel.innerHTML = `<label class="payments-import-drop"><span data-i18n="paymentImportChoose">Vali CSV-fail</span><input id="paymentImportFile" type="file" accept=".csv,text/csv"></label><div class="payments-preview" id="paymentImportPreview"><p class="payments-empty" data-i18n="paymentImportEmpty">Valige CSV-fail ridade eelvaateks.</p></div><div class="payments-actions"><span id="paymentImportCount"></span><button class="primary-button" id="paymentImportConfirm" type="button" disabled data-i18n="paymentImportConfirm">Impordi maksed</button></div>`;
+  importPanel.innerHTML = `<label class="payments-import-drop"><span data-i18n="paymentImportChoose">Vali XML-fail</span><input id="paymentImportFile" type="file" accept=".xml,application/xml,text/xml"></label><div class="payments-preview" id="paymentImportPreview"><p class="payments-empty" data-i18n="paymentImportEmpty">Valige XML-fail tehingute eelvaateks.</p></div><div class="payments-actions"><span id="paymentImportCount"></span><button class="primary-button" id="paymentImportConfirm" type="button" disabled data-i18n="paymentImportConfirm">Impordi maksed</button></div>`;
   importView.append(importPanel);
 
   const exportView = makeView("paymentExportView", "paymentExportTitle", "paymentExportDescription");
@@ -281,7 +299,26 @@
   const cashList = document.createElement("section");
   cashList.className = "data-panel cash-payment-register";
   cashList.innerHTML = `<div class="cash-payment-filterbar"><label class="field cash-payment-search-field"><span data-i18n="cashPaymentSearch">Osapool või kirjeldus</span><input id="cashPaymentSearch" type="search" placeholder="${translateCopy("Osapool või kirjeldus", "cashPaymentSearch")}"></label><label class="field"><span data-i18n="cashPaymentAccountFilter">Kassa</span><select id="cashPaymentAccountFilter"><option value="">Kassa / Cash</option></select></label><label class="field"><span data-i18n="cashPaymentFrom">Alates</span><input id="cashPaymentFrom" type="date"></label><label class="field"><span data-i18n="cashPaymentTo">Kuni</span><input id="cashPaymentTo" type="date"></label><label class="field"><span data-i18n="cashPaymentAuthor">Sisestaja</span><input id="cashPaymentAuthor" type="search" placeholder="${translateCopy("Sisestaja", "cashPaymentAuthor")}"></label><button class="text-button cash-payment-clear" id="cashPaymentClear" type="button" aria-label="${translateCopy("Tühjenda filtrid", "cashPaymentClear")}" title="${translateCopy("Tühjenda filtrid", "cashPaymentClear")}">×</button><button class="primary-button cash-payment-apply" id="cashPaymentApply" type="button" data-i18n="cashPaymentApply">FILTREERI</button></div><div class="table-wrap cash-payment-table-wrap" id="cashPaymentsTable"></div><div class="cash-payment-pagination"><nav class="register-page-numbers" id="cashPaymentPages" aria-label="Cash payment pages"></nav><span id="cashPaymentTotal"></span><label class="cash-payment-page-size"><span data-i18n="cashPaymentRows">Ridu lehel</span><select id="cashPaymentPageSize" aria-label="Rows per page"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option></select></label></div><section class="register-page-summary cash-payment-summary"><h3 data-i18n="pageSumsTitle">Lehekülje summad</h3><dl><div><dt data-i18n="pageSumRows">Ridu:</dt><dd id="cashPageRows">0</dd></div><div><dt data-i18n="pageSumTotal">Summa:</dt><dd id="cashPageAmount">0,00 EUR</dd></div></dl></section>`;
-  cashView.append(cashForm, cashList);
+  cashView.append(cashList);
+  const cashEditorView = makeView("cashPaymentEditorView", "cashPaymentFormTitle", "paymentCashDescription");
+  const cashEditorHeading = cashEditorView.querySelector(":scope > .view-heading");
+  cashEditorHeading.querySelector("p")?.remove();
+  cashEditorHeading.querySelector(":scope > button").remove();
+  const cashEditorActions = document.createElement("div");
+  cashEditorActions.className = "inline-actions cash-payment-editor-actions";
+  const cashCancelButton = cashForm.querySelector("#cashPaymentCancel");
+  cashCancelButton.className = "secondary-button";
+  const cashSaveButton = cashForm.querySelector('button[type="submit"]');
+  cashForm.id = "cashPaymentForm";
+  cashSaveButton.setAttribute("form", cashForm.id);
+  const cashNewButton = cashAddButton.cloneNode(true);
+  cashNewButton.className = "secondary-button";
+  cashNewButton.addEventListener("click", () => cashAddButton.click());
+  cashEditorActions.append(cashNewButton, cashSaveButton, cashCancelButton);
+  cashEditorHeading.append(cashEditorActions);
+  cashForm.querySelector(".cash-payment-form-heading").remove();
+  cashForm.hidden = false;
+  cashEditorView.append(cashForm);
 
   const parseDate = value => {
     const text = String(value || "").trim();
@@ -516,14 +553,17 @@
   };
   cashExports.querySelectorAll("[data-cash-export]").forEach(button => button.addEventListener("click", () => exportCashRegister(button.dataset.cashExport)));
   cashAddButton.addEventListener("click", () => {
-    cashForm.hidden = false;
+    if (!can("payments")) { denyAction("payments"); return; }
+    cashForm.reset();
     document.getElementById("cashPaymentDate").value = localDate();
+    showView("cashPaymentEditorView");
+    cashForm.dispatchEvent(new Event("cash-payment-editor-open"));
     document.getElementById("cashPaymentRecipient").focus();
   });
   document.getElementById("cashPaymentCancel").addEventListener("click", () => {
     cashForm.reset();
     document.getElementById("cashPaymentDate").value = localDate();
-    cashForm.hidden = true;
+    showView("cashPaymentsView");
   });
   document.getElementById("cashPaymentApply").addEventListener("click", () => { cashCurrentPage = 1; renderCashPayments(); });
   document.getElementById("cashPaymentClear").addEventListener("click", () => {
@@ -553,38 +593,146 @@
     const link = document.createElement("a"); link.href = url; link.download = `maksekorraldused-${localDate()}.csv`; link.click(); URL.revokeObjectURL(url);
     showMessage(translateCopy("Экспорт платежных поручений скачан.", "paymentExported"));
   });
+  const xmlChild = (node, name) => [...(node?.children || [])].find(child => child.localName === name);
+  const xmlPath = (node, ...names) => names.reduce((parent, name) => xmlChild(parent, name), node);
+  const xmlValue = (node, ...names) => xmlPath(node, ...names)?.textContent.trim() || "";
+  const importHash = async text => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)))].map(value => value.toString(16).padStart(2, "0")).join("");
+  const readXmlFile = async file => {
+    if (!/\.xml$/i.test(file.name)) throw new Error("paymentImportUnsupported");
+    if (file.size > 20 * 1024 * 1024) throw new Error("paymentImportTooLarge");
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let encoding = bytes[0] === 255 && bytes[1] === 254 || bytes[0] === 60 && bytes[1] === 0 ? "utf-16le"
+      : bytes[0] === 254 && bytes[1] === 255 || bytes[0] === 0 && bytes[1] === 60 ? "utf-16be" : "utf-8";
+    if (encoding === "utf-8") {
+      const declaration = new TextDecoder("ascii").decode(bytes.slice(0, 200)).match(/<\?xml[^>]*encoding\s*=\s*["']([^"']+)["']/i);
+      if (declaration) encoding = declaration[1];
+    }
+    return new TextDecoder(encoding, { fatal: true }).decode(bytes);
+  };
+  const parseXmlImport = async text => {
+    if (text.includes("<!DOCTYPE") || text.includes("<!ENTITY")) throw new Error("paymentImportInvalid");
+    const document = new DOMParser().parseFromString(text, "application/xml");
+    if (document.getElementsByTagNameNS("*", "parsererror").length) throw new Error("paymentImportInvalid");
+    const root = document.documentElement;
+    if (root.localName !== "Document" || !/^urn:iso:std:iso:20022:tech:xsd:camt\.(053|054)\.001\.\d+$/.test(root.namespaceURI || "")) throw new Error("paymentImportUnsupported");
+    const statementRoot = xmlChild(root, "BkToCstmrStmt") || xmlChild(root, "BkToCstmrDbtCdtNtfctn");
+    if (!statementRoot) throw new Error("paymentImportUnsupported");
+    const statements = [...statementRoot.children].filter(node => ["Stmt", "Ntfctn"].includes(node.localName));
+    if (!statements.length) throw new Error("paymentImportInvalid");
+    const fileHash = await importHash(text);
+    const rows = [];
+    let skipped = 0;
+    const amountFor = (node, allowZero = false) => {
+      const value = node?.textContent.trim() || "";
+      const amount = Number(value);
+      if (!/^\d+(\.\d+)?$/.test(value) || !Number.isFinite(amount) || amount < 0 || !allowZero && amount === 0) throw new Error("paymentImportInvalid");
+      return amount;
+    };
+    for (const [statementIndex, statement] of statements.entries()) {
+      const account = xmlValue(statement, "Acct", "Id", "IBAN") || xmlValue(statement, "Acct", "Id", "Othr", "Id");
+      const entries = [...statement.children].filter(node => node.localName === "Ntry");
+      for (const [entryIndex, entry] of entries.entries()) {
+        const status = xmlValue(entry, "Sts", "Cd") || xmlValue(entry, "Sts");
+        if (!status) throw new Error("paymentImportInvalid");
+        if (status !== "BOOK") { skipped += 1; continue; }
+        const date = (xmlValue(entry, "BookgDt", "Dt") || xmlValue(entry, "BookgDt", "DtTm")).slice(0, 10);
+        const parsedDate = new Date(`${date}T12:00:00Z`);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.valueOf()) || !parsedDate.toISOString().startsWith(date)) throw new Error("paymentImportInvalid");
+        const entryAmountNode = xmlChild(entry, "Amt");
+        const entryAmount = amountFor(entryAmountNode, true);
+        const currency = entryAmountNode?.getAttribute("Ccy") || xmlValue(statement, "Acct", "Ccy");
+        const indicator = xmlValue(entry, "CdtDbtInd");
+        if (!/^[A-Z]{3}$/.test(currency) || !["CRDT", "DBIT"].includes(indicator)) throw new Error("paymentImportInvalid");
+        if (currency !== "EUR") throw new Error("paymentImportCurrencyError");
+        const details = [...entry.getElementsByTagNameNS("*", "TxDtls")];
+        const transactions = details.length ? details : [null];
+        if (!entryAmount && transactions.length === 1) { skipped += 1; continue; }
+        const entryRows = [];
+        for (const [transactionIndex, transaction] of transactions.entries()) {
+          const detailAmountNode = xmlChild(transaction, "Amt") || xmlPath(transaction, "AmtDtls", "TxAmt", "Amt");
+          const transactionIndicator = xmlValue(transaction, "CdtDbtInd") || indicator;
+          if (!["CRDT", "DBIT"].includes(transactionIndicator)) throw new Error("paymentImportInvalid");
+          if (transactions.length === 1 && transactionIndicator !== indicator) throw new Error("paymentImportBatchError");
+          if (transactions.length > 1 && (!detailAmountNode || (detailAmountNode.getAttribute("Ccy") || currency) !== currency)) throw new Error("paymentImportBatchError");
+          const amount = transactions.length === 1 ? entryAmount : amountFor(detailAmountNode);
+          const incoming = transactionIndicator === "CRDT";
+          const party = xmlPath(transaction, "RltdPties", incoming ? "Dbtr" : "Cdtr");
+          const supplier = xmlValue(party, "Pty", "Nm") || xmlValue(party, "Nm") || xmlValue(transaction, "RltdPties", incoming ? "DbtrAcct" : "CdtrAcct", "Id", "IBAN") || translateCopy("Банковская операция", "paymentImportUnknownParty");
+          const remittance = xmlChild(transaction, "RmtInf");
+          const note = [remittance ? [...remittance.getElementsByTagNameNS("*", "Ustrd")].map(node => node.textContent.trim()).join(" · ") : "", xmlValue(transaction, "AddtlTxInf"), xmlValue(entry, "AddtlNtryInf")].filter(Boolean).join(" · ");
+          const transactionReference = xmlValue(transaction, "Refs", "AcctSvcrRef");
+          const reference = transactionReference || xmlValue(entry, "AcctSvcrRef");
+          const batchReference = transactions.length > 1 && !transactionReference ? xmlValue(transaction, "Refs", "TxId") || transactionIndex : "";
+          const identity = reference && reference !== "NOTPROVIDED" && account
+            ? [account, reference, batchReference, date, transactionIndicator, amount, currency].join("|")
+            : `${fileHash}:${statementIndex}:${entryIndex}:${transactionIndex}`;
+          entryRows.push({ date, supplier, amount, currency, direction: incoming ? "incoming" : "outgoing", note,
+            bankAccount: account, bankReference: reference, referenceNumber: xmlValue(transaction, "RmtInf", "Strd", "CdtrRefInf", "Ref"),
+            isReversal: xmlValue(entry, "RvslInd") === "true", bankImportId: await importHash(identity) });
+        }
+        const signedTotal = entryRows.reduce((sum, row) => sum + (row.direction === "incoming" ? row.amount : -row.amount), 0);
+        if (Math.abs(signedTotal - (indicator === "CRDT" ? entryAmount : -entryAmount)) > 0.005) throw new Error("paymentImportBatchError");
+        rows.push(...entryRows);
+      }
+    }
+    return { rows, skipped };
+  };
   const importInput = document.getElementById("paymentImportFile");
   const importPreview = document.getElementById("paymentImportPreview");
   const importConfirm = document.getElementById("paymentImportConfirm");
   let importedRows = [];
+  let importGeneration = 0;
+  let importedContext = "";
+  const importContext = () => `${cloudWorkspace?.organizationId || activeCompanyId}:${STORAGE.purchases}`;
   importInput.addEventListener("change", async () => {
+    const generation = ++importGeneration;
+    const context = importContext();
     importedRows = [];
     importConfirm.disabled = true;
+    document.getElementById("paymentImportCount").textContent = "";
+    if (!can("payments")) { denyAction("payments"); return; }
     const file = importInput.files[0];
-    if (!file) return;
+    if (!file) { importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите XML файл для просмотра операций.", "paymentImportEmpty")}</p>`; return; }
     try {
-      const parsed = parseImport(await file.text());
-      if (parsed === null) { importPreview.innerHTML = `<p class="payments-empty">${translateCopy("В CSV должны быть столбцы: дата, получатель и сумма.", "paymentImportInvalid")}</p>`; return; }
-      importedRows = parsed;
-      document.getElementById("paymentImportCount").textContent = `${parsed.length} ${translateCopy("платежей", "paymentImportCount")}`;
-      importPreview.innerHTML = parsed.length ? `<table class="data-table"><thead><tr><th>${translateCopy("Дата", "paymentDateColumn")}</th><th>${translateCopy("Получатель", "paymentRecipientColumn")}</th><th>${translateCopy("Описание", "paymentDescriptionColumn")}</th><th>${translateCopy("Сумма", "paymentAmountColumn")}</th></tr></thead><tbody>${parsed.slice(0, 50).map(item => `<tr><td>${escapeHtml(formatDate(item.date))}</td><td>${escapeHtml(item.supplier)}</td><td>${escapeHtml(item.note)}</td><td>${money(item.amount)} EUR</td></tr>`).join("")}</tbody></table>` : `<p class="payments-empty">${translateCopy("Нет файла для импорта", "paymentImportNoFile")}</p>`;
-      importConfirm.disabled = !parsed.length;
-    } catch { importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Не удалось прочитать файл.", "paymentImportError")}</p>`; }
+      const parsed = await parseXmlImport(await readXmlFile(file));
+      if (generation !== importGeneration) return;
+      if (context !== importContext()) throw new Error("paymentImportContextChanged");
+      const knownIds = new Set(purchases.map(item => item.bankImportId).filter(Boolean));
+      importedRows = parsed.rows.filter(item => !knownIds.has(item.bankImportId));
+      importedContext = context;
+      const duplicates = parsed.rows.length - importedRows.length;
+      document.getElementById("paymentImportCount").textContent = [`${importedRows.length} ${translateCopy("Строк для импорта", "paymentImportCount")}`, parsed.skipped ? `${translateCopy("Пропущено", "paymentImportSkipped")}: ${parsed.skipped}` : "", duplicates ? `${translateCopy("Уже импортировано", "paymentImportDuplicate")}: ${duplicates}` : ""].filter(Boolean).join(" · ");
+      importPreview.innerHTML = importedRows.length ? `<table class="data-table"><thead><tr><th>${translateCopy("Дата", "paymentDateColumn")}</th><th>${translateCopy("Контрагент", "paymentImportCounterparty")}</th><th>${translateCopy("Направление", "paymentImportDirection")}</th><th>${translateCopy("Описание", "paymentDescriptionColumn")}</th><th>${translateCopy("Сумма", "paymentAmountColumn")}</th></tr></thead><tbody>${importedRows.slice(0, 50).map(item => `<tr><td>${escapeHtml(formatDate(item.date))}</td><td>${escapeHtml(item.supplier)}</td><td>${translateCopy(item.direction === "incoming" ? "Поступление" : "Выплата", item.direction === "incoming" ? "paymentImportIncoming" : "paymentImportOutgoing")}</td><td>${escapeHtml(item.note)}</td><td>${money(item.amount)} ${escapeHtml(item.currency)}</td></tr>`).join("")}</tbody></table>` : `<p class="payments-empty">${translateCopy("Новых проведенных операций нет.", "paymentImportNoRows")}</p>`;
+      importConfirm.disabled = !importedRows.length;
+    } catch (error) {
+      if (generation !== importGeneration) return;
+      importedRows = []; importConfirm.disabled = true;
+      importPreview.innerHTML = `<p class="payments-empty">${escapeHtml(translateCopy("Не удалось прочитать XML файл.", /^paymentImport/.test(error.message) ? error.message : "paymentImportReadError"))}</p>`;
+    }
   });
   importConfirm.addEventListener("click", () => {
+    if (!can("payments")) { denyAction("payments"); return; }
     if (!importedRows.length) return;
-    const rows = importedRows.map(item => ({ ...item, category: "bank", amountDue: 0, currency: "EUR", paymentMethod: "bank" }));
+    if (importedContext !== importContext()) { importedRows = []; importConfirm.disabled = true; showMessage(translateCopy("Компания изменилась. Загрузите XML заново.", "paymentImportContextChanged"), true); return; }
+    const knownIds = new Set(purchases.map(item => item.bankImportId).filter(Boolean));
+    const rows = importedRows.filter(item => !knownIds.has(item.bankImportId)).map(item => ({ ...item, id: crypto.randomUUID(), category: "bank", amountDue: 0, paymentMethod: "bank", paymentOrigin: "bank-import", enteredAt: new Date().toISOString(), enteredBy: currentInvoiceActorEmail() || "—" }));
+    if (!rows.length) { importedRows = []; importConfirm.disabled = true; showMessage(translateCopy("Новых операций нет.", "paymentImportNoRows")); return; }
     const next = [...rows, ...purchases];
     try { saveList(STORAGE.purchases, next); purchases = next; }
     catch { showMessage(translateCopy("Не удалось сохранить импортированные платежи.", "paymentImportError"), true); return; }
     importedRows = []; importInput.value = ""; importConfirm.disabled = true;
-    importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите CSV файл для просмотра строк.", "paymentImportEmpty")}</p>`;
+    importPreview.innerHTML = `<p class="payments-empty">${translateCopy("Выберите XML файл для просмотра операций.", "paymentImportEmpty")}</p>`;
     document.getElementById("paymentImportCount").textContent = "";
     renderPurchases(); renderDashboard(); renderReport();
     showMessage(translateCopy("Платежи импортированы.", "paymentImportSaved"));
   });
+  cashForm.addEventListener("cash-payment-saved", () => {
+    cashCurrentPage = 1;
+    showView("cashPaymentsView");
+  });
   cashForm.addEventListener("submit", event => {
     event.preventDefault();
+    if (!can("payments")) { denyAction("payments"); return; }
     const item = {
       id: crypto.randomUUID(), date: document.getElementById("cashPaymentDate").value,
       supplier: document.getElementById("cashPaymentRecipient").value.trim(),
@@ -599,9 +747,9 @@
     try { saveList(STORAGE.purchases, next); purchases = next; }
     catch { showMessage(translateCopy("Не удалось сохранить кассовый платеж.", "paymentImportError"), true); return; }
     cashForm.reset(); document.getElementById("cashPaymentDate").value = localDate();
-    cashForm.hidden = true;
     cashCurrentPage = 1;
-    renderCashPayments(); renderPurchases(); renderDashboard(); renderReport();
+    renderPurchases(); renderDashboard(); renderReport();
+    showView("cashPaymentsView");
     showMessage(translateCopy("Кассовый платеж сохранен.", "cashPaymentSaved"));
   });
   document.getElementById("cashPaymentDate").value = localDate();

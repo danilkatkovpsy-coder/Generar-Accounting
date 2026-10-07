@@ -5,15 +5,17 @@
 #cashPaymentsView .cash-payment-export-links button{padding:0;border:0;color:#35634d;background:transparent;font-size:11px;font-weight:650}
 #cashPaymentsView .cash-payment-export-links button:hover{text-decoration:underline}
 #cashPaymentsView .cash-payment-add-button{min-height:36px}
-#cashPaymentsView .cash-payment-form[hidden]{display:none!important}
-#cashPaymentsView .cash-payment-form{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:0 0 14px;padding:16px}
-#cashPaymentsView .cash-payment-form-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
-#cashPaymentsView .cash-payment-form-heading h2{margin:0;color:#425c51;font-size:16px;font-weight:650}
-#cashPaymentsView .cash-payment-form-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end}
-#cashPaymentsView .cash-payment-form-fields .field{min-width:0;margin:0}
-#cashPaymentsView .cash-payment-form-fields input,#cashPaymentsView .cash-payment-form-fields select{width:100%;min-width:0}
-#cashPaymentsView .cash-payment-form-fields .cash-note-field{grid-column:span 2}
-#cashPaymentsView .cash-payment-form-fields button{grid-column:4;min-height:38px}
+#cashPaymentEditorView{width:min(100%,1440px);padding:0 16px}
+#cashPaymentEditorView .view-heading{align-items:center;gap:16px;margin-bottom:14px}
+#cashPaymentEditorView .cash-payment-editor-actions{gap:12px;flex-wrap:wrap}
+#cashPaymentEditorView .cash-payment-form{display:block;max-width:none;margin:0;padding:0;border:0;background:transparent}
+#cashPaymentEditorView .cash-payment-form-fields[hidden]{display:none!important}
+#cashPaymentEditorView .bank-payment-composer-details textarea{width:100%;min-width:0;min-height:64px;resize:vertical}
+#cashPaymentEditorView .bank-payment-extra-table textarea{width:100%;min-width:200px;min-height:54px;padding:6px 8px;font-size:11px;resize:vertical}
+#cashPaymentEditorView .cash-payment-form-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end}
+#cashPaymentEditorView .cash-payment-form-fields .field{min-width:0;margin:0}
+#cashPaymentEditorView .cash-payment-form-fields input,#cashPaymentEditorView .cash-payment-form-fields select{width:100%;min-width:0}
+#cashPaymentEditorView .cash-payment-form-fields .cash-note-field{grid-column:span 2}
 #cashPaymentsView .cash-payment-register{max-width:none;margin-top:0;padding:12px}
 #cashPaymentsView .cash-payment-filterbar{display:grid;grid-template-columns:minmax(150px,1.6fr) minmax(110px,.9fr) minmax(120px,.8fr) minmax(120px,.8fr) minmax(110px,.85fr) 34px auto;gap:8px;align-items:end;margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid #e5eae7}
 #cashPaymentsView .cash-payment-filterbar .field{min-width:0;margin:0}
@@ -50,4 +52,5 @@
 #cashPaymentsView .cash-payment-summary{margin-top:18px}
 @media(max-width:1050px){#cashPaymentsView .cash-payment-filterbar{grid-template-columns:repeat(3,minmax(0,1fr))}#cashPaymentsView .cash-payment-search-field input{margin-top:0}#cashPaymentsView .cash-payment-apply{width:100%}}
 @media(max-width:760px){#cashPaymentsView{padding:0 12px}#cashPaymentsView .view-heading{flex-direction:column;align-items:stretch}#cashPaymentsView .cash-payment-heading-actions{justify-content:flex-start}#cashPaymentsView .cash-payment-filterbar{grid-template-columns:repeat(2,minmax(0,1fr))}#cashPaymentsView .cash-payment-filterbar>.field{min-width:0}#cashPaymentsView .cash-payment-clear,#cashPaymentsView .cash-payment-apply{width:100%}#cashPaymentsView .cash-payment-pagination{justify-content:center;flex-wrap:wrap;padding-bottom:38px}#cashPaymentsView .cash-payment-pagination>.cash-payment-total{position:absolute;left:0;bottom:0}#cashPaymentsView .cash-payment-page-size{right:0;bottom:0}#cashPaymentsView .cash-payment-table th:nth-child(1),#cashPaymentsView .cash-payment-table td:nth-child(1),#cashPaymentsView .cash-payment-table th:nth-child(4),#cashPaymentsView .cash-payment-table td:nth-child(4),#cashPaymentsView .cash-payment-table th:nth-child(7),#cashPaymentsView .cash-payment-table td:nth-child(7),#cashPaymentsView .cash-payment-table th:nth-child(8),#cashPaymentsView .cash-payment-table td:nth-child(8),#cashPaymentsView .cash-payment-table th:nth-child(9),#cashPaymentsView .cash-payment-table td:nth-child(9),#cashPaymentsView .cash-payment-table th:nth-child(10),#cashPaymentsView .cash-payment-table td:nth-child(10){display:none}#cashPaymentsView .cash-payment-table{min-width:0}#cashPaymentsView .cash-payment-table th:nth-child(2){width:28%}#cashPaymentsView .cash-payment-table th:nth-child(3){width:34%}#cashPaymentsView .cash-payment-table th:nth-child(5){width:20%}#cashPaymentsView .cash-payment-table th:nth-child(6){width:18%}#cashPaymentsView .cash-payment-sort{flex-wrap:wrap}#cashPaymentsView .cash-payment-summary{width:100%}}
-@media(max-width:520px){#cashPaymentsView .cash-payment-form-fields{grid-template-columns:minmax(0,1fr)}#cashPaymentsView .cash-payment-form-fields .cash-note-field{grid-column:auto}#cashPaymentsView .cash-payment-form-fields button{grid-column:auto;width:100%}}
+@media(max-width:760px){#cashPaymentEditorView{padding:0 12px}#cashPaymentEditorView .view-heading{align-items:stretch}#cashPaymentEditorView .cash-payment-form-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){#cashPaymentEditorView .cash-payment-form-fields{grid-template-columns:minmax(0,1fr)}#cashPaymentEditorView .cash-payment-form-fields .cash-note-field{grid-column:auto}}

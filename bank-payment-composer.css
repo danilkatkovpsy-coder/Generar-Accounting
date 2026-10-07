@@ -1,52 +1,53 @@
-#purchaseEditorView .bank-payment-composer{display:grid;gap:18px;margin-top:2px}
-#purchaseEditorView .bank-payment-composer-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px;align-items:end}
-#purchaseEditorView .bank-payment-composer-details>.field{min-width:0;margin:0}
-#purchaseEditorView .bank-payment-composer-details>.field.wide{grid-column:1/-1}
-#purchaseEditorView .bank-payment-composer-details input,#purchaseEditorView .bank-payment-composer-details select{width:100%;min-width:0}
-#purchaseEditorView .bank-payment-composer-details #purchaseSupplier{min-width:0}
-#purchaseEditorView .bank-payment-account-balance{display:grid;min-height:65px;align-content:center;gap:3px;padding:8px 11px;border:1px solid #e4dbca;border-radius:6px;background:#f6f2ea;color:#66736b;font-size:11px}
-#purchaseEditorView .bank-payment-account-balance strong{color:#2d473b;font-size:15px;font-variant-numeric:tabular-nums}
-#purchaseEditorView .bank-payment-account-balance small{font-size:10px}
-#purchaseEditorView .bank-payment-debt-toolbar{display:flex;align-items:center;justify-content:flex-start;gap:12px;padding-bottom:10px;border-bottom:1px solid #e6ebe8}
-#purchaseEditorView .bank-payment-recipient-tabs{display:inline-flex;gap:3px;padding:3px;border:1px solid #e2dbd0;border-radius:6px;background:#f5f1e9}
-#purchaseEditorView .bank-payment-recipient-tabs button{min-height:34px;padding:6px 14px;border:0;border-radius:4px;color:#526158;background:transparent;font-size:12px;font-weight:600}
-#purchaseEditorView .bank-payment-recipient-tabs button[aria-pressed=true]{color:#344b3e;background:#e5dbc8;box-shadow:inset 0 0 0 1px #d8c9ae}
-#purchaseEditorView .bank-payment-debt-search{width:min(480px,58%);margin:0}
-#purchaseEditorView .bank-payment-search-controls{display:flex;align-items:center;gap:7px}
-#purchaseEditorView .bank-payment-search-controls input{flex:1;min-width:0;min-height:36px}
-#purchaseEditorView .bank-payment-search-controls button{min-height:36px;padding:7px 12px;font-size:11px;white-space:nowrap}
-#purchaseEditorView .bank-payment-advance-row{display:grid;grid-template-columns:max-content minmax(220px,1fr) minmax(100px,140px);align-items:center;gap:10px;padding:8px 11px;border-top:1px solid #e6ebe8;border-bottom:1px solid #e6ebe8;background:#faf9f6;color:#526158;font-size:12px}
-#purchaseEditorView .bank-payment-advance-row label{font-weight:600}
-#purchaseEditorView .bank-payment-advance-row input{width:100%;min-width:0;min-height:34px;padding:5px 8px}
-#purchaseEditorView #bankPaymentAdvanceAmount{text-align:right;font-variant-numeric:tabular-nums}
-#purchaseEditorView .bank-payment-debts-wrap,#purchaseEditorView .bank-payment-extra-wrap{max-width:100%;overflow-x:auto}
-#purchaseEditorView .bank-payment-debts-table{width:100%;min-width:900px;table-layout:auto;border-collapse:collapse}
-#purchaseEditorView .bank-payment-debts-table th,#purchaseEditorView .bank-payment-extra-table th{padding:9px 10px;color:#52635a;background:#edf0ec;font-size:11px;text-align:left;white-space:nowrap}
-#purchaseEditorView .bank-payment-debts-table td,#purchaseEditorView .bank-payment-extra-table td{padding:7px 9px;border-bottom:1px solid #e7ebe8;font-size:12px;vertical-align:middle}
-#purchaseEditorView .bank-payment-debts-table tbody tr:nth-child(even) td,#purchaseEditorView .bank-payment-extra-table tbody tr:nth-child(even) td{background:#faf9f6}
-#purchaseEditorView .bank-payment-debts-table th:nth-child(6),#purchaseEditorView .bank-payment-debts-table td:nth-child(6),#purchaseEditorView .bank-payment-debts-table th:nth-child(7),#purchaseEditorView .bank-payment-debts-table td:nth-child(7){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-#purchaseEditorView .bank-payment-debts-table td:nth-child(7) input{width:110px;min-height:32px;padding:5px 7px;text-align:right;font-variant-numeric:tabular-nums}
-#purchaseEditorView .bank-payment-debts-table td:last-child,#purchaseEditorView .bank-payment-debts-table th:last-child{width:44px;text-align:center}
-#purchaseEditorView .bank-payment-debts-table input[type=checkbox]{width:16px;height:16px;accent-color:#718c72}
-#purchaseEditorView .bank-payment-debt-balance{font-variant-numeric:tabular-nums}
-#purchaseEditorView .bank-payment-debts-empty{margin:0;padding:22px 12px;color:#78847d;text-align:center}
-#purchaseEditorView .bank-payment-debts-empty[hidden]{display:none}
-#purchaseEditorView .bank-payment-extra-section{display:grid;gap:9px}
-#purchaseEditorView .bank-payment-extra-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
-#purchaseEditorView .bank-payment-extra-heading h3{margin:0;color:#425c51;font-size:16px;font-weight:650}
-#purchaseEditorView .bank-payment-add-line{min-height:34px;padding:6px 11px;font-size:11px}
-#purchaseEditorView .bank-payment-extra-table{width:100%;min-width:960px;table-layout:auto;border-collapse:collapse}
-#purchaseEditorView .bank-payment-extra-table input,#purchaseEditorView .bank-payment-extra-table select{width:100%;min-width:75px;min-height:34px;padding:5px 7px;font-size:11px}
-#purchaseEditorView .bank-payment-extra-table td:first-child{min-width:220px}
-#purchaseEditorView .bank-payment-extra-table td:nth-child(2),#purchaseEditorView .bank-payment-extra-table td:nth-child(3){width:100px}
-#purchaseEditorView .bank-payment-extra-total{min-width:100px;text-align:right;font-variant-numeric:tabular-nums}
-#purchaseEditorView .bank-payment-remove-line{display:grid;width:30px;height:30px;place-items:center;padding:0;border:0;border-radius:4px;color:#758078;background:transparent}
-#purchaseEditorView .bank-payment-remove-line:hover{color:#a35446;background:#f8efed}
-#purchaseEditorView .bank-payment-remove-line svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-width:1.8}
-#purchaseEditorView .bank-payment-composer-total{display:flex;align-items:center;justify-content:flex-end;gap:16px;padding:13px 14px;border-top:1px solid #d9d1c4;color:#44594e;font-size:14px;font-weight:650}
-#purchaseEditorView .bank-payment-composer-total .field{width:190px;margin:0}
-#purchaseEditorView .bank-payment-composer-total label{display:none}
-#purchaseEditorView .bank-payment-composer-total input{width:100%;min-height:40px;text-align:right;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;background:#f6f2ea}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer{display:grid;min-width:0;gap:18px;margin-top:2px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer>*{min-width:0}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px;align-items:end}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details>.field{min-width:0;margin:0}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details>.field.wide{grid-column:1/-1}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details input,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details select{width:100%;min-width:0}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details #purchaseSupplier{min-width:0}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-account-balance{display:grid;min-height:65px;align-content:center;gap:3px;padding:8px 11px;border:1px solid #e4dbca;border-radius:6px;background:#f6f2ea;color:#66736b;font-size:11px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-account-balance strong{color:#2d473b;font-size:15px;font-variant-numeric:tabular-nums}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-account-balance small{font-size:10px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debt-toolbar{display:flex;align-items:center;justify-content:flex-start;gap:12px;padding-bottom:10px;border-bottom:1px solid #e6ebe8}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-recipient-tabs{display:inline-flex;gap:3px;padding:3px;border:1px solid #e2dbd0;border-radius:6px;background:#f5f1e9}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-recipient-tabs button{min-height:34px;padding:6px 14px;border:0;border-radius:4px;color:#526158;background:transparent;font-size:12px;font-weight:600}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-recipient-tabs button[aria-pressed=true]{color:#344b3e;background:#e5dbc8;box-shadow:inset 0 0 0 1px #d8c9ae}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debt-search{width:min(480px,58%);margin:0}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-search-controls{display:flex;align-items:center;gap:7px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-search-controls input{flex:1;min-width:0;min-height:36px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-search-controls button{min-height:36px;padding:7px 12px;font-size:11px;white-space:nowrap}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-advance-row{display:grid;grid-template-columns:max-content minmax(220px,1fr) minmax(100px,140px);align-items:center;gap:10px;padding:8px 11px;border-top:1px solid #e6ebe8;border-bottom:1px solid #e6ebe8;background:#faf9f6;color:#526158;font-size:12px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-advance-row label{font-weight:600}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-advance-row input{width:100%;min-width:0;min-height:34px;padding:5px 8px}
+:is(#purchaseEditorView,#cashPaymentEditorView) #bankPaymentAdvanceAmount{text-align:right;font-variant-numeric:tabular-nums}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-wrap,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-wrap{max-width:100%;overflow-x:auto}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table{width:100%;min-width:900px;table-layout:auto;border-collapse:collapse}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table th,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table th{padding:9px 10px;color:#52635a;background:#edf0ec;font-size:11px;text-align:left;white-space:nowrap}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table td,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table td{padding:7px 9px;border-bottom:1px solid #e7ebe8;font-size:12px;vertical-align:middle}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table tbody tr:nth-child(even) td,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table tbody tr:nth-child(even) td{background:#faf9f6}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table th:nth-child(6),:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table td:nth-child(6),:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table th:nth-child(7),:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table td:nth-child(7){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table td:nth-child(7) input{width:110px;min-height:32px;padding:5px 7px;text-align:right;font-variant-numeric:tabular-nums}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table td:last-child,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table th:last-child{width:44px;text-align:center}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-table input[type=checkbox]{width:16px;height:16px;accent-color:#718c72}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debt-balance{font-variant-numeric:tabular-nums}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-empty{margin:0;padding:22px 12px;color:#78847d;text-align:center}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debts-empty[hidden]{display:none}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-section{display:grid;gap:9px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-heading h3{margin:0;color:#425c51;font-size:16px;font-weight:650}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-add-line{min-height:34px;padding:6px 11px;font-size:11px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table{width:100%;min-width:960px;table-layout:auto;border-collapse:collapse}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table input,:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table select{width:100%;min-width:75px;min-height:34px;padding:5px 7px;font-size:11px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table td:first-child{min-width:220px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table td:nth-child(2),:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-table td:nth-child(3){width:100px}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-total{min-width:100px;text-align:right;font-variant-numeric:tabular-nums}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-remove-line{display:grid;width:30px;height:30px;place-items:center;padding:0;border:0;border-radius:4px;color:#758078;background:transparent}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-remove-line:hover{color:#a35446;background:#f8efed}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-remove-line svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-width:1.8}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-total{display:flex;align-items:center;justify-content:flex-end;gap:16px;padding:13px 14px;border-top:1px solid #d9d1c4;color:#44594e;font-size:14px;font-weight:650}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-total .field{width:190px;margin:0}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-total label{display:none}
+:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-total input{width:100%;min-height:40px;text-align:right;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;background:#f6f2ea}
 #purchasesView .bank-payment-table tbody tr[data-purchase-index]{cursor:pointer}
 #purchasesView .bank-payment-table tbody tr[data-purchase-index]:focus-visible{outline:2px solid #718c72;outline-offset:-2px}
 .bank-payment-editor-dialog{width:min(620px,calc(100vw - 24px));max-width:none;max-height:min(90vh,840px);overflow-x:hidden;padding:0;border:1px solid #e0d8ca;border-radius:8px;background:#fff;color:#1d2b27;box-shadow:0 20px 60px rgba(26,48,39,.22)}
@@ -70,5 +71,5 @@
 .bank-payment-dialog-delete{margin-right:auto;color:#a35446}
 .bank-payment-dialog-delete:hover{border-color:#e6c9c4;background:#fbf1ef;color:#8f3e33}
 @media(max-width:560px){.bank-payment-dialog-details,.bank-payment-edit-form{grid-template-columns:minmax(0,1fr);padding:14px}.bank-payment-dialog-note,.bank-payment-edit-note,.bank-payment-amount-lock{grid-column:auto}.bank-payment-dialog-actions{justify-content:flex-start;padding:12px 14px}.bank-payment-dialog-delete{margin-right:auto}}
-@media(max-width:950px){#purchaseEditorView .bank-payment-composer-details{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){#purchaseEditorView .bank-payment-composer{gap:14px}#purchaseEditorView .bank-payment-composer-details{grid-template-columns:minmax(0,1fr)}#purchaseEditorView .bank-payment-composer-details>.field.wide{grid-column:auto}#purchaseEditorView .bank-payment-debt-toolbar{align-items:stretch;flex-direction:column}#purchaseEditorView .bank-payment-debt-search{width:100%}#purchaseEditorView .bank-payment-advance-row{grid-template-columns:minmax(0,1fr)}#purchaseEditorView .bank-payment-extra-heading{align-items:flex-start;flex-direction:column}#purchaseEditorView .bank-payment-composer-total{align-items:stretch;flex-direction:column;gap:8px}#purchaseEditorView .bank-payment-composer-total .field{width:100%}}
+@media(max-width:950px){:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer{gap:14px}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details{grid-template-columns:minmax(0,1fr)}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-details>.field.wide{grid-column:auto}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debt-toolbar{align-items:stretch;flex-direction:column}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-debt-search{width:100%}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-advance-row{grid-template-columns:minmax(0,1fr)}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-extra-heading{align-items:flex-start;flex-direction:column}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-total{align-items:stretch;flex-direction:column;gap:8px}:is(#purchaseEditorView,#cashPaymentEditorView) .bank-payment-composer-total .field{width:100%}}

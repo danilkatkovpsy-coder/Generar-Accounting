@@ -1,4 +1,17 @@
-@media(min-width:761px) and (max-width:1440px){.app-nav{overflow:visible;flex-wrap:wrap;row-gap:2px}}
+.topbar{position:relative;z-index:200;overflow:visible}
+.app-nav{overflow:visible}
+.payroll-nav-wrap[hidden]{display:none!important}
+#generalLedgerTab{display:none!important}
+#ledgerView,#ledgerTurnoverView{width:min(100%,1440px)}
+#ledgerView #generalLedgerPanel{margin:0}
+#ledgerView>.view-heading,#ledgerTurnoverView>.view-heading{align-items:center;gap:16px}
+#ledgerTurnoverView .data-table{width:100%;min-width:550px}
+#ledgerTurnoverView .data-table td:not(:first-child),#ledgerTurnoverView .data-table th:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+#ledgerTurnoverView .data-table tfoot{font-weight:650}
+@media(min-width:761px){.app-nav{overflow:visible;flex-wrap:nowrap;min-width:0}}
+@media(min-width:761px) and (max-width:1440px){.app-nav{gap:2px}.app-nav>.nav-button,.app-nav .payments-nav-wrap>.nav-button{padding:6px 7px;gap:4px;font-size:12px;white-space:nowrap}.app-nav .nav-icon,.app-nav .payments-nav-icon{width:16px;height:16px;flex:0 0 16px}.app-nav .payments-nav-chevron{width:11px;height:11px;flex:0 0 11px}.app-nav .nav-utilities{gap:5px;padding:0 4px}.app-nav .payments-nav-wrap>.nav-button{gap:4px}}
+.fixed-assets-nav-menu .fixed-assets-settings-item{margin-top:4px;border-top:1px solid #e6ebe8;border-radius:0 0 5px 5px}
+.fixed-assets-nav-wrap[hidden],.fixed-assets-nav-menu button[hidden]{display:none!important}
 @media(min-width:761px) and (max-width:1100px){.app-nav{flex-wrap:nowrap;gap:2px}.app-nav>.nav-button,.app-nav .payments-nav-wrap>.nav-button{flex:0 1 auto;min-width:0;min-height:30px;padding:4px 5px;gap:3px;font-size:11px}.app-nav .nav-icon{width:14px;height:14px}.payments-nav-wrap{flex:0 1 auto;min-width:0}.payroll-nav-label{flex:0 1 auto;min-height:30px;padding:4px 5px;font-size:11px}.nav-utilities{gap:4px;margin-left:auto;padding:0 3px}.app-nav .language-switch{padding:2px}.app-nav .language-switch button{min-width:26px;min-height:25px;padding:3px 4px;font-size:9px}.app-nav .logout-button{min-height:27px;padding:4px 5px;gap:4px;font-size:10px}.app-nav .logout-icon{width:14px;height:14px}}
 @media(max-width:760px){.app-nav .payments-nav-wrap .payments-nav-menu{position:absolute;top:calc(100% + 2px);left:0;width:100%;margin:0;border-radius:5px;box-shadow:0 8px 18px rgba(26,48,39,.15)}}
 @media(max-width:760px){.payments-nav-wrap{width:100%;flex-direction:column}.payments-nav-wrap>.nav-button{width:100%;justify-content:flex-start}

@@ -1,15 +1,25 @@
 (() => {
-  const form = document.getElementById("purchaseForm");
-  const formGrid = form?.querySelector(".form-grid");
-  const dateInput = document.getElementById("purchaseDate");
-  const recipientInput = document.getElementById("purchaseSupplier");
-  const accountSelect = document.getElementById("purchaseBankAccount");
-  const amountInput = document.getElementById("purchaseAmount");
-  const noteInput = document.getElementById("purchaseNote");
+  const initializeComposer = paymentMethod => {
+  const isCash = paymentMethod === "cash";
+  const form = document.getElementById(isCash ? "cashPaymentForm" : "purchaseForm");
+  const formGrid = form?.querySelector(isCash ? ".cash-payment-form-fields" : ".form-grid");
+  const dateInput = document.getElementById(isCash ? "cashPaymentDate" : "purchaseDate");
+  const recipientInput = document.getElementById(isCash ? "cashPaymentRecipient" : "purchaseSupplier");
+  const accountSelect = document.getElementById(isCash ? "cashPaymentAccount" : "purchaseBankAccount");
+  const amountInput = document.getElementById(isCash ? "cashPaymentAmount" : "purchaseAmount");
+  let noteInput = document.getElementById(isCash ? "cashPaymentNote" : "purchaseNote");
   if (!form || !formGrid || !dateInput || !recipientInput || !accountSelect || !amountInput || !noteInput || form.dataset.bankComposerReady) return;
 
+  if (isCash) {
+    const noteArea = document.createElement("textarea");
+    noteArea.id = noteInput.id;
+    noteArea.rows = 2;
+    noteInput.replaceWith(noteArea);
+    noteInput = noteArea;
+  }
   form.dataset.bankComposerReady = "true";
   Object.assign(ruTexts, {
+    cashComposerBalanceHint: "Рассчитано по кассовым платежам, без начального остатка.",
     bankComposerClient: "Клиент", bankComposerSupplier: "Поставщик", bankComposerRecipient: "Получатель", bankComposerDate: "Дата",
     bankComposerSearch: "Поиск по контрагенту или счету", bankComposerBalance: "Остаток на счете",
     bankComposerBalanceUnavailable: "Баланс не синхронизирован с банком", bankComposerReference: "Основание платежа",
@@ -40,6 +50,7 @@
     bankComposerDeleted: "Банковский платеж удален.", bankComposerDeleteError: "Не удалось удалить банковский платеж."
   });
   Object.assign(etTexts, {
+    cashComposerBalanceHint: "Arvutatud kassamaksete põhjal, algsaldot arvestamata.",
     bankComposerClient: "Klient", bankComposerSupplier: "Hankija", bankComposerRecipient: "Saaja", bankComposerDate: "Kuupäev",
     bankComposerSearch: "Otsi osapoole või arve järgi", bankComposerBalance: "Kontojääk",
     bankComposerBalanceUnavailable: "Panga saldo pole sünkroonitud", bankComposerReference: "Alusdokument",
@@ -70,13 +81,13 @@
     bankComposerDeleted: "Pangamakse kustutati.", bankComposerDeleteError: "Pangamakset ei saanud kustutada."
   });
 
-  const get = id => document.getElementById(id);
+  const get = id => document.getElementById(isCash && id.startsWith("bankPayment") ? id.replace("bankPayment", "cashComposer") : id);
   const copy = (fallback, key) => translateCopy(fallback, key);
   const selectedAmounts = new Map();
-  let recipientType = "supplier";
+  let recipientType = isCash ? "client" : "supplier";
   let lastAutofilledRecipient = "";
 
-  const fieldFor = input => input.closest(".field");
+  const fieldFor = input => input?.closest(".field");
   const dueDateField = fieldFor(get("purchaseDueDate"));
   const categoryField = fieldFor(get("purchaseCategory"));
   const dateField = fieldFor(dateInput);
@@ -90,8 +101,10 @@
   recipientInput.dataset.i18nPlaceholder = "bankComposerRecipient";
   amountInput.required = false;
   amountInput.readOnly = true;
-  dueDateField.hidden = true;
-  categoryField.hidden = true;
+  if (!isCash) {
+    dueDateField.hidden = true;
+    categoryField.hidden = true;
+  }
   for (const [input, key, fallback] of [
     [dateInput, "bankComposerDate", "Kuupäev"],
     [recipientInput, "bankComposerRecipient", "Saaja"],
@@ -115,8 +128,14 @@
   currencyField.innerHTML = `<label for="bankPaymentCurrency" data-i18n="bankComposerCurrency">${copy("Valuuta", "bankComposerCurrency")}</label><select id="bankPaymentCurrency"><option value="EUR">EUR</option></select>`;
   const balanceField = document.createElement("div");
   balanceField.className = "bank-payment-account-balance";
-  balanceField.innerHTML = `<span data-i18n="bankComposerBalance">${copy("Kontojääk", "bankComposerBalance")}</span><strong>— EUR</strong><small data-i18n="bankComposerBalanceUnavailable">${copy("Panga saldo pole sünkroonitud", "bankComposerBalanceUnavailable")}</small>`;
+  balanceField.innerHTML = `<span data-i18n="bankComposerBalance">${copy("Kontojääk", "bankComposerBalance")}</span><strong>— EUR</strong>${isCash ? "" : `<small data-i18n="bankComposerBalanceUnavailable">${copy("Panga saldo pole sünkroonitud", "bankComposerBalanceUnavailable")}</small>`}`;
   details.append(dateField, accountField, recipientField, documentField, currencyField, balanceField, noteField);
+  if (isCash) {
+    const orderField = fieldFor(get("cashPaymentReference"));
+    details.insertBefore(orderField, noteField);
+    noteField.classList.add("wide");
+    balanceField.querySelector("strong").title = copy("Arvutatud kassamaksete põhjal, algsaldot arvestamata.", "cashComposerBalanceHint");
+  }
 
   const debtToolbar = document.createElement("div");
   debtToolbar.className = "bank-payment-debt-toolbar";
@@ -183,6 +202,14 @@
   totalBar.append(totalLabel, amountField);
 
   composer.append(details, debtToolbar, debtsPanel, advanceSection, extraSection, totalBar);
+  if (isCash) {
+    for (const element of composer.querySelectorAll("[id]")) {
+      if (element.id.startsWith("bankPayment")) element.id = element.id.replace("bankPayment", "cashComposer");
+    }
+    for (const label of composer.querySelectorAll("label[for]")) {
+      if (label.htmlFor.startsWith("bankPayment")) label.htmlFor = label.htmlFor.replace("bankPayment", "cashComposer");
+    }
+  }
   form.insertBefore(composer, formGrid);
   formGrid.hidden = true;
 
@@ -190,8 +217,16 @@
   const extraBody = extraWrap.querySelector("tbody");
   const searchInput = searchField.querySelector("input");
   const advanceLabel = advanceSection.querySelector("label");
-  const advanceDescription = advanceSection.querySelector("#bankPaymentAdvanceDescription");
-  const advanceAmount = advanceSection.querySelector("#bankPaymentAdvanceAmount");
+  const advanceDescription = get("bankPaymentAdvanceDescription");
+  const advanceAmount = get("bankPaymentAdvanceAmount");
+  const updateCashBalance = () => {
+    if (!isCash) return;
+    const balance = purchases.filter(item => item.paymentMethod === "cash" && (item.cashRegister || item.bankAccount || "Kassa / Cash") === accountSelect.value)
+      .reduce((sum, item) => sum + (item.direction === "incoming" ? 1 : -1) * Math.abs(Number(item.amount) || 0), 0);
+    balanceField.querySelector("strong").textContent = `${money(balance)} EUR`;
+  };
+  accountSelect.addEventListener("change", updateCashBalance);
+  form.addEventListener("cash-payment-editor-open", () => { renderDebts(); updateCashBalance(); });
 
   const outstandingFor = (record, type) => {
     if (type === "client") return invoiceIsPaid(record) ? 0 : invoiceOutstandingAmount(record);
@@ -262,6 +297,14 @@
     const row = document.createElement("tr");
     row.dataset.extraLine = "true";
     row.innerHTML = `<td><input type="text" data-line-field="description" aria-label="${escapeHtml(copy("Kirjeldus", "bankComposerDescription"))}"></td><td><input type="number" min="0.01" step="0.01" value="1" data-line-field="quantity" aria-label="${escapeHtml(copy("Kogus", "bankComposerQuantity"))}"></td><td><input type="number" min="0" step="0.01" value="0" data-line-field="price" aria-label="${escapeHtml(copy("Hind", "bankComposerPrice"))}"></td><td class="bank-payment-extra-total"><output>0,00</output></td><td><select data-line-field="account" aria-label="${escapeHtml(copy("Konto", "bankComposerAccount"))}"><option value="">—</option><option value="4000">4000</option><option value="2100">2100</option><option value="1000">1000</option></select></td><td><input type="text" data-line-field="object" aria-label="${escapeHtml(copy("Objekt", "bankComposerObject"))}"></td><td><button type="button" class="bank-payment-remove-line" aria-label="${escapeHtml(copy("Eemalda rida", "bankComposerRemoveLine"))}" title="${escapeHtml(copy("Eemalda rida", "bankComposerRemoveLine"))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"></path></svg></button></td>`;
+    if (isCash) {
+      const description = row.querySelector('[data-line-field="description"]');
+      const descriptionArea = document.createElement("textarea");
+      descriptionArea.dataset.lineField = "description";
+      descriptionArea.rows = 2;
+      descriptionArea.setAttribute("aria-label", description.getAttribute("aria-label"));
+      description.replaceWith(descriptionArea);
+    }
     extraBody.append(row);
   };
   const setRecipientType = type => {
@@ -322,16 +365,16 @@
   recipientInput.addEventListener("input", () => { if (recipientInput.value !== lastAutofilledRecipient) lastAutofilledRecipient = ""; });
   form.addEventListener("reset", () => {
     selectedAmounts.clear();
-    recipientType = "supplier";
+    recipientType = isCash ? "client" : "supplier";
     lastAutofilledRecipient = "";
     searchInput.value = "";
-    document.getElementById("bankPaymentReference").value = "";
-    document.getElementById("bankPaymentCurrency").value = "EUR";
+    get("bankPaymentReference").value = "";
+    get("bankPaymentCurrency").value = "EUR";
     advanceDescription.value = "";
     advanceAmount.value = "";
     extraBody.replaceChildren();
     addExtraLine();
-    setRecipientType("supplier");
+    setRecipientType(isCash ? "client" : "supplier");
     queueMicrotask(updateTotal);
   });
 
@@ -371,12 +414,13 @@
     const paymentDate = dateInput.value;
     const bankAccount = accountSelect.value;
     if (!bankAccount) {
-      showMessage(copy("Valige pangakonto.", "bankComposerAccountRequired"), true);
+      showMessage(isCash ? copy("Kassa", "cashPaymentAccount") : copy("Valige pangakonto.", "bankComposerAccountRequired"), true);
       accountSelect.focus();
       return;
     }
-    const currency = document.getElementById("bankPaymentCurrency").value;
-    const reference = document.getElementById("bankPaymentReference").value.trim();
+    const currency = get("bankPaymentCurrency").value;
+    const reference = get("bankPaymentReference").value.trim();
+    const cashFields = isCash ? { cashRegister: bankAccount, referenceNumber: get("cashPaymentReference").value.trim() } : {};
     const note = noteInput.value.trim();
     const batchId = crypto.randomUUID();
     const enteredAt = new Date().toISOString();
@@ -389,7 +433,7 @@
       category: incoming ? copy("Laekumine kliendilt", "bankComposerIncoming") : copy("Makse hankijale", "bankComposerOutgoing"),
       amount: item.amount, amountDue: 0, currency,
       note: [incoming ? copy("Laekumine kliendilt", "bankComposerIncoming") : copy("Makse hankijale", "bankComposerOutgoing"), reference, `${copy("Arve", "bankComposerInvoice")} ${item.reference}`, note].filter(Boolean).join(" · "),
-      bankAccount, paymentMethod: "bank", direction: incoming ? "incoming" : "outgoing",
+      bankAccount, paymentMethod, ...cashFields, documentReference: reference, direction: incoming ? "incoming" : "outgoing",
       paymentOrigin: incoming ? "client-invoice-payment" : "supplier-invoice-settlement",
       paymentBatchId: batchId, relatedInvoiceId: item.source.id || item.source.number, relatedInvoicePaymentId: paymentId,
       enteredAt, enteredBy
@@ -400,8 +444,8 @@
       category: line.account || (incoming ? copy("Kliendi ettemakse", "bankComposerClientAdvance") : copy("Makse hankijale", "bankComposerOutgoing")),
       amount: line.amount, amountDue: 0, currency,
       note: [incoming ? copy("Laekumine kliendilt", "bankComposerIncoming") : copy("Makse hankijale", "bankComposerOutgoing"), reference, line.description, note].filter(Boolean).join(" · "),
-      bankAccount, paymentMethod: "bank", direction: incoming ? "incoming" : "outgoing",
-      paymentOrigin: "bank-payment-line", paymentBatchId: batchId,
+      bankAccount, paymentMethod, ...cashFields, documentReference: reference, direction: incoming ? "incoming" : "outgoing",
+      paymentOrigin: `${paymentMethod}-payment-line`, paymentBatchId: batchId,
       account: line.account, object: line.object, quantity: line.quantity, unitPrice: line.price,
       enteredAt, enteredBy
     });
@@ -410,8 +454,8 @@
       category: incoming ? copy("Kliendi ettemakse", "bankComposerClientAdvance") : copy("Hankijale tasutud ettemakse", "bankComposerSupplierAdvanceLabel"),
       amount: advanceValue, amountDue: 0, currency,
       note: [incoming ? copy("Laekumine kliendilt", "bankComposerIncoming") : copy("Makse hankijale", "bankComposerOutgoing"), reference, advanceText, note].filter(Boolean).join(" · "),
-      bankAccount, paymentMethod: "bank", direction: incoming ? "incoming" : "outgoing",
-      paymentOrigin: "bank-payment-advance", paymentBatchId: batchId, enteredAt, enteredBy
+      bankAccount, paymentMethod, ...cashFields, documentReference: reference, direction: incoming ? "incoming" : "outgoing",
+      paymentOrigin: `${paymentMethod}-payment-advance`, paymentBatchId: batchId, enteredAt, enteredBy
     });
 
     const previousPurchases = purchases.slice();
@@ -423,7 +467,7 @@
       invoice: item.source, amountDue: item.source.amountDue, paymentStatus: item.source.paymentStatus,
       paidAt: item.source.paidAt, payments: item.source.payments
     }));
-    const saveButton = document.querySelector("#purchaseEditorView .invoice-editor-actions button[type='submit']");
+    const saveButton = document.querySelector(isCash ? "#cashPaymentEditorView button[type='submit']" : "#purchaseEditorView .invoice-editor-actions button[type='submit']");
     if (saveButton) saveButton.disabled = true;
     try {
       purchases.unshift(...records);
@@ -431,7 +475,7 @@
       if (incoming) {
         for (const item of selected) {
           const payment = records.find(record => String(record.relatedInvoiceId) === String(item.source.id || item.source.number));
-          await recordInvoicePayment(item.source, item.amount, "transfer", paymentDate, payment?.relatedInvoicePaymentId);
+          await recordInvoicePayment(item.source, item.amount, isCash ? "cash" : "transfer", paymentDate, payment?.relatedInvoicePaymentId);
         }
         if (!cloudWorkspace) saveList(STORAGE.invoices, invoices);
       } else if (selected.length) {
@@ -442,7 +486,7 @@
           invoice.paymentStatus = remaining === 0 ? "paid" : "unpaid";
           invoice.paidAt = remaining === 0 ? enteredAt : null;
           const payment = records.find(record => String(record.relatedInvoiceId) === String(invoice.id));
-          invoice.payments = [...(invoice.payments || []), { id: payment?.relatedInvoicePaymentId, amount: item.amount, payment_method: "transfer", paid_at: enteredAt }];
+          invoice.payments = [...(invoice.payments || []), { id: payment?.relatedInvoicePaymentId, amount: item.amount, payment_method: isCash ? "cash" : "transfer", paid_at: enteredAt }];
         }
         saveList(STORAGE.supplierInvoices, supplierInvoices);
       }
@@ -450,8 +494,12 @@
       renderDashboard();
       renderReport();
       if (!incoming && typeof renderSupplierInvoices === "function") renderSupplierInvoices();
-      setPurchaseFormOpen(false, true);
-      showMessage(copy("Pangamakse salvestati.", "bankComposerSaved"));
+      if (isCash) {
+        form.reset();
+        dateInput.value = localDate();
+        form.dispatchEvent(new Event("cash-payment-saved"));
+      } else setPurchaseFormOpen(false, true);
+      showMessage(isCash ? copy("Sularahamakse salvestati.", "cashPaymentSaved") : copy("Pangamakse salvestati.", "bankComposerSaved"));
     } catch (error) {
       purchases.splice(0, purchases.length, ...previousPurchases);
       for (const previous of [...previousSupplierState, ...previousClientState]) {
@@ -464,7 +512,7 @@
       else if (!incoming && selected.length) saveList(STORAGE.supplierInvoices, supplierInvoices);
       try { saveList(STORAGE.purchases, purchases); } catch {}
       console.error(error);
-      showMessage(error.message || copy("Pangamakset ei saanud salvestada.", "bankComposerSaveError"), true);
+      showMessage(error.message || (isCash ? copy("Не удалось сохранить кассовый платеж.", "paymentImportError") : copy("Pangamakset ei saanud salvestada.", "bankComposerSaveError")), true);
     } finally {
       if (saveButton) saveButton.disabled = false;
       renderDebts();
@@ -472,6 +520,11 @@
     }
   };
   form.addEventListener("submit", onSubmit, true);
+  addExtraLine();
+  setRecipientType(isCash ? "client" : "supplier");
+  updateCashBalance();
+  applyLanguage(language);
+  if (isCash) return;
 
   const withExpensePurchases = callback => {
     const allPurchases = purchases;
@@ -737,7 +790,7 @@
     window.openBankPaymentEditor(Number(row.dataset.purchaseIndex));
   });
 
-  addExtraLine();
-  renderDebts();
-  applyLanguage(language);
+  };
+  initializeComposer("bank");
+  initializeComposer("cash");
 })();
