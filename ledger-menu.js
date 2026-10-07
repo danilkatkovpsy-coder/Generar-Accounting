@@ -1,4 +1,5 @@
 (() => {
+  const initialize = () => {
   const nav = document.getElementById("appNav");
   const anchor = nav?.querySelector('[data-payments-menu-ready="true"]')?.closest(".payments-nav-wrap");
   const panel = document.getElementById("generalLedgerPanel");
@@ -112,6 +113,7 @@
     const entries = baseJournalCreateLedgerEntries(start, end);
     const accounts = new Map(getLedgerAccounts().map(account => [account.code, account.label]));
     for (const item of manualJournalEntries) {
+      if (entries.some(entry => entry.id === `manual-${item.id}`)) continue;
       if (!item.date || item.date < start || item.date > end) continue;
       const common = { id: `manual-${item.id}`, journalNumber: item.number, date: item.date, documentNumber: item.documentNumber || "", description: item.description || "", currency: item.currency || "EUR", enteredAt: item.enteredAt, enteredBy: item.enteredBy };
       const lines = Array.isArray(item.lines) ? item.lines : [{ accountCode: item.debitAccount, debit: item.amount, credit: 0 }, { accountCode: item.creditAccount, debit: 0, credit: item.amount }];
@@ -261,6 +263,7 @@
     get("ledgerJournalEnd").value = "";
     closeJournalEntry();
     loadJournalRows();
+    window.refreshAccountingLedger?.();
     showMessage(copy("journalEntrySaved"));
   });
   get("ledgerJournalMore").addEventListener("click", () => {
@@ -511,13 +514,17 @@
     get("ledgerTurnoverMetaAccounts").textContent = accounts.map(account => `${account.code} · ${account.label}`).join(", ");
     get("ledgerTurnoverMetaGenerated").textContent = reportTimestamp();
     turnoverReportPeriod.textContent = `${copy("ledgerTurnoverPeriod")}: ${formatDate(start)} – ${formatDate(end)} · EUR`;
-    const hasOpeningBalances = turnoverRows.every(row => row.fiscalOpeningBalance !== null);
-    get("ledgerTurnoverResults").querySelector(".ledger-disclaimer").textContent = copy(hasOpeningBalances ? "ledgerTurnoverKnownOpening" : "ledgerTurnoverUnknownOpening");
+    const hasKnownOpeningBalances = turnoverRows.every(row => row.fiscalOpeningBalance !== null);
+    get("ledgerTurnoverResults").querySelector(".ledger-disclaimer").textContent = copy(hasKnownOpeningBalances ? "ledgerTurnoverKnownOpening" : "ledgerTurnoverUnknownOpening");
     turnoverSetupGrid.hidden = true;
     turnoverNotice.hidden = true;
     get("ledgerTurnoverResults").hidden = false;
     return true;
   };
+  window.refreshLedgerTurnover = calculateTurnover;
+  document.addEventListener("accounting-ledger-updated", () => {
+    if (ledgerMode === "entries" && !journalRegister.hidden) loadJournalRows();
+  });
   get("ledgerTurnoverGenerate").addEventListener("click", () => { if (can("reports")) calculateTurnover(); });
   get("ledgerTurnoverExport").addEventListener("click", () => {
     if (!can("exportReports")) { denyAction("exportReports"); return; }
@@ -603,4 +610,8 @@
   document.addEventListener("click", event => { if (!wrapper.contains(event.target)) setOpen(false); });
   document.addEventListener("keydown", event => { if (event.key === "Escape") setOpen(false); });
   applyLanguage(language);
+  };
+  window.initializeLedgerMenu = initialize;
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  else initialize();
 })();

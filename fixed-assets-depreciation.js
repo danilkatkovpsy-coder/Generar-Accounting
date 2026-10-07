@@ -232,6 +232,7 @@
     catch { showEntryError(); return; }
     detailDialog.close();
     renderRegister();
+    window.refreshAccountingLedger?.();
     displayMessage("assetDepEntrySaved", false, true);
   });
   const exportRegister = format => {

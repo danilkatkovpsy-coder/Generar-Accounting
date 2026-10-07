@@ -1,7 +1,7 @@
 #annualReportPanel .annual-official-workspace{margin-top:24px;padding-top:20px;border-top:1px solid #e6ebe8}
 .annual-official-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .annual-official-heading h2{margin:0;font-size:19px;color:#234337}
-.annual-draft-badge{flex:0 0 auto;padding:4px 8px;border-radius:4px;color:#916520;background:#faf1db;font-size:11px}
+.annual-draft-badge{flex:0 0 auto;padding:4px 8px;border:1px solid #dce7df;border-radius:4px;color:#35674d;background:#edf4ee;font-size:11px}
 .annual-official-settings{display:grid;grid-template-columns:1.1fr 1.4fr 1fr 1fr 1fr;gap:12px;align-items:end}
 .annual-official-settings .field{min-width:0;margin:0}
 .annual-official-settings input,.annual-official-settings select{width:100%;min-width:0;min-height:36px;padding:7px 9px;font-size:12px}
@@ -17,6 +17,7 @@
 #annualReportPanel .annual-official-table td{padding:7px 10px;border-bottom:1px solid #e6ebe8;font-size:12px}
 #annualReportPanel .annual-official-table .annual-taxonomy-group td{background:#f7f9f6;color:#425c51;font-weight:650}
 .annual-official-table input{width:100%;min-width:110px;min-height:32px;padding:5px 8px;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.annual-official-table input[readonly]{border-color:#dce4dc;color:#33443b;background:#f3f6f3;cursor:default}
 .annual-confirmation{display:flex;align-items:center;gap:8px;color:#58675f;font-size:12px}
 .annual-confirmation input{width:16px;min-height:16px;height:16px;margin:0;accent-color:#577d69}
 .annual-report-actions{display:flex;align-items:center;gap:10px;margin-top:16px}
@@ -30,3 +31,39 @@
 .annual-download-controls svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:1100px){.annual-official-settings{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.annual-official-heading{align-items:flex-start;flex-wrap:wrap}.annual-official-settings{grid-template-columns:minmax(0,1fr)}.annual-report-actions{flex-wrap:wrap}.annual-taxonomy-form .table-wrap{max-width:100%;overflow-x:auto}}
+#annualReportPanel .annual-official-workspace{margin-top:0;padding-top:0;border-top:0}
+.annual-report-compose{display:flex;align-items:flex-end;gap:12px;max-width:520px;margin:18px 0 24px}
+.annual-report-compose .field{flex:1;min-width:0;margin:0}
+.annual-report-compose label{display:block;margin-bottom:6px;color:#65716a;font-size:12px}
+.annual-report-compose select{width:100%;min-height:42px;padding:8px 11px;border:1px solid #ccd5cf;border-radius:4px;background:#fff;font-size:14px}
+.annual-year-picker{position:relative}
+.annual-year-toggle{display:grid;grid-template-columns:minmax(0,1fr) 16px;align-items:center;gap:12px;width:100%;min-height:58px;padding:9px 12px;border:1px solid #ccd5cf;border-radius:5px;color:#1d2b27;background:#fff;text-align:left}
+.annual-year-toggle:focus-visible{outline:3px solid rgba(71,119,91,.2);outline-offset:2px}
+.annual-year-toggle>svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.annual-year-display{display:grid;grid-template-columns:76px minmax(0,1fr);align-items:center;gap:12px;min-width:0}
+.annual-year-display strong{color:#35674d;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.annual-year-display span{overflow:hidden;color:#65716a;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.annual-year-menu{position:absolute;top:calc(100% + 6px);right:0;left:0;z-index:30;max-height:min(440px,calc(100vh - 150px));overflow-y:auto;padding:5px;border:1px solid #e1e8e2;border-radius:6px;background:#fff;box-shadow:0 12px 30px rgba(26,48,39,.14)}
+.annual-year-option{display:grid;grid-template-columns:76px minmax(0,1fr);align-items:center;gap:12px;width:100%;min-height:53px;padding:7px 11px;border:0;border-bottom:1px solid #edf0ed;border-radius:4px;color:#1d2b27;background:#fff;text-align:left;cursor:pointer}
+.annual-year-option:last-child{border-bottom:0}
+.annual-year-option:hover{background:#f6f8f6}
+.annual-year-option[aria-selected="true"]{color:#2f6746;background:#edf4ee}
+.annual-year-option strong{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.annual-year-option span{color:#65716a;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.annual-report-compose button{min-height:42px;margin:0;white-space:nowrap}
+.annual-report-compose button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.annual-report-state{flex:0 0 auto;padding:5px 9px;border:1px solid #dce7df;border-radius:4px;color:#35674d;background:#edf4ee;font-size:11px}
+.annual-report-document{padding-top:16px;border-top:1px solid #e6ebe8}
+.annual-report-document-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;color:#58675f;font-size:12px}
+.annual-report-document-meta strong{color:#1d2b27;font-size:14px}
+.annual-report-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.annual-report-stat{min-width:0;padding:12px 14px;border:1px solid #e2e8e3;border-radius:4px;background:#f8faf8}
+.annual-report-stat span{display:block;margin-bottom:5px;color:#68756e;font-size:11px}
+.annual-report-stat strong{display:block;color:#1d2b27;font-size:17px;font-weight:650;font-variant-numeric:tabular-nums}
+.annual-taxonomy-form{margin:18px 0 24px}
+.annual-taxonomy-form h3{margin:0 0 8px;color:#344a3e;font-size:14px}
+#annualReportPanel .annual-official-table{min-width:560px}
+#annualReportPanel .annual-official-table th:not(:first-child),#annualReportPanel .annual-official-table td:not(:first-child){width:185px;text-align:right;font-variant-numeric:tabular-nums}
+.annual-report-actions{padding-top:14px;border-top:1px solid #e6ebe8}
+.annual-report-actions button{min-width:96px}
+@media(max-width:650px){.annual-report-compose{align-items:stretch;flex-direction:column;max-width:none}.annual-report-compose button{justify-content:center}.annual-report-summary{grid-template-columns:minmax(0,1fr)}.annual-report-document-meta{gap:8px 14px}.annual-report-stat strong{font-size:15px}}

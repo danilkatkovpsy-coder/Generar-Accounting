@@ -9,7 +9,7 @@ import tempfile
 import threading
 import zipfile
 from datetime import date, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -236,37 +236,56 @@ def pdf_bytes(payload):
                                  author=payload["companyName"], leftMargin=18 * mm, rightMargin=18 * mm,
                                  topMargin=20 * mm, bottomMargin=22 * mm)
     normal = ParagraphStyle("AnnualBody", fontName="AnnualRegular", fontSize=9, leading=13, spaceAfter=8)
-    heading = ParagraphStyle("AnnualHeading", parent=normal, fontName="AnnualBold", fontSize=15, leading=20, spaceAfter=14, keepWithNext=True)
-    title = ParagraphStyle("AnnualTitle", parent=heading, fontSize=22, leading=28, spaceAfter=20)
+    heading = ParagraphStyle("AnnualHeading", parent=normal, fontName="AnnualBold", fontSize=15, leading=20, spaceAfter=12, keepWithNext=True)
+    title = ParagraphStyle("AnnualTitle", parent=heading, fontSize=24, leading=30, spaceAfter=20)
     label = ParagraphStyle("AnnualLabel", parent=normal, fontSize=8, leading=11, spaceAfter=0)
     group = ParagraphStyle("AnnualGroup", parent=label, fontName="AnnualBold")
     format_date = lambda value: value.strftime("%d.%m.%Y")
     period_label = f"{format_date(start)} - {format_date(end)}"
     prior_label = f"{format_date(previous_year(start))} - {format_date(previous_year(end))}"
-    story = [Spacer(1, 15 * mm), Paragraph("MAJANDUSAASTA ARUANNE", title),
-             Paragraph(escape(payload["companyName"]), heading),
-             Paragraph(f"Registrikood: {escape(payload['registryCode'])}", normal),
-             Paragraph(f"Aruandeperiood: {period_label}", normal),
-             Paragraph("V\u00e4ikeettev\u00f5tja, osa\u00fching", normal),
-             Paragraph("Eesti finantsaruandluse standardi taksonoomia 2026-01-01", normal),
-             Paragraph("Rahalised summad on esitatud eurodes, t\u00e4psusega 0,01 eurot.", normal),
-             Spacer(1, 12 * mm), Paragraph("MUSTAND", heading),
-             Paragraph("Esitatud on p\u00f5hiaruanded. Tegevusaruanne, raamatupidamise aastaaruande lisad ja juhtkonna heakskiitmine puuduvad. See dokument ei ole valmis registrile esitamiseks.", normal),
-             Spacer(1, 8 * mm), Paragraph("Sisukord", heading)]
-    for form in FORMS:
-        story.append(Paragraph(escape(form["title"].split("] ", 1)[-1]), normal))
+    money = lambda value: Decimal(str(value or 0)).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    format_amount = lambda value: f"{money(value):,}".replace(",", " ")
+    concept_id = lambda name: next((identifier for identifier, concept in CONCEPTS.items() if concept["name"] == name), "")
+    report_value = lambda name, period="current": values.get(concept_id(name), {}).get(period, Decimal("0.00"))
+    raw_address = str(payload.get("address", "")).strip()
+    postal_match = re.search(r"(?<!\d)(\d{5})(?!\d)", raw_address)
+    postal_code = postal_match.group(1) if postal_match else ""
+    address_parts = [part.strip().strip(",") for part in re.split(r"[\n,]+", raw_address) if part.strip()]
+    address_parts = [re.sub(r"\b\d{5}\b", "", part).strip(" ,") for part in address_parts]
+    address_parts = [part for part in address_parts if part]
+    county = next((part for part in address_parts if "maakond" in part.lower()), "")
+    city = next((part for part in address_parts if "tallinn" in part.lower() or "tartu" in part.lower()), "")
+    district = next((part for part in address_parts if "linnaosa" in part.lower()), "")
+    other_address = [part for part in address_parts if part not in {county, city, district}]
+    ordered_address = [part for part in (county, city, district, *other_address) if part]
+    post_address = ", ".join(ordered_address)
+    title_page = [Spacer(1, 16 * mm), Paragraph("MAJANDUSAASTA ARUANNE", title),
+                  Paragraph(f"aruandeaasta algus: {format_date(start)}", normal),
+                  Paragraph(f"aruandeaasta l\u00f5pp: {format_date(end)}", normal),
+                  Spacer(1, 8 * mm), Paragraph(f"\u00e4rinimi: {escape(payload['companyName'])}", normal),
+                  Paragraph(f"registrikood: {escape(payload['registryCode'])}", normal)]
+    if post_address:
+        title_page.append(Paragraph(f"postiaadress: {escape(post_address)}", normal))
+    if postal_code:
+        title_page.append(Paragraph(f"postisihtnumber: {escape(postal_code)}", normal))
+    for key, label_text in (("phone", "telefon"), ("email", "e-posti aadress")):
+        value = str(payload.get(key, "")).strip()
+        if value:
+            title_page.append(Paragraph(f"{label_text}: {escape(value)}", normal))
+    title_page.extend([Spacer(1, 10 * mm), Paragraph("V\u00c4LJAV\u00d5TE · ALLKIRJASTAMATA", heading),
+                       Paragraph("Kohaliku rakenduse koostatud eelvaade. Riigile esitatav l\u00f5plik PDF genereeritakse e-\u00c4riregistris p\u00e4rast vajalike vormide t\u00e4itmist ja allkirjastamist.", normal)])
+    story = title_page + [PageBreak(), Paragraph(escape(payload["companyName"]), normal),
+                          Paragraph(f"{end.year}. a. majandusaasta aruanne", normal),
+                          Spacer(1, 8 * mm), Paragraph("Sisukord", heading)]
+    contents = [("Raamatupidamise aastaaruanne", 3), ("Bilanss", 3), ("Kasumiaruanne", 4),
+                ("Raamatupidamise aastaaruande lisad", 5), ("Aruande allkirjad", 6),
+                ("Kasumi jaotamise ettepanek", 7), ("M\u00fc\u00fcgitulu jaotus tegevusalade l\u00f5ikes", 8)]
+    story.extend(Paragraph(f"{escape(label_text)} <font color='#66736b'>{page_number}</font>", normal) for label_text, page_number in contents)
 
-    def format_amount(value):
-        if value is None:
-            return "\u2014"
-        return f"{value:,.2f}".replace(",", " ").replace(".", ",")
-
-    for form in FORMS:
-        story.extend([PageBreak(), Paragraph(escape(form["title"].split("] ", 1)[-1]), heading),
-                      Paragraph("(eurodes; t\u00e4psus 0,01 eurot)", normal)])
-        current_caption = format_date(end) if form["code"] == "201012" else period_label
-        prior_caption = format_date(previous_year(end)) if form["code"] == "201012" else prior_label
-        rows = [[Paragraph("Kirje", group), Paragraph(current_caption, group), Paragraph(prior_caption, group)]]
+    def statement_table(form):
+        current_caption = format_date(end) if form["code"] == "201012" else str(end.year)
+        prior_caption = format_date(previous_year(end)) if form["code"] == "201012" else str(previous_year(end).year)
+        rows = [[Paragraph("", group), Paragraph(current_caption, group), Paragraph(prior_caption, group)]]
         active = {identifier for identifier, periods in values.items() if any(amount != 0 for amount in periods.values())}
         pending_groups = []
         emitted_groups = set()
@@ -288,25 +307,66 @@ def pdf_bytes(payload):
             rows.append([Paragraph("Esitatavad kirjed puuduvad.", label), "", ""])
         table = Table(rows, colWidths=[document.width - 170, 85, 85], repeatRows=1)
         commands = [("FONTNAME", (0, 0), (-1, -1), "AnnualRegular"), ("FONTSIZE", (0, 0), (-1, -1), 8),
-                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e8eeea")),
-                    ("LINEBELOW", (0, 0), (-1, -1), .3, colors.HexColor("#dce3dd")),
-                    ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
+                    ("GRID", (0, 0), (-1, -1), .45, colors.HexColor("#c9c9c9")),
+                    ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
                     ("VALIGN", (0, 0), (-1, -1), "TOP"), ("ALIGN", (1, 1), (-1, -1), "RIGHT")]
         for row_index in group_rows:
-            commands.extend([("BACKGROUND", (0, row_index), (-1, row_index), colors.HexColor("#f5f7f4")),
+            commands.extend([("BACKGROUND", (0, row_index), (-1, row_index), colors.HexColor("#f4f4f4")),
                              ("SPAN", (0, row_index), (-1, row_index))])
         table.setStyle(TableStyle(commands))
-        story.append(table)
+        return table
 
-    def page_footer(canvas, current_document):
+    balance_form, income_form = FORMS
+    story.extend([PageBreak(), Paragraph("Raamatupidamise aastaaruanne", heading),
+                  Paragraph("Bilanss", heading), Paragraph("(eurodes)", normal), statement_table(balance_form),
+                  PageBreak(), Paragraph("Kasumiaruanne", heading), Paragraph("(eurodes)", normal), statement_table(income_form),
+                  PageBreak(), Paragraph("Raamatupidamise aastaaruande lisad", heading),
+                  Paragraph("Lisa 1 Arvestusp\u00f5him\u00f5tted", ParagraphStyle("AnnualNoteHeading", parent=normal, fontName="AnnualBold", fontSize=11, spaceAfter=8)),
+                  Paragraph("K\u00e4esolev aruanne on Eesti finantsaruandluse standardist l\u00e4htuv mikroettev\u00f5tja l\u00fchendatud raamatupidamise aastaaruanne, mille eesm\u00e4rk on anda aruande kasutajale raamatupidamise seaduses n\u00f5utud informatsiooni aruandekohustuslase finantsseisundi ja -tulemuse kohta.", normal),
+                  Paragraph("Ettev\u00f5tte tegevuse j\u00e4tkumise hinnang: esitamata.", normal),
+                  PageBreak(), Paragraph("Aruande digitaalallkirjad", heading),
+                  Paragraph("Aruanne on allkirjastamata. Digitaalallkirjad lisatakse e-\u00c4riregistris.", normal),
+                  Paragraph("Osanike koosoleku kinnitamise staatus: kinnitamata.", normal),
+                  PageBreak(), Paragraph("Kasumi jaotamise ettepanek", heading), Paragraph("(eurodes)", normal)])
+    retained = report_value("RetainedEarningsLoss")
+    current_profit = report_value("TotalAnnualPeriodProfitLoss")
+    available_profit = retained + current_profit
+    proposal_rows = [["N\u00e4itaja", format_date(end)],
+                     ["Eelmiste perioodide jaotamata kasum (kahjum)", format_amount(retained)],
+                     ["Aruandeaasta kasum (kahjum)", format_amount(current_profit)],
+                     ["Kokku", format_amount(available_profit)],
+                     ["Kasumi jaotamise ettepanek", "Esitamata"]]
+    proposal_table = Table(proposal_rows, colWidths=[document.width - 120, 120])
+    proposal_table.setStyle(TableStyle([("FONTNAME", (0, 0), (-1, -1), "AnnualRegular"), ("FONTSIZE", (0, 0), (-1, -1), 8),
+                                        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
+                                        ("GRID", (0, 0), (-1, -1), .45, colors.HexColor("#c9c9c9")),
+                                        ("ALIGN", (1, 1), (-1, -1), "RIGHT"), ("TOPPADDING", (0, 0), (-1, -1), 6),
+                                        ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+    story.extend([proposal_table, Spacer(1, 5 * mm),
+                  Paragraph("Jaotamise otsust ega dividendide jaotust ei tuletata raamatupidamiskannetest; see osa vajab juhatuse/osanike sisendit e-\u00c4riregistris.", normal),
+                  PageBreak(), Paragraph("M\u00fc\u00fcgitulu jaotus tegevusalade l\u00f5ikes", heading),
+                  Paragraph("Tegevusala", normal), Paragraph(f"M\u00fc\u00fcgitulu kokku: {format_amount(report_value('Revenue'))} EUR", normal),
+                  Paragraph("EMTAK koodi ja tegevusalap\u00f5hist m\u00fc\u00fcgitulu jaotust ei ole Kontoplaanis seadistatud. RIK-i juhendi kohaselt tuleb esitada kuni 10 suuremat tegevusala v\u00f5i jaotada v\u00e4hemalt 90% m\u00fc\u00fcgitulust EMTAK koodide l\u00f5ikes.", normal)])
+
+    def cover_page(canvas, current_document):
         canvas.saveState()
         canvas.setFont("AnnualRegular", 8)
         canvas.setFillColor(colors.HexColor("#66736b"))
-        canvas.drawString(current_document.leftMargin, 12 * mm, f"{payload['registryCode']} | {period_label} | Mustand")
-        canvas.drawRightString(A4[0] - current_document.rightMargin, 12 * mm, f"Lehek\u00fclg {canvas.getPageNumber()}")
+        canvas.drawString(current_document.leftMargin, 12 * mm, "Eelvaade · allkirjastamata · mitte riigile esitamiseks")
         canvas.restoreState()
 
-    document.build(story, onFirstPage=page_footer, onLaterPages=page_footer)
+    def page_header_footer(canvas, current_document):
+        canvas.saveState()
+        canvas.setFont("AnnualRegular", 8)
+        canvas.setFillColor(colors.HexColor("#222222"))
+        canvas.drawString(current_document.leftMargin, A4[1] - 12 * mm, payload["companyName"])
+        canvas.drawRightString(A4[0] - current_document.rightMargin, A4[1] - 12 * mm, f"{end.year}. a. majandusaasta aruanne")
+        canvas.setFillColor(colors.HexColor("#66736b"))
+        canvas.drawRightString(A4[0] - current_document.rightMargin, 12 * mm, f"{current_document.page}")
+        canvas.restoreState()
+
+    document.build(story, onFirstPage=cover_page, onLaterPages=page_header_footer)
     return stream.getvalue()
 
 

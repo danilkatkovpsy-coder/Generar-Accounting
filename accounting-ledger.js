@@ -41,6 +41,7 @@
   });
 
   const salesVoucher = (entries, invoice) => {
+    if (["draft", "void"].includes(invoice.status)) return;
     const total = roundMoney(invoice.total);
     if (total <= 0 || !isDate(invoice.date)) return;
     const id = `sales-invoice-${invoice.id || invoice.number}`;
@@ -62,6 +63,7 @@
   };
 
   const supplierInvoiceVoucher = (entries, invoice) => {
+    if (["draft", "void"].includes(invoice.status)) return;
     const total = roundMoney(invoice.amount);
     if (total <= 0 || !isDate(invoice.date)) return;
     const id = `supplier-invoice-${invoice.id}`;
@@ -86,7 +88,7 @@
   const buildPayment = (entries, record, sourceType, linkedKind = "") => {
     const amount = roundMoney(record.amount);
     const date = normalizedDate(record.date || record.paid_at || record.enteredAt);
-    if (amount <= 0 || !isDate(date) || record.status === "draft") return;
+    if (amount <= 0 || !isDate(date) || ["draft", "void"].includes(record.status)) return;
     const invoiceId = record.relatedInvoiceId || "";
     const kind = linkedKind || (record.direction === "incoming" ? "client" : "supplier");
     const id = `payment-${record.relatedInvoicePaymentId || record.id || paymentFingerprint(kind, invoiceId, date, amount, record.paymentMethod || record.payment_method)}`;
@@ -154,7 +156,7 @@
     appendEmbeddedPayments("supplier", supplierInvoices);
 
     for (const expense of expenses) {
-      if (expense.status === "draft" || !isDate(expense.date) || roundMoney(expense.amount) <= 0) continue;
+      if (["draft", "void"].includes(expense.status) || !isDate(expense.date) || roundMoney(expense.amount) <= 0) continue;
       const duplicateInvoice = supplierInvoices.some(invoice => invoice.date === expense.date && roundMoney(invoice.amount) === roundMoney(expense.amount) && String(invoice.invoiceNumber || "") === String(expense.invoiceNumber || "") && String(invoice.supplierName || "") === String(expense.supplierName || ""));
       if (duplicateInvoice) continue;
       const amount = roundMoney(expense.amount);
@@ -233,6 +235,134 @@
     const month = String(index + 1).padStart(2, "0"), totals = monthlyLedgerSummary(`${year}-${month}-01`, `${year}-${month}-${String(new Date(year, index + 1, 0).getDate()).padStart(2, "0")}`);
     return { name, ...totals, total: totals.buy + totals.cost };
   });
+  const accountingDataSnapshot = () => JSON.stringify({
+    invoices: invoices.map(item => [item.id, item.number, item.date, item.total, item.status, item.amountDue, (item.items || []).map(line => [line.accountCode, line.quantity, line.price, line.discountPercent, line.taxRate, line.isTextLine]), (item.payments || []).map(payment => [payment.id, payment.date, payment.amount, payment.status])]),
+    purchases: purchases.map(item => [item.id, item.date, item.amount, item.amountDue, item.accountCode, item.category, item.status, item.direction, item.paymentOrigin, item.relatedInvoiceId, item.paymentMethod, item.payment_method, item.invoiceNumber, item.supplier, item.note]),
+    supplierInvoices: supplierInvoices.map(item => [item.id, item.date, item.amount, item.status, item.accountCode, item.invoiceLine, item.invoiceNumber, item.supplierName, (item.items || []).map(line => [line.accountCode, line.quantity, line.price, line.discountPercent, line.taxRate, line.isTextLine]), (item.payments || []).map(payment => [payment.id, payment.date, payment.amount, payment.status])]),
+    expenses: expenses.map(item => [item.id, item.date, item.amount, item.status, item.accountCode, item.invoiceNumber, item.supplierName]),
+    journals: manualJournalEntries.map(item => [item.id, item.date, item.lines]),
+    depreciation: readStorage(STORAGE.fixedAssets, []).map(asset => [asset.id, (asset.depreciationEntries || []).map(item => [item.id, item.date, item.amount, item.expenseAccount, item.depreciationAccount, item.assetAccount])]),
+    opening: ledgerOpeningBalances,
+    accounts: accountPlanEntries.map(account => [account.code, account.type, account.active, account.reportGroup, account.annualReportLine])
+  });
+  let lastAccountingDataSnapshot = accountingDataSnapshot();
+  const baseRenderReportForLedger = renderReport;
+  renderReport = (...args) => {
+    const result = baseRenderReportForLedger(...args);
+    const snapshot = accountingDataSnapshot();
+    if (snapshot !== lastAccountingDataSnapshot) {
+      lastAccountingDataSnapshot = snapshot;
+      document.dispatchEvent(new Event("accounting-ledger-updated"));
+    }
+    return result;
+  };
+  const defaultAnnualReportLines = { "1000": "CashAndCashEquivalents", "1100": "CashAndCashEquivalents", "1200": "ShortTermAccountsReceivable", "2000": "ShortTermTradePayablesTotal", "2900": "OtherEquity", "3000": "Revenue", "4000": "RawMaterialsAndConsumablesUsed", "5000": "RawMaterialsAndConsumablesUsed", "6000": "OtherOperatingExpense" };
+  const annualReportLineFor = account => String(account.annualReportLine || defaultAnnualReportLines[String(account.code)] || "").split("_").at(-1);
+  const annualReportFormCodeFor = type => ["asset", "liability"].includes(type) ? "201012" : "301011";
+  window.getAnnualReportAccountLine = annualReportLineFor;
+  window.calculateAnnualReportFacts = (forms, periods) => {
+    const latestEnd = [periods.current.end, periods.prior.end].filter(Boolean).sort().at(-1);
+    if (!latestEnd) return { facts: {}, unmappedAccounts: [] };
+    const accounts = getLedgerAccounts();
+    const reportLines = new Map(forms.flatMap(form => (form.rows || []).filter(row => !row.abstract && row.type !== "xbrli:stringItemType").map(row => [row.name, { formCode: form.code, periodType: row.periodType, balance: row.balance }])));
+    const hasValidReportLine = account => {
+      const line = reportLines.get(annualReportLineFor(account));
+      const sideIsValid = account.type === "asset" ? line?.balance === "debit" : account.type === "liability" ? line?.balance === "credit" : true;
+      return Boolean(line && sideIsValid && line.formCode === annualReportFormCodeFor(account.type) && line.periodType === (["asset", "liability"].includes(account.type) ? "instant" : "duration"));
+    };
+    const allEntries = buildAccountingLedgerEntries("0001-01-01", latestEnd);
+    const activityFor = range => {
+      const balances = new Map();
+      for (const entry of allEntries) {
+        if (entry.date < range.start || entry.date > range.end) continue;
+        const code = String(entry.accountCode || "");
+        balances.set(code, (balances.get(code) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0));
+      }
+      return balances;
+    };
+    const closingFor = end => {
+      const balances = new Map();
+      for (const entry of allEntries) {
+        if (entry.date > end) continue;
+        const code = String(entry.accountCode || "");
+        balances.set(code, (balances.get(code) || 0) + (Number(entry.debit) || 0) - (Number(entry.credit) || 0));
+      }
+      return balances;
+    };
+    const currentActivity = activityFor(periods.current), priorActivity = activityFor(periods.prior);
+    const currentClosing = closingFor(periods.current.end), priorClosing = closingFor(periods.prior.end);
+    const balanceRows = forms.find(form => form.code === "201012")?.rows || [];
+    const membersOf = name => {
+      const index = balanceRows.findIndex(row => row.name === name);
+      if (index < 0) return new Set();
+      const depth = Number(balanceRows[index].depth);
+      let end = index + 1;
+      while (end < balanceRows.length && Number(balanceRows[end].depth) > depth) end++;
+      return new Set(balanceRows.slice(index + 1, end).map(row => row.name));
+    };
+    const currentAssetLines = membersOf("CurrentAssetsAbstract"), nonCurrentAssetLines = membersOf("NonCurrentAssetsAbstract");
+    const currentLiabilityLines = membersOf("CurrentLiabilitiesAbstract"), nonCurrentLiabilityLines = membersOf("NonCurrentLiabilitiesAbstract");
+    const equityLines = membersOf("EquityAbstract");
+    const netProfit = activity => roundMoney(accounts.reduce((sum, account) => {
+      const value = activity.get(String(account.code)) || 0;
+      return sum + (account.type === "income" ? -value : account.type === "expense" ? -value : 0);
+    }, 0));
+    const accumulatedProfit = balances => roundMoney(accounts.reduce((sum, account) => {
+      const value = balances.get(String(account.code)) || 0;
+      return sum + (account.type === "income" ? -value : account.type === "expense" ? -value : 0);
+    }, 0));
+    const currentPriorProfit = accumulatedProfit(closingFor(shiftDate(periods.current.start, -1)));
+    const priorPriorProfit = accumulatedProfit(closingFor(shiftDate(periods.prior.start, -1)));
+    const accountTotal = (balances, predicate, normalSide) => roundMoney(accounts.reduce((sum, account) => {
+      if (!predicate(account)) return sum;
+      const value = balances.get(String(account.code)) || 0;
+      return sum + (normalSide === "credit" ? -value : value);
+    }, 0));
+    const facts = {};
+    for (const form of forms) {
+      const rows = form.rows || [];
+      for (let index = 0; index < rows.length; index++) {
+        const row = rows[index];
+        if (row.abstract || row.type === "xbrli:stringItemType") continue;
+        let endIndex = index + 1;
+        while (endIndex < rows.length && Number(rows[endIndex].depth) > Number(row.depth)) endIndex++;
+        const subtree = new Set(rows.slice(index, endIndex).map(item => item.name));
+        const valueFor = (period, activity, closing, openingProfit) => {
+          if (row.name === "AnnualPeriodProfitLoss" || row.name === "TotalAnnualPeriodProfitLoss") return netProfit(activity);
+          if (row.name === "TotalProfitLoss" || row.name === "TotalProfitLossBeforeTax") return netProfit(activity);
+          const balances = row.periodType === "instant" ? closing : activity;
+          if (row.name === "Assets") return accountTotal(balances, account => account.type === "asset", "debit");
+          if (row.name === "CurrentAssets") return accountTotal(balances, account => account.type === "asset" && currentAssetLines.has(annualReportLineFor(account)), "debit");
+          if (row.name === "NonCurrentAssets") return accountTotal(balances, account => account.type === "asset" && nonCurrentAssetLines.has(annualReportLineFor(account)), "debit");
+          if (row.name === "CurrentLiabilities") return accountTotal(balances, account => account.type === "liability" && currentLiabilityLines.has(annualReportLineFor(account)), "credit");
+          if (row.name === "NonCurrentLiabilities") return accountTotal(balances, account => account.type === "liability" && nonCurrentLiabilityLines.has(annualReportLineFor(account)), "credit");
+          if (row.name === "Liabilities") return accountTotal(balances, account => account.type === "liability" && !equityLines.has(annualReportLineFor(account)), "credit");
+          if (row.name === "RetainedEarningsLoss") return roundMoney(accountTotal(balances, account => account.type === "liability" && annualReportLineFor(account) === row.name, "credit") + openingProfit);
+          if (row.name === "Equity") return roundMoney(accountTotal(balances, account => account.type === "liability" && equityLines.has(annualReportLineFor(account)), "credit") + openingProfit + netProfit(activity));
+          if (row.name === "LiabilitiesAndEquity") return roundMoney(accountTotal(balances, account => account.type === "liability" && !equityLines.has(annualReportLineFor(account)), "credit") + accountTotal(balances, account => account.type === "liability" && equityLines.has(annualReportLineFor(account)), "credit") + openingProfit + netProfit(activity));
+          return roundMoney(accounts.reduce((sum, account) => {
+            const mappedLine = annualReportLineFor(account);
+            if (!subtree.has(mappedLine)) return sum;
+            const value = balances.get(String(account.code)) || 0;
+            if (row.periodType === "instant") return sum + (account.type === "liability" ? -value : value);
+            return sum + (account.type === "income" || account.type === "expense" ? -value : 0);
+          }, 0));
+        };
+        facts[row.name] = {
+          current: valueFor(periods.current, currentActivity, currentClosing, currentPriorProfit),
+          prior: valueFor(periods.prior, priorActivity, priorClosing, priorPriorProfit)
+        };
+      }
+    }
+    const unmappedAccounts = accounts.filter(account => {
+      if (hasValidReportLine(account)) return false;
+      const hasBalance = account.type === "asset" || account.type === "liability"
+        ? (currentClosing.get(String(account.code)) || 0) !== 0 || (priorClosing.get(String(account.code)) || 0) !== 0
+        : (currentActivity.get(String(account.code)) || 0) !== 0 || (priorActivity.get(String(account.code)) || 0) !== 0;
+      return hasBalance;
+    }).map(account => ({ code: String(account.code), label: account.label }));
+    return { facts, unmappedAccounts };
+  };
   summarizeProfitPeriod = period => {
     const totals = monthlyLedgerSummary(period.start, period.end), costs = totals.buy + totals.cost;
     return { ...period, ...totals, purchases: totals.buy, supplierInvoices: 0, otherExpenses: totals.cost, costs, result: totals.sales - costs };
@@ -244,17 +374,41 @@
 
   const getAccountPlanPanel = () => document.getElementById("accountPlanPanel");
   const accountTypeLabel = type => ({ asset: copy("Активы", "Aktiva", "accountPlanAsset"), liability: copy("Пассивы", "Passiva", "accountPlanLiability"), income: copy("Доходы", "Tulud", "accountPlanIncome"), expense: copy("Расходы", "Kulud", "accountPlanExpense") })[type] || type;
+  const annualReportLineOptions = (selected, type) => `<option value="">${escapeHtml(translateCopy("Не назначено", "accountPlanAnnualReportLine"))}</option>${(window.annualReportProfile?.forms || []).filter(form => form.code === annualReportFormCodeFor(type)).map(form => `<optgroup label="${escapeHtml(form.title)}">${form.rows.filter(concept => !concept.abstract && concept.type !== "xbrli:stringItemType").map(concept => `<option value="${escapeHtml(concept.name)}" ${annualReportLineFor({ annualReportLine: selected }) === concept.name ? "selected" : ""}>${escapeHtml(concept.label)}</option>`).join("")}</optgroup>`).join("")}`;
   const renderAccountPlan = () => {
     const panel = getAccountPlanPanel(), body = document.getElementById("accountPlanRows");
     if (!panel || !body) return;
+    const header = panel.querySelector(".account-plan-table thead tr");
+    if (header && !header.querySelector("[data-annual-report-line-header]")) {
+      const cell = document.createElement("th");
+      cell.dataset.annualReportLineHeader = "true";
+      cell.dataset.i18n = "accountPlanAnnualReportLine";
+      cell.textContent = translateCopy("Строка годового отчёта", "accountPlanAnnualReportLine");
+      header.append(cell);
+    }
     const query = panel.querySelector("#accountPlanSearch")?.value.trim().toLocaleLowerCase(language) || "", type = panel.querySelector("#accountPlanTypeFilter")?.value || "";
     const rows = accountPlanEntries.filter(account => (!type || account.type === type) && (!query || `${account.code} ${account.descriptionEt} ${account.descriptionEn}`.toLocaleLowerCase(language).includes(query))).sort((a, b) => String(a.code).localeCompare(String(b.code), undefined, { numeric: true }));
     const emptyKey = query || type ? "accountPlanNoMatches" : "accountPlanEmpty";
-    body.innerHTML = rows.map(account => `<tr data-account-code="${escapeHtml(account.code)}"><td data-account-plan-column="code">${escapeHtml(account.code)}</td><td data-account-plan-column="description">${escapeHtml(language === "et" ? account.descriptionEt : account.descriptionEn || account.descriptionEt)}</td><td data-account-plan-column="type">${escapeHtml(accountTypeLabel(account.type))}</td><td data-account-plan-column="balanceLine">${escapeHtml(account.balanceLine || "—")}</td><td data-account-plan-column="cashFlowLine">${escapeHtml(account.cashFlowLine || "—")}</td></tr>`).join("") || `<tr><td class="account-plan-empty" colspan="5">${escapeHtml(translateCopy(emptyKey === "accountPlanNoMatches" ? "Счета по заданному фильтру не найдены." : "Счета пока не добавлены.", emptyKey))}</td></tr>`;
+    body.innerHTML = rows.map(account => `<tr data-account-code="${escapeHtml(account.code)}"><td data-account-plan-column="code">${escapeHtml(account.code)}</td><td data-account-plan-column="description">${escapeHtml(language === "et" ? account.descriptionEt : account.descriptionEn || account.descriptionEt)}</td><td data-account-plan-column="type">${escapeHtml(accountTypeLabel(account.type))}</td><td data-account-plan-column="balanceLine">${escapeHtml(account.balanceLine || "—")}</td><td data-account-plan-column="cashFlowLine">${escapeHtml(account.cashFlowLine || "—")}</td><td><select data-account-plan-annual-line="${escapeHtml(account.code)}" aria-label="${escapeHtml(account.code)} ${escapeHtml(translateCopy("Строка годового отчёта", "accountPlanAnnualReportLine"))}" ${window.annualReportProfile ? "" : "disabled"}>${annualReportLineOptions(account.annualReportLine || defaultAnnualReportLines[String(account.code)] || "", account.type)}</select></td></tr>`).join("") || `<tr><td class="account-plan-empty" colspan="6">${escapeHtml(translateCopy(emptyKey === "accountPlanNoMatches" ? "Счета по заданному фильтру не найдены." : "Счета пока не добавлены.", emptyKey))}</td></tr>`;
     panel.querySelectorAll("[data-account-plan-column]").forEach(cell => { const toggle = panel.querySelector(`[data-account-plan-column-toggle="${cell.dataset.accountPlanColumn}"]`); if (toggle) cell.hidden = !toggle.checked; });
+    body.querySelectorAll("[data-account-plan-annual-line]").forEach(select => select.addEventListener("change", () => {
+      const next = accountPlanEntries.map(account => account.code === select.dataset.accountPlanAnnualLine ? { ...account, annualReportLine: select.value } : account);
+      try { saveList(STORAGE.accountPlanEntries, next); }
+      catch { showMessage(copy("Не удалось сохранить Kontoplaan", "Kontoplaani ei saanud salvestada", "accountPlanSaveError"), true); renderAccountPlan(); return; }
+      accountPlanEntries = next;
+      window.refreshAccountingLedger?.();
+    }));
   };
   window.renderAccountPlan = renderAccountPlan;
-  window.refreshAccountingLedger = () => { renderAccountPlan(); renderReport(); renderDashboard(); document.dispatchEvent(new Event("accounting-ledger-updated")); };
+  const refreshVisibleAccountingReports = () => {
+    const balance = document.getElementById("balanceResults"), profit = document.getElementById("profitResults"), ledger = document.getElementById("ledgerResults"), turnover = document.getElementById("ledgerTurnoverResults");
+    if (balance && !balance.hidden) generateBalanceReport();
+    if (profit && !profit.hidden) generateProfitLossReport();
+    if (ledger && !ledger.hidden) generateGeneralLedger();
+    if (turnover && !turnover.hidden) window.refreshLedgerTurnover?.();
+  };
+  document.addEventListener("accounting-ledger-updated", refreshVisibleAccountingReports);
+  window.refreshAccountingLedger = () => { renderAccountPlan(); renderReport(); renderDashboard(); };
   const populateAccountSelect = (select, selectedValue = select.value, type = "") => {
     if (!select) return;
     const accounts = getLedgerAccounts().filter(account => !type || account.type === type);
@@ -339,15 +493,39 @@
     showMessage(copy("ledgerOpeningBalancesSaved"));
     window.refreshAccountingLedger?.();
   });
+  Object.assign(ruTexts, { accountPlanAnnualReportLine: "Строка годового отчёта", accountPlanAnnualReportLineRequired: "Выберите строку годового отчёта для счёта." });
+  Object.assign(etTexts, { accountPlanAnnualReportLine: "Aastaaruande rida", accountPlanAnnualReportLineRequired: "Valige kontole aastaaruande rida." });
   const accountPlanForm = document.getElementById("accountPlanCreateForm");
+  const annualReportLineInput = document.createElement("select");
+  annualReportLineInput.id = "accountPlanAnnualReportLineInput";
+  annualReportLineInput.required = true;
+  const annualReportLineField = document.createElement("div");
+  annualReportLineField.className = "field";
+  const annualReportLineLabel = document.createElement("label");
+  annualReportLineLabel.htmlFor = annualReportLineInput.id;
+  annualReportLineLabel.dataset.i18n = "accountPlanAnnualReportLine";
+  annualReportLineLabel.textContent = translateCopy("Строка годового отчёта", "accountPlanAnnualReportLine");
+  annualReportLineField.append(annualReportLineLabel, annualReportLineInput);
+  document.getElementById("accountPlanBalanceLineInput")?.closest(".account-plan-entry-fields")?.append(annualReportLineField);
+  const populateAnnualReportLines = () => {
+    const profile = window.annualReportProfile;
+    annualReportLineInput.disabled = !profile;
+    const type = document.getElementById("accountPlanEntryType").value;
+    annualReportLineInput.innerHTML = `<option value="">${escapeHtml(translateCopy("Выберите строку", "invoiceAccountChoose"))}</option>${(profile?.forms || []).filter(form => form.code === annualReportFormCodeFor(type)).map(form => `<optgroup label="${escapeHtml(form.title)}">${form.rows.filter(concept => !concept.abstract && concept.type !== "xbrli:stringItemType").map(concept => `<option value="${escapeHtml(concept.name)}">${escapeHtml(concept.label)}</option>`).join("")}</optgroup>`).join("")}`;
+  };
+  document.addEventListener("annual-report-profile-ready", () => { populateAnnualReportLines(); renderAccountPlan(); });
+  document.getElementById("accountPlanEntryType")?.addEventListener("change", populateAnnualReportLines);
+  populateAnnualReportLines();
   accountPlanForm?.addEventListener("submit", event => {
     event.preventDefault(); event.stopImmediatePropagation();
     const code = document.getElementById("accountPlanCodeInput").value.trim(), descriptionEt = document.getElementById("accountPlanDescriptionEtInput").value.trim(), descriptionEn = document.getElementById("accountPlanDescriptionEnInput").value.trim(), type = document.getElementById("accountPlanEntryType").value;
+    const annualReportLine = annualReportLineInput.value;
     if (!code || !descriptionEt || accountPlanEntries.some(account => account.code === code)) { showMessage(translateCopy("Kontokood peab olema unikaalne ja eestikeelne kirjeldus täidetud.", "accountPlanSaveError"), true); return; }
-    const account = { code, descriptionEt, descriptionEn, type, balanceLine: document.getElementById("accountPlanBalanceLineInput")?.value.trim() || "", cashFlowLine: document.getElementById("accountPlanCashFlowLineInput")?.value.trim() || "", reportGroup: type === "expense" ? "expenses" : type === "income" ? "sales" : "balance" };
+    if (!annualReportLine) { showMessage(translateCopy("Выберите строку годового отчёта для счёта.", "accountPlanAnnualReportLineRequired"), true); return; }
+    const account = { code, descriptionEt, descriptionEn, type, annualReportLine, balanceLine: document.getElementById("accountPlanBalanceLineInput")?.value.trim() || "", cashFlowLine: document.getElementById("accountPlanCashFlowLineInput")?.value.trim() || "", reportGroup: type === "expense" ? "expenses" : type === "income" ? "sales" : "balance" };
     const next = [...accountPlanEntries, account];
     try { saveList(STORAGE.accountPlanEntries, next); } catch { showMessage(translateCopy("Kontoplaani kontot ei saanud salvestada.", "accountPlanSaveError"), true); return; }
-    accountPlanEntries = next; document.getElementById("accountPlanCreateDialog").close(); renderAccountPlan();
+    accountPlanEntries = next; document.getElementById("accountPlanCreateDialog").close(); renderAccountPlan(); window.refreshAccountingLedger?.();
   }, true);
   getAccountPlanPanel()?.querySelector("#accountPlanApplyFilter")?.addEventListener("click", renderAccountPlan);
   getAccountPlanPanel()?.querySelector("#accountPlanClearFilters")?.addEventListener("click", () => requestAnimationFrame(renderAccountPlan));
@@ -412,4 +590,5 @@
   refreshExpenseView();
   renderDashboard();
   document.querySelectorAll("[data-language]").forEach(button => button.addEventListener("click", () => requestAnimationFrame(renderAccountPlan)));
+  window.initializeLedgerMenu?.();
 })();
