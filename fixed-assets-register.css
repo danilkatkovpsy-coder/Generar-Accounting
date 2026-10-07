@@ -42,18 +42,189 @@
 .fixed-assets-footer .register-page-numbers{flex:1}
 .fixed-assets-page-size{display:flex;align-items:center;gap:7px;white-space:nowrap}
 .fixed-assets-page-size select{width:65px;min-height:32px;padding:5px 7px;font-size:12px}
-.fixed-asset-dialog{width:min(760px,calc(100vw - 24px));max-width:none;max-height:90dvh;overflow:auto;padding:18px;border:1px solid #dfe6e1;border-radius:8px;color:var(--ink);background:#fff;box-shadow:0 20px 60px rgba(23,37,30,.25)}
+.fixed-asset-dialog{width:min(1040px,calc(100vw - 24px));max-width:none;max-height:90dvh;overflow:auto;padding:18px;border:1px solid #dfe6e1;border-radius:8px;color:var(--ink);background:#fff;box-shadow:0 20px 60px rgba(23,37,30,.25)}
 .fixed-asset-dialog::backdrop{background:rgba(23,37,30,.4)}
 .fixed-asset-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .fixed-asset-dialog-heading h2{margin:0;color:#234337;font-size:20px}
-.fixed-asset-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.fixed-asset-heading-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.fixed-asset-heading-actions .primary-button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:8px 12px;font-size:12px}
+.fixed-asset-editor-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.fixed-asset-editor-columns section{min-width:0}
+.fixed-asset-editor-columns h3{margin:0 0 12px;color:#35634d;font-size:14px}
+.fixed-asset-form-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
 .fixed-asset-form-grid .field{min-width:0;margin:0}
+.fixed-asset-form-grid .field{display:grid;grid-template-columns:145px minmax(0,1fr);align-items:center;gap:10px}
 .fixed-asset-form-grid label{font-size:11px}
-.fixed-asset-form-grid input{width:100%;min-width:0;min-height:36px;padding:7px 9px;font-size:12px}
+.fixed-asset-form-grid .is-required>label:after{content:" *";color:#b17c36}
+.fixed-asset-form-grid input,.fixed-asset-form-grid select,.fixed-asset-form-grid textarea{width:100%;min-width:0;min-height:32px;padding:6px 8px;border:1px solid #dfe6e1;border-radius:4px;font-size:12px}
+.fixed-asset-form-grid textarea{resize:vertical}
+.fixed-asset-form-grid input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+.fixed-asset-form-grid .field:has(#assetField-depreciationStart),.fixed-asset-form-grid .field:has(#assetField-expenseAccount){border-top:1px solid #e6ebe8;margin-top:5px;padding-top:12px}
+.fixed-asset-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:130px;padding:18px;border:1px dashed #aebdb4;border-radius:4px;color:#66736b;font-size:12px;text-align:center}
+.fixed-asset-drop.is-dragging{border-color:#35634d;background:#f0f5f1}
+.fixed-asset-drop>svg{width:28px;height:28px;flex-basis:28px;color:#89988f}
+.fixed-asset-drop button{padding:0;border:0;color:#35634d;background:transparent;font:inherit;font-weight:600;text-decoration:underline}
+.fixed-asset-file-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #e6ebe8}
+.fixed-asset-file-name{flex:1;min-width:0;padding:0;border:0;color:#35634d;background:transparent;text-align:left;overflow-wrap:anywhere;font-size:12px}
+.fixed-asset-file-name:hover{text-decoration:underline}
+.fixed-asset-file-row .fixed-assets-clear{flex:0 0 34px}
+.fixed-asset-help-text{margin:0 0 16px;color:#66736b;font-size:12px;line-height:1.5}
+.fixed-asset-help-text[hidden]{display:none}
+.fixed-asset-depreciation-panel{padding:14px}
+.fixed-asset-depreciation-page-heading{display:flex;align-items:center;gap:14px;min-height:0;padding:0;color:var(--ink);background:transparent}
+.fixed-asset-depreciation-page-heading>div:first-child{flex:1;min-width:0;padding:0}
+.fixed-asset-depreciation-page-heading h1{color:#192723!important;font-size:31px!important}
+.fixed-asset-depreciation-exports{gap:12px;margin-top:6px}
+.fixed-asset-depreciation-exports button{color:#35634d;font-size:11px}
+.fixed-asset-depreciation-exports button:hover{text-decoration:underline}
+.fixed-asset-depreciation-actions{display:flex;align-items:center;gap:8px}
+.fixed-asset-depreciation-actions>button,.fixed-asset-depreciation-actions .fixed-assets-menu-wrap>button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 11px;border-radius:4px;font-size:12px;white-space:nowrap}
+.fixed-asset-depreciation-actions svg{width:16px;height:16px;flex:0 0 16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fixed-asset-depreciation-page-heading>#fixedAssetDepBack{min-height:34px;padding:6px 9px;font-size:11px}
+.fixed-asset-depreciation-register{padding:14px;overflow:hidden}
+.fixed-asset-depreciation-register .fixed-assets-table-wrap{overflow-x:auto}
+.fixed-assets-table.fixed-asset-depreciation-ledger{width:100%;min-width:900px!important;border-collapse:collapse;table-layout:auto}
+.fixed-assets-table.fixed-asset-depreciation-ledger th{height:42px;padding:9px 8px;border-bottom:1px solid #dfe6e1;color:#58675f;background:#e8eeea;font-size:10px;text-align:left}
+.fixed-assets-table.fixed-asset-depreciation-ledger td{height:42px;padding:10px 8px;border-bottom:1px solid #e6ebe8;color:var(--ink);font-size:12px}
+.fixed-assets-table.fixed-asset-depreciation-ledger td:nth-child(1),.fixed-assets-table.fixed-asset-depreciation-ledger td:nth-child(2),.fixed-assets-table.fixed-asset-depreciation-ledger td:nth-child(3),.fixed-assets-table.fixed-asset-depreciation-ledger td:nth-child(4),.fixed-assets-table.fixed-asset-depreciation-ledger td:last-child{white-space:nowrap}
+.fixed-assets-table.fixed-asset-depreciation-ledger td:nth-child(5){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fixed-assets-table.fixed-asset-depreciation-ledger tbody tr:nth-child(even){background:#fafbf9}
+.fixed-assets-table.fixed-asset-depreciation-ledger tbody tr:nth-child(odd){background:#fff}
+.fixed-assets-table.fixed-asset-depreciation-ledger tbody tr[data-depreciation-period]{cursor:pointer}
+.fixed-assets-table.fixed-asset-depreciation-ledger tbody tr[data-depreciation-period]:hover{background:#f0f5f1}
+.fixed-assets-table.fixed-asset-depreciation-ledger tbody tr[data-depreciation-period]:focus-visible{outline:2px solid #718c72;outline-offset:-2px}
+.fixed-assets-table.fixed-asset-depreciation-ledger .fixed-assets-empty{height:100px;color:#78847d;text-align:center}
+.fixed-asset-depreciation-register .fixed-assets-footer{padding:12px 10px}
+.fixed-asset-depreciation-help{padding:12px;color:#66736b;font-size:12px;line-height:1.5}
+.fixed-asset-depreciation-help[hidden]{display:none}
+.fixed-asset-depreciation-dialog{width:min(900px,calc(100vw - 24px))}
+.fixed-asset-depreciation-entry-dialog{width:min(1720px,calc(100vw - 24px))}
+.fixed-asset-depreciation-entry-period{display:flex;align-items:center;gap:6px;margin:0 0 14px;padding:14px 12px;background:#f0f1ee;color:var(--ink);font-size:13px}
+.fixed-asset-depreciation-entry-table-wrap{max-width:100%;overflow:auto}
+.fixed-assets-table.fixed-asset-depreciation-entry-table{width:100%;min-width:1600px;border-collapse:collapse;table-layout:fixed}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th{padding:9px 8px;border:1px solid #dfe6e1;background:#e8eeea;color:#58675f;font-size:10px;text-align:left;vertical-align:middle}
+.fixed-assets-table.fixed-asset-depreciation-entry-table td{padding:8px;border:1px solid #e3e8e4;background:#fff;vertical-align:middle}
+.fixed-assets-table.fixed-asset-depreciation-entry-table tbody tr:nth-child(even) td{background:#fafbf9}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(1){width:260px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(2){width:150px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(3){width:130px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(4){width:100px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(5),.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(6){width:120px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(7),.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(8){width:160px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(9){width:175px}
+.fixed-assets-table.fixed-asset-depreciation-entry-table th:nth-child(10){width:150px}
+.fixed-asset-depreciation-entry-table input,.fixed-asset-depreciation-entry-table textarea{display:block;width:100%;min-width:0;min-height:36px;padding:7px 8px;border:1px solid #dfe6e1;border-radius:3px;color:var(--ink);background:#fff;font:inherit;font-size:12px}
+.fixed-asset-depreciation-entry-table textarea{min-height:62px;resize:vertical}
+.fixed-asset-depreciation-entry-table input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+.fixed-asset-depreciation-entry-table .fixed-asset-dep-number{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fixed-asset-depreciation-entry-table .has-invalid-balance td{background:#fff0ed!important}
+.fixed-asset-depreciation-entry-table tfoot th{background:#f7f8f6;text-align:right;font-size:12px}
+.fixed-asset-depreciation-entry-date{display:grid;grid-template-columns:150px minmax(0,240px);align-items:center;gap:12px;margin:0 0 16px;font-size:12px}
+.fixed-asset-depreciation-entry-date input,.fixed-asset-depreciation-entry-fields input{min-width:0;min-height:34px;padding:6px 8px;border:1px solid #dfe6e1;border-radius:4px;font-size:12px}
+.fixed-asset-depreciation-entry-rows{display:grid;gap:14px}
+.fixed-asset-depreciation-entry-card{padding:12px;border:1px solid #e4e9e5;border-radius:4px;background:#fff}
+.fixed-asset-depreciation-entry-card h3{margin:0 0 10px;color:#234337;font-size:14px}
+.fixed-asset-depreciation-entry-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px;padding:9px;background:#f7f8f6}
+.fixed-asset-depreciation-entry-summary>div{display:grid;gap:4px;min-width:0}
+.fixed-asset-depreciation-entry-summary span,.fixed-asset-depreciation-entry-fields label>span{color:#66736b;font-size:10px}
+.fixed-asset-depreciation-entry-summary strong{font-size:12px;font-weight:600;overflow-wrap:anywhere}
+.fixed-asset-depreciation-entry-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fixed-asset-depreciation-entry-fields label{display:grid;gap:5px;min-width:0;margin:0}
+.fixed-asset-depreciation-entry-fields input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+.fixed-asset-depreciation-entry-dialog .fixed-asset-dialog-actions{position:sticky;bottom:-18px;padding:12px 0 2px;background:#fff}
+.fixed-asset-depreciation-heading,.fixed-asset-depreciation-filters{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.fixed-asset-depreciation-heading{margin-bottom:14px}
+.fixed-asset-depreciation-heading h2{margin:0;color:#234337;font-size:17px}
+.fixed-asset-depreciation-filters{justify-content:flex-start;flex-wrap:wrap;margin-bottom:12px}
+.fixed-asset-depreciation-filters .field{min-width:190px;margin:0}
+.fixed-asset-depreciation-filters input{min-height:36px;padding:7px 9px}
+.fixed-asset-depreciation-note,.fixed-asset-depreciation-local{margin:8px 0;color:#66736b;font-size:12px;line-height:1.5}
+.fixed-asset-depreciation-local{padding:9px 11px;border-left:3px solid #c5a76c;background:#faf8f2}
+.fixed-asset-depreciation-message{margin:10px 0;color:#35634d;font-size:12px}
+.fixed-asset-depreciation-message.is-error{color:#a35446}
+.fixed-asset-depreciation-message[hidden]{display:none}
+.fixed-asset-report-heading p{margin:5px 0 0;color:#66736b;font-size:12px}
+.fixed-asset-report-actions{display:flex;align-items:center;gap:8px}
+.fixed-asset-report-actions>button{min-height:38px}
+.fixed-asset-report-actions svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fixed-asset-report-workspace{display:grid;grid-template-columns:minmax(230px,.8fr) minmax(420px,1.2fr) minmax(420px,1.2fr);align-items:stretch;gap:12px;margin-bottom:16px}
+.fixed-asset-report-pane{min-width:0;padding:12px;border:1px solid #e2e7e3;border-radius:5px;background:#f7f8f6}
+.fixed-asset-report-pane h2{margin:0 0 10px;color:#234337;font-size:16px}
+.fixed-asset-report-date-fields{display:grid;grid-template-columns:1fr;gap:10px}
+.fixed-asset-report-date-fields .field{min-width:0;margin:0}
+.fixed-asset-report-date-fields input,.fixed-asset-report-picker input[type="search"]{width:100%;min-width:0;min-height:34px;padding:6px 8px;font-size:12px}
+.fixed-asset-report-picker{display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);align-items:center;gap:8px}
+.fixed-asset-report-picker>div{display:grid;grid-template-rows:auto auto minmax(220px,1fr);gap:6px;min-width:0}
+.fixed-asset-report-picker label{color:#66736b;font-size:11px}
+.fixed-asset-report-picker select{width:100%;min-width:0;height:260px;padding:5px;border:1px solid #dfe6e1;border-radius:4px;background:#fff;color:var(--ink);font-size:12px}
+.fixed-asset-report-picker option{padding:5px 4px}
+.fixed-asset-report-picker-actions{display:flex;flex-direction:column;gap:8px}
+.fixed-asset-report-picker-actions button{width:34px;height:34px;padding:0;font-size:14px}
+.fixed-asset-report-help{margin:12px 0 0;padding:10px;border-left:3px solid #c5a76c;background:#faf8f2;color:#66736b;font-size:11px;line-height:1.5}
+.fixed-asset-report-help[hidden]{display:none}
+.fixed-asset-report-results{padding:14px}
+.fixed-asset-report-results[hidden]{display:none!important}
+.fixed-asset-report-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.fixed-asset-report-results-heading h2{margin:0;color:#234337;font-size:17px}
+.fixed-asset-report-period-label{margin:0 0 10px;color:#66736b;font-size:12px}
+.fixed-assets-table.fixed-asset-report-table{width:100%;min-width:900px;border-collapse:collapse}
+.fixed-assets-table.fixed-asset-report-table td:nth-child(n+3),.fixed-assets-table.fixed-asset-report-table tfoot th:nth-child(n+2){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fixed-assets-table.fixed-asset-report-table tfoot{background:#f0f5f1}
+.fixed-assets-table.fixed-asset-report-table tfoot th{padding:10px 8px;color:#234337;font-size:12px}
+.fixed-asset-report-status{margin:8px 0;color:#a35446;font-size:12px}
+.fixed-asset-report-status[hidden]{display:none}
+.report-export-buttons{display:inline-flex;align-items:center;gap:6px;margin-left:6px}
+.report-export-format{min-height:32px;padding:5px 9px;font-size:11px}
+.fixed-asset-settings-dialog{width:min(1480px,calc(100vw - 28px));max-height:88dvh;padding:12px;overflow:auto}
+.fixed-asset-settings-dialog .fixed-asset-dialog-heading{margin:0 0 10px;padding:0 0 10px;border-bottom:1px solid #e4e9e5}
+.fixed-asset-settings-dialog .fixed-asset-dialog-heading h2{font-size:18px}
+.fixed-asset-settings-actions{display:flex;align-items:center;gap:6px}
+.fixed-asset-settings-actions .primary-button{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:7px 10px;font-size:12px}
+.fixed-asset-settings-actions svg{width:16px;height:16px;flex:0 0 16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fixed-asset-settings-general{display:grid;gap:7px;padding:11px 10px;background:#f0f1ee}
+.fixed-asset-settings-general>label{display:grid;grid-template-columns:minmax(230px,.42fr) minmax(0,1fr);align-items:center;gap:12px;min-width:0;margin:0;font-size:11px}
+.fixed-asset-settings-general input[type="text"],.fixed-asset-settings-general select{width:100%;min-width:0;min-height:32px;padding:6px 8px;border:1px solid #dfe6e1;border-radius:3px;background:#fff;font-size:12px}
+.fixed-asset-settings-general select{max-width:230px}
+.fixed-asset-settings-toggle{grid-template-columns:minmax(230px,.42fr) auto!important;justify-content:start}
+.fixed-asset-settings-toggle input{position:absolute;width:1px;height:1px;opacity:0}
+.fixed-asset-settings-switch{position:relative;width:40px;height:22px;border-radius:12px;background:#c9d0cb;transition:background .15s ease}
+.fixed-asset-settings-switch:after{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;content:"";box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s ease}
+.fixed-asset-settings-toggle input:checked+.fixed-asset-settings-switch{background:#65866f}
+.fixed-asset-settings-toggle input:checked+.fixed-asset-settings-switch:after{transform:translateX(18px)}
+.fixed-asset-settings-toggle input:focus-visible+.fixed-asset-settings-switch{outline:2px solid #718c72;outline-offset:2px}
+.fixed-asset-settings-auto-note{margin:7px 0 0 250px;color:#8a6e43;font-size:10px}
+.fixed-asset-settings-groups-title{margin:13px 0 7px;color:#35634d;font-size:15px}
+.fixed-asset-settings-table-wrap{max-width:100%;overflow:auto}
+.fixed-assets-table.fixed-asset-settings-table{width:100%;min-width:1100px;border-collapse:collapse;table-layout:fixed}
+.fixed-assets-table.fixed-asset-settings-table th{padding:8px 7px;background:#e8eeea;color:#58675f;font-size:10px;text-align:left}
+.fixed-assets-table.fixed-asset-settings-table td{padding:5px;border-bottom:1px solid #e6ebe8}
+.fixed-assets-table.fixed-asset-settings-table th:nth-child(1),.fixed-assets-table.fixed-asset-settings-table th:nth-child(2){width:15%}
+.fixed-assets-table.fixed-asset-settings-table th:nth-child(3){width:8%}
+.fixed-assets-table.fixed-asset-settings-table th:nth-child(4),.fixed-assets-table.fixed-asset-settings-table th:nth-child(5),.fixed-assets-table.fixed-asset-settings-table th:nth-child(6){width:19%}
+.fixed-assets-table.fixed-asset-settings-table th:last-child{width:42px}
+.fixed-assets-table.fixed-asset-settings-table input{width:100%;min-width:0;min-height:32px;padding:5px 7px;border:1px solid #dfe6e1;border-radius:3px;background:#fff;font-size:11px}
+.fixed-assets-table.fixed-asset-settings-table input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+.fixed-asset-settings-remove{width:30px;height:30px}
+.fixed-asset-settings-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+.fixed-asset-settings-footer .secondary-button{min-height:32px;padding:6px 9px;font-size:11px}
+.fixed-asset-settings-local{color:#78847d;font-size:10px}
+.fixed-asset-settings-dialog .fixed-asset-dialog-actions{position:sticky;bottom:-12px;padding:9px 0 0;background:#fff}
+.ledger-subview .balance-advanced .ledger-setting-checkbox{width:18px;min-width:18px;height:18px;min-height:18px;margin:0;accent-color:#16834b;appearance:auto}
+.fixed-asset-depreciation-table{min-width:850px!important}
+.fixed-asset-depreciation-table tfoot{background:#f0f5f1}
+.fixed-asset-depreciation-table tfoot th{text-align:right}
+.fixed-asset-depreciation-table tfoot th:first-child{text-align:left}
+.fixed-asset-depreciation-table td:nth-child(3),.fixed-asset-depreciation-table td:nth-child(4),.fixed-asset-depreciation-table td:last-child{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .fixed-asset-form-grid .fixed-assets-inactive input{width:16px;min-height:16px;height:16px}
 .fixed-asset-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 .fixed-asset-error{margin:12px 0 0;color:#a35446;font-size:12px}
 @media(max-width:1150px){.fixed-assets-filterbar{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:760px){#fixedAssetsView .fixed-assets-heading{flex-direction:column;align-items:stretch}.fixed-assets-filterbar{grid-template-columns:repeat(2,minmax(0,1fr))}.fixed-assets-footer{flex-wrap:wrap}.fixed-assets-footer .register-page-numbers{order:3;flex:1 0 100%}.fixed-asset-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#fixedAssetsView .fixed-assets-table .fixed-assets-empty{text-align:left}}
-@media(max-width:480px){.fixed-asset-form-grid{grid-template-columns:minmax(0,1fr)}.fixed-assets-filterbar{grid-template-columns:minmax(0,1fr)}.fixed-assets-help{position:fixed;top:auto;right:12px;width:calc(100vw - 24px)}}
+@media(max-width:760px){#fixedAssetsView .fixed-assets-heading{flex-direction:column;align-items:stretch}.fixed-assets-filterbar{grid-template-columns:repeat(2,minmax(0,1fr))}.fixed-assets-footer{flex-wrap:wrap}.fixed-assets-footer .register-page-numbers{order:3;flex:1 0 100%}.fixed-asset-editor-columns{grid-template-columns:minmax(0,1fr);gap:20px}.fixed-asset-dialog-heading{align-items:flex-start}.fixed-asset-dialog-heading h2{font-size:18px;overflow-wrap:anywhere}.fixed-asset-heading-actions{gap:4px}#fixedAssetsView .fixed-assets-table .fixed-assets-empty{text-align:left}}
+@media(max-width:760px){.fixed-asset-depreciation-page-heading{flex-wrap:wrap;gap:10px}.fixed-asset-depreciation-page-heading>div:first-child{flex:1 1 100%}.fixed-asset-depreciation-actions{flex:1 1 auto;min-height:0;flex-wrap:wrap}.fixed-asset-depreciation-page-heading>#fixedAssetDepBack{align-self:center;margin-left:auto}}
+@media(max-width:1100px){.fixed-asset-report-workspace{grid-template-columns:minmax(0,1fr)}.fixed-asset-report-date-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.fixed-asset-report-date-fields{grid-template-columns:minmax(0,1fr)}.fixed-asset-report-results-heading{align-items:flex-start;flex-direction:column}.fixed-asset-report-picker{grid-template-columns:minmax(0,1fr)}.fixed-asset-report-picker-actions{flex-direction:row;justify-content:center}.fixed-asset-report-picker-actions button{width:auto;min-width:48px;padding:0 10px}}
+@media(max-width:620px){.fixed-asset-settings-dialog{padding:9px}.fixed-asset-settings-general>label,.fixed-asset-settings-toggle{grid-template-columns:minmax(0,1fr)!important;gap:5px}.fixed-asset-settings-auto-note{margin-left:0}.fixed-asset-settings-footer{align-items:flex-start;flex-direction:column}.fixed-asset-settings-actions{gap:2px}}
+@media(max-width:760px){.fixed-asset-depreciation-entry-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.fixed-asset-depreciation-entry-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.fixed-asset-depreciation-entry-date{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.fixed-asset-depreciation-entry-fields{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.fixed-asset-form-grid .field{grid-template-columns:115px minmax(0,1fr);gap:8px}.fixed-asset-dialog{padding:12px}.fixed-asset-dialog-heading{flex-wrap:wrap}.fixed-assets-filterbar{grid-template-columns:minmax(0,1fr)}.fixed-assets-help{position:fixed;top:auto;right:12px;width:calc(100vw - 24px)}}
 @media print{body.fixed-assets-printing>*:not(#fixedAssetsPrint){display:none!important}body.fixed-assets-printing #fixedAssetsPrint{display:block!important;padding:0;font-size:8px}#fixedAssetsPrint table{width:100%;border-collapse:collapse}#fixedAssetsPrint th,#fixedAssetsPrint td{padding:5px;border-bottom:1px solid #ddd;font-size:8px;text-align:left}#fixedAssetsPrint thead{display:table-header-group}body.fixed-assets-printing{margin:0;background:#fff}}

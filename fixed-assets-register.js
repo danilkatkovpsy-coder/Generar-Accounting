@@ -10,9 +10,9 @@
     assetResponsible: "ОТВЕТСТВЕННЫЙ", assetTotal: "Всего", assetRows: "Строк на странице", assetEmpty: "Основных средств пока нет.",
     assetNoResults: "Активов по заданным фильтрам нет.", assetNewTitle: "Новое основное средство", assetEditTitle: "Изменить основное средство",
     assetSave: "Сохранить", assetCancel: "Отмена", assetActive: "Активно", assetSaved: "Основное средство сохранено.",
-    assetSaveError: "Не удалось сохранить основное средство.", assetInvalid: "Проверьте код, описание, даты, стоимость, остаток и процент амортизации.",
+    assetSaveError: "Не удалось сохранить основное средство.", assetInvalid: "Проверьте описание, даты, стоимость, начальный износ и процент амортизации.",
     assetDuplicate: "Такой код уже используется.", assetWrongCompany: "Компания изменилась. Откройте запись заново.",
-    assetHelpText: "Остаток — введённая учетная стоимость. Изменение ставки само по себе не проводит амортизацию.",
+    assetHelpText: "Остаток рассчитывается из стоимости за вычетом износа на начало и сохранённых начислений амортизации.",
     assetLocalSaved: "Сохранено на этом устройстве. Облачная синхронизация основных средств пока недоступна.",
     assetLocalMode: "Основные средства сохраняются на этом устройстве. Облачная синхронизация пока недоступна.",
     assetPdf: "Печать / PDF", assetSettingsAction: "Настройки основных средств", assetFirst: "Первая страница",
@@ -27,15 +27,31 @@
     assetRows: "Ridu lehel", assetEmpty: "Põhivara pole veel lisatud.", assetNoResults: "Valitud filtritega põhivara pole.",
     assetNewTitle: "Uus põhivara", assetEditTitle: "Muuda põhivara", assetSave: "Salvesta", assetCancel: "Tühista",
     assetActive: "Aktiivne", assetSaved: "Põhivara salvestati.", assetSaveError: "Põhivara ei saanud salvestada.",
-    assetInvalid: "Kontrollige koodi, kirjeldust, kuupäevi, soetusmaksumust, jääki ja amortisatsiooniprotsenti.",
+    assetInvalid: "Kontrollige kirjeldust, kuupäevi, soetusmaksumust, algkulumit ja amortisatsioonimäära.",
     assetDuplicate: "See kood on juba kasutusel.", assetWrongCompany: "Ettevõte on muutunud. Avage kirje uuesti.",
-    assetHelpText: "Jääk on sisestatud raamatupidamislik väärtus. Määra muutmine ei kirjenda automaatselt amortisatsiooni.",
+    assetHelpText: "Jääk arvutatakse soetusmaksumusest, lahutades algkulum ja salvestatud amortisatsioonikanded.",
     assetLocalSaved: "Salvestatud selles seadmes. Põhivara pilvesünkroonimine ei ole veel saadaval.",
     assetLocalMode: "Põhivara salvestatakse selles seadmes. Pilvesünkroonimine ei ole veel saadaval.",
     assetPdf: "Prindi / PDF", assetSettingsAction: "Põhivara seaded", assetFirst: "Esimene lehekülg",
     assetPrevious: "Eelmine lehekülg", assetNext: "Järgmine lehekülg", assetLast: "Viimane lehekülg"
   });
   const copy = key => translateCopy(key, key);
+  Object.assign(ruTexts, {
+    assetBasic: "Основные данные", assetFiles: "Файлы", assetInitialDepreciation: "Начальный износ",
+    assetPeriod: "Период амортизации", assetMonth: "Месяц", assetQuarter: "Квартал", assetYear: "Год", assetExpenseAccount: "Счёт расходов",
+    assetDepreciationAccount: "Счёт амортизации", assetAssetAccount: "Счёт основного средства", assetNotes: "Дополнительная информация",
+    assetDropFiles: "Перетащите файлы сюда или", assetBrowseFiles: "выберите на компьютере", assetRemoveFile: "Удалить файл",
+    assetDownloadFile: "Скачать файл", assetFileLimit: "Общий размер файлов не должен превышать 3 МБ.",
+    assetFileError: "Не удалось прочитать или скачать файл."
+  });
+  Object.assign(etTexts, {
+    assetBasic: "Põhiandmed", assetFiles: "Failid", assetInitialDepreciation: "Kulum alguseks",
+    assetPeriod: "Amortisatsiooniperiood", assetMonth: "Kuu", assetQuarter: "Kvartal", assetYear: "Aasta", assetExpenseAccount: "Kulukonto",
+    assetDepreciationAccount: "Amortisatsioonikonto", assetAssetAccount: "Põhivarakonto", assetNotes: "Lisainfo",
+    assetDropFiles: "Lohista oma failid siia või", assetBrowseFiles: "otsi arvutist", assetRemoveFile: "Eemalda fail",
+    assetDownloadFile: "Laadi fail alla", assetFileLimit: "Failide kogumaht ei tohi ületada 3 MB.",
+    assetFileError: "Faili ei saanud lugeda või alla laadida."
+  });
   const get = id => document.getElementById(id);
   const icons = {
     add: '<path d="M12 5v14M5 12h14"></path>', buy: '<path d="M18 5a7 7 0 1 0 0 14M3 10h12M3 14h12"></path>',
@@ -64,8 +80,17 @@
   dialog.className = "fixed-asset-dialog";
   dialog.id = "fixedAssetDialog";
   dialog.setAttribute("aria-labelledby", "fixedAssetDialogTitle");
-  const fields = [["code", "assetCode", "text"], ["description", "assetDescription", "text"], ["group", "assetGroup", "text"], ["cost", "assetCost", "number"], ["bookValue", "assetBookValue", "number"], ["acquiredDate", "assetAcquired", "date"], ["depreciationStart", "assetStart", "date"], ["depreciationRate", "assetRate", "number"], ["depreciationEnd", "assetEnd", "date"], ["responsible", "assetResponsible", "text"], ["objectName", "assetObject", "text"]];
-  dialog.innerHTML = `<form id="fixedAssetForm"><div class="fixed-asset-dialog-heading"><h2 id="fixedAssetDialogTitle"></h2><button type="button" class="fixed-assets-clear" id="fixedAssetDialogClose" aria-label="${copy("assetCancel")}">${icon("clear")}</button></div><div class="fixed-asset-form-grid">${fields.map(([key, label, type]) => `<div class="field"><label for="assetField-${key}" data-i18n="${label}">${copy(label)}</label><input id="assetField-${key}" data-asset-field="${key}" type="${type}" ${["code", "description", "cost", "bookValue", "acquiredDate", "depreciationRate"].includes(key) ? "required" : ""} ${type === "number" ? `min="0" step="0.01" ${key === "depreciationRate" ? 'max="100"' : ""}` : 'maxlength="300"'}></div>`).join("")}<label class="fixed-assets-inactive"><input id="assetField-active" type="checkbox" checked><span data-i18n="assetActive">${copy("assetActive")}</span></label></div><p id="fixedAssetError" class="fixed-asset-error" role="alert" hidden></p><div class="fixed-asset-dialog-actions"><button type="button" class="secondary-button" id="fixedAssetCancel" data-i18n="assetCancel">${copy("assetCancel")}</button><button type="submit" class="primary-button" id="fixedAssetSave" data-i18n="assetSave">${copy("assetSave")}</button></div></form>`;
+  const fields = [["group", "assetGroup", "text"], ["code", "assetCode", "text"], ["description", "assetDescription", "text"], ["cost", "assetCost", "number"], ["acquiredDate", "assetAcquired", "date"], ["depreciationStart", "assetStart", "date"], ["initialDepreciation", "assetInitialDepreciation", "number"], ["depreciationRate", "assetRate", "number"], ["depreciationPeriod", "assetPeriod", "select"], ["depreciationEnd", "assetEnd", "date"], ["expenseAccount", "assetExpenseAccount", "text"], ["depreciationAccount", "assetDepreciationAccount", "text"], ["assetAccount", "assetAssetAccount", "text"], ["objectName", "assetObject", "text"], ["responsible", "assetResponsible", "text"], ["notes", "assetNotes", "textarea"]];
+  const requiredFields = ["description", "cost", "acquiredDate", "initialDepreciation", "depreciationRate"];
+  const fieldMarkup = ([key, label, type]) => {
+    const attributes = `id="assetField-${key}" data-asset-field="${key}" ${requiredFields.includes(key) ? "required" : ""}`;
+    const list = key === "group" ? "assetGroups" : key === "objectName" ? "assetObjects" : "";
+    const control = type === "select" ? `<select ${attributes}><option value="month" data-i18n="assetMonth">${copy("assetMonth")}</option><option value="quarter" data-i18n="assetQuarter">${copy("assetQuarter")}</option><option value="year" data-i18n="assetYear">${copy("assetYear")}</option></select>`
+      : type === "textarea" ? `<textarea ${attributes} rows="4" maxlength="5000"></textarea>`
+      : `<input ${attributes} type="${type}" ${list ? `list="${list}"` : ""} ${type === "number" ? `min="0" step="0.01" ${key === "depreciationRate" ? 'max="100"' : ""}` : type === "text" ? 'maxlength="300"' : ""}>`;
+    return `<div class="field ${requiredFields.includes(key) ? "is-required" : ""}"><label for="assetField-${key}" data-i18n="${label}">${copy(label)}</label>${control}</div>`;
+  };
+  dialog.innerHTML = `<form id="fixedAssetForm"><div class="fixed-asset-dialog-heading"><h2 id="fixedAssetDialogTitle"></h2><div class="fixed-asset-heading-actions"><button type="submit" class="primary-button" id="fixedAssetSave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12l4 4v12a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8M7 3v5h8"></path></svg><span data-i18n="assetSave">${copy("assetSave")}</span></button><button type="button" class="fixed-assets-clear" id="fixedAssetDialogHelp" title="${copy("assetHelp")}" aria-label="${copy("assetHelp")}">${icon("help")}</button><button type="button" class="fixed-assets-clear" id="fixedAssetDialogClose" aria-label="${copy("assetCancel")}">${icon("clear")}</button></div></div><p id="fixedAssetDialogHelpText" class="fixed-asset-help-text" data-i18n="assetHelpText" hidden>${copy("assetHelpText")}</p><div class="fixed-asset-editor-columns"><section><h3 data-i18n="assetBasic">${copy("assetBasic")}</h3><div class="fixed-asset-form-grid">${fields.map(fieldMarkup).join("")}<label class="fixed-assets-inactive"><input id="assetField-active" type="checkbox" checked><span data-i18n="assetActive">${copy("assetActive")}</span></label></div></section><section class="fixed-asset-files"><h3 data-i18n="assetFiles">${copy("assetFiles")}</h3><div id="fixedAssetDrop" class="fixed-asset-drop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-4 4 4-4 4 4M20 16v4H4v-4"></path></svg><div><span data-i18n="assetDropFiles">${copy("assetDropFiles")}</span> <button type="button" id="fixedAssetBrowse" data-i18n="assetBrowseFiles">${copy("assetBrowseFiles")}</button></div><input type="file" id="fixedAssetFileInput" multiple hidden></div><div id="fixedAssetFilesList"></div></section></div><datalist id="assetGroups"></datalist><datalist id="assetObjects"></datalist><p id="fixedAssetError" class="fixed-asset-error" role="alert" hidden></p><div class="fixed-asset-dialog-actions"><button type="button" class="secondary-button" id="fixedAssetCancel" data-i18n="assetCancel">${copy("assetCancel")}</button></div></form>`;
   document.body.append(dialog);
   const form = get("fixedAssetForm");
   let assets = [];
@@ -73,6 +98,9 @@
   let serialized = "";
   let editingId = null;
   let editingKey = "";
+  let attachments = [];
+  let fileRead = Promise.resolve();
+  let editorGeneration = 0;
   let page = 1;
   let pageSize = 25;
   let sort = "code";
@@ -162,41 +190,112 @@
     const asset = assets.find(item => item.id === id);
     if (id && !asset) return;
     form.reset();
-    delete get("assetField-bookValue").dataset.manual;
+    editorGeneration++;
+    fileRead = Promise.resolve();
+    get("fixedAssetSave").disabled = false;
     editingId = asset?.id || null; editingKey = storageKey;
     const titleKey = asset ? "assetEditTitle" : "assetNewTitle";
     get("fixedAssetDialogTitle").dataset.i18n = titleKey; get("fixedAssetDialogTitle").textContent = copy(titleKey);
     fields.forEach(([key]) => { get(`assetField-${key}`).value = asset?.[key] ?? ""; });
+    const assetSettings = window.readFixedAssetSettings?.();
+    const priorDepreciation = Array.isArray(asset?.depreciationEntries) ? asset.depreciationEntries.reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0) : 0;
+    get("assetField-initialDepreciation").value = asset ? asset.initialDepreciation ?? Math.max(0, Number(asset.cost || 0) - Number(asset.bookValue || 0) - priorDepreciation) : "0";
+    get("assetField-depreciationPeriod").value = asset?.depreciationPeriod || assetSettings?.depreciationPeriod || "month";
+    attachments = (asset?.attachments || []).map(file => ({ ...file }));
+    renderFiles();
+    const fillSuggestions = (id, values) => get(id).replaceChildren(...values.map(value => new Option(value.label || value, value.code || value)));
+    fillSuggestions("assetGroups", [...new Set([...assets.map(item => item.group), ...(assetSettings?.groups || []).map(group => group.name)].filter(Boolean))]);
+    fillSuggestions("assetObjects", [...new Set(assets.map(item => item.objectName).filter(Boolean))]);
     if (!asset) {
-      const maximum = assets.reduce((value, item) => /^\d+$/.test(item.code) ? Math.max(value, Number(item.code)) : value, 0);
-      get("assetField-code").value = String(maximum + 1).padStart(2, "0");
       get("assetField-acquiredDate").value = localDate(); get("assetField-depreciationRate").value = "0";
-    } else get("assetField-bookValue").dataset.manual = "true";
+    }
     get("assetField-active").checked = asset?.active !== false;
     get("fixedAssetError").hidden = true;
+    get("fixedAssetDialogHelpText").hidden = true;
+    get("fixedAssetDialogHelp").title = copy("assetHelp");
+    get("fixedAssetDialogHelp").setAttribute("aria-label", copy("assetHelp"));
+    get("fixedAssetDialogClose").setAttribute("aria-label", copy("assetCancel"));
     dialog.showModal(); get("assetField-description").focus();
   };
+  const applyAssetGroupDefaults = () => {
+    const selectedGroup = get("assetField-group").value.trim().toLocaleLowerCase(language);
+    const group = window.readFixedAssetSettings?.().groups?.find(item => String(item.name || "").trim().toLocaleLowerCase(language) === selectedGroup);
+    if (!group) return;
+    get("assetField-depreciationRate").value = group.rate ?? "";
+    get("assetField-assetAccount").value = group.assetAccount || "";
+    get("assetField-depreciationAccount").value = group.depreciationAccount || "";
+    get("assetField-expenseAccount").value = group.expenseAccount || "";
+  };
+  get("assetField-group").addEventListener("change", applyAssetGroupDefaults);
   get("fixedAssetAdd").addEventListener("click", () => openEditor());
   get("fixedAssetBuy").addEventListener("click", () => { if (!can("expenses")) { denyAction("expenses"); return; } resetSupplierInvoiceForm(); setSupplierInvoicePage(true); });
   get("fixedAssetMore").addEventListener("click", () => { const open = get("fixedAssetMoreMenu").hidden; get("fixedAssetMoreMenu").hidden = !open; get("fixedAssetMore").setAttribute("aria-expanded", String(open)); });
   get("fixedAssetHelp").addEventListener("click", () => { const open = get("fixedAssetHelpPanel").hidden; get("fixedAssetHelpPanel").hidden = !open; get("fixedAssetHelp").setAttribute("aria-expanded", String(open)); });
   get("fixedAssetSettings").addEventListener("click", () => { get("fixedAssetMoreMenu").hidden = true; get("fixedAssetMore").setAttribute("aria-expanded", "false"); menu.querySelector('[data-target="fixedAssetsSettingsView"]').click(); });
-  get("assetField-cost").addEventListener("input", () => { if (!get("assetField-bookValue").dataset.manual) get("assetField-bookValue").value = get("assetField-cost").value; });
-  get("assetField-bookValue").addEventListener("input", event => { event.target.dataset.manual = "true"; });
   ["fixedAssetDialogClose", "fixedAssetCancel"].forEach(id => get(id).addEventListener("click", () => dialog.close()));
   const error = key => { get("fixedAssetError").textContent = copy(key); get("fixedAssetError").hidden = false; };
-  form.addEventListener("submit", event => {
+  const renderFiles = () => {
+    get("fixedAssetFilesList").replaceChildren(...attachments.map((file, index) => {
+      const row = document.createElement("div"); row.className = "fixed-asset-file-row";
+      const download = document.createElement("button"); download.type = "button"; download.className = "fixed-asset-file-name";
+      download.textContent = file.name; download.title = copy("assetDownloadFile");
+      download.addEventListener("click", async () => {
+        try {
+          if (!/^data:[^,]*;base64,[A-Za-z0-9+/=\s]*$/.test(file.data || "")) throw new Error("Invalid file");
+          const bytes = Uint8Array.from(atob(file.data.slice(file.data.indexOf(",") + 1)), character => character.charCodeAt(0));
+          triggerBlobDownload(new Blob([bytes], { type: "application/octet-stream" }), file.name);
+        } catch { error("assetFileError"); }
+      });
+      const remove = document.createElement("button"); remove.type = "button"; remove.className = "fixed-assets-clear";
+      remove.innerHTML = icon("clear"); remove.title = copy("assetRemoveFile"); remove.setAttribute("aria-label", `${copy("assetRemoveFile")}: ${file.name}`);
+      remove.addEventListener("click", () => { attachments.splice(index, 1); renderFiles(); });
+      row.append(download, remove); return row;
+    }));
+  };
+  const addFiles = selected => {
+    if (!selected.length) return;
+    const generation = editorGeneration;
+    get("fixedAssetSave").disabled = true;
+    fileRead = fileRead.then(async () => {
+      if (generation !== editorGeneration) return;
+      if (attachments.reduce((sum, file) => sum + Number(file.size || 0), 0) + selected.reduce((sum, file) => sum + file.size, 0) > 3 * 1024 * 1024) { error("assetFileLimit"); return; }
+      const added = await Promise.all(selected.map(file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ id: crypto.randomUUID(), name: file.name, type: file.type, size: file.size, data: reader.result });
+        reader.onerror = reject; reader.onabort = reject; reader.readAsDataURL(file);
+      })));
+      if (generation !== editorGeneration || editingKey !== STORAGE.fixedAssets || !dialog.open) return;
+      attachments.push(...added); renderFiles();
+    }).catch(() => { if (generation === editorGeneration) error("assetFileError"); });
+    const pending = fileRead;
+    pending.finally(() => { if (generation === editorGeneration && pending === fileRead) get("fixedAssetSave").disabled = false; });
+  };
+  get("fixedAssetBrowse").addEventListener("click", () => get("fixedAssetFileInput").click());
+  get("fixedAssetFileInput").addEventListener("change", event => { addFiles([...event.target.files]); event.target.value = ""; });
+  get("fixedAssetDrop").addEventListener("dragover", event => { event.preventDefault(); event.currentTarget.classList.add("is-dragging"); });
+  get("fixedAssetDrop").addEventListener("dragleave", event => event.currentTarget.classList.remove("is-dragging"));
+  get("fixedAssetDrop").addEventListener("drop", event => { event.preventDefault(); event.currentTarget.classList.remove("is-dragging"); addFiles([...(event.dataTransfer?.files || [])]); });
+  dialog.addEventListener("close", () => { editorGeneration++; get("fixedAssetDrop").classList.remove("is-dragging"); });
+  get("fixedAssetDialogHelp").addEventListener("click", () => { get("fixedAssetDialogHelpText").hidden = !get("fixedAssetDialogHelpText").hidden; });
+  form.addEventListener("submit", async event => {
     event.preventDefault();
+    const generation = editorGeneration;
+    await fileRead;
+    if (generation !== editorGeneration || !dialog.open) return;
     if (!can("expenses")) { denyAction("expenses"); return; }
     if (editingKey !== STORAGE.fixedAssets) { error("assetWrongCompany"); return; }
     readAssets();
     const asset = Object.fromEntries(fields.map(([key]) => [key, get(`assetField-${key}`).value.trim()]));
-    for (const key of ["cost", "bookValue", "depreciationRate"]) asset[key] = Number(asset[key]);
-    if (!asset.code || !asset.description || !asset.acquiredDate || ![asset.cost, asset.bookValue, asset.depreciationRate].every(Number.isFinite) || asset.cost < 0 || asset.bookValue < 0 || asset.bookValue > asset.cost || asset.depreciationRate < 0 || asset.depreciationRate > 100 || asset.depreciationStart && asset.depreciationEnd && asset.depreciationStart > asset.depreciationEnd) { error("assetInvalid"); return; }
-    if (assets.some(item => item.id !== editingId && String(item.code || "").toLocaleLowerCase(language) === asset.code.toLocaleLowerCase(language))) { error("assetDuplicate"); return; }
+    if (!form.reportValidity()) return;
+    if (requiredFields.some(key => !asset[key])) { error("assetInvalid"); return; }
+    for (const key of ["cost", "initialDepreciation", "depreciationRate"]) asset[key] = Number(asset[key]);
+    if (!Number.isFinite(asset.initialDepreciation) || asset.initialDepreciation < 0 || !["month", "quarter", "year"].includes(asset.depreciationPeriod)) { error("assetInvalid"); return; }
+    if (!asset.description || !asset.acquiredDate || ![asset.cost, asset.depreciationRate].every(Number.isFinite) || asset.cost < 0 || asset.initialDepreciation > asset.cost || asset.depreciationRate < 0 || asset.depreciationRate > 100 || asset.depreciationStart && asset.depreciationEnd && asset.depreciationStart > asset.depreciationEnd) { error("assetInvalid"); return; }
+    if (asset.code && assets.some(item => item.id !== editingId && String(item.code || "").toLocaleLowerCase(language) === asset.code.toLocaleLowerCase(language))) { error("assetDuplicate"); return; }
     const existing = assets.find(item => item.id === editingId);
     if (editingId && !existing) { error("assetSaveError"); return; }
-    const record = { ...existing, ...asset, id: existing?.id || crypto.randomUUID(), active: get("assetField-active").checked, currency: "EUR", updatedAt: new Date().toISOString() };
+    const accumulatedDepreciation = (existing?.depreciationEntries || []).reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
+    const record = { ...existing, ...asset, bookValue: Math.max(0, Math.round((asset.cost - asset.initialDepreciation - accumulatedDepreciation) * 100) / 100), attachments: attachments.map(file => ({ ...file })), id: existing?.id || crypto.randomUUID(), active: get("assetField-active").checked, currency: "EUR", updatedAt: new Date().toISOString() };
     const next = existing ? assets.map(item => item.id === editingId ? record : item) : [record, ...assets];
     try { saveList(STORAGE.fixedAssets, next); }
     catch { error("assetSaveError"); return; }

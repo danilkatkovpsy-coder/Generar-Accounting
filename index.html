@@ -816,6 +816,7 @@
     const invoiceTaxPriceHint=document.createElement("p");invoiceTaxPriceHint.id="invoiceVatPriceHint";invoiceTaxPriceHint.className="hint";invoiceTaxPriceHint.dataset.i18n="invoiceVatPriceHint";invoiceTaxPriceHint.hidden=true;document.getElementById("itemRows").after(invoiceTaxPriceHint);
     const STORAGE_BASE={seller:"accounting-seller-v1",sellerWebsite:"accounting-seller-website-v1",clients:"accounting-clients-v1",invoices:"accounting-invoices-v1",quotes:"accounting-sales-quotes-v1",salesOrders:"accounting-sales-orders-v1",articles:"accounting-articles-v1",background:"accounting-background-v1",logo:"accounting-logo-v1",color:"accounting-invoice-color-v1",theme:"accounting-invoice-theme-v1",designTokens:"accounting-design-tokens-v1",purchases:"accounting-purchases-v1",expenses:"accounting-expenses-v1",suppliers:"accounting-suppliers-v1",supplierInvoices:"accounting-supplier-invoices-v1",invoiceNumberStart:"accounting-invoice-number-start-v1",paymentTermsDays:"accounting-payment-terms-days-v1",invoiceLateFee:"accounting-invoice-late-fee-v1",emailTemplate:"accounting-invoice-email-template-v1",members:"accounting-members-v1"};
     STORAGE_BASE.fixedAssets="accounting-fixed-assets-v1";
+    STORAGE_BASE.manualJournalEntries="accounting-manual-journal-v1";
     const sellerDefaults={name:"ROLLMAN INVEST OÜ",address:"Pae tn 23a\nLasnamäe linnaosa, Tallinn\n11414 Harju maakond",reg:"Rg-kood 14842530",kmkr:"",phone:"+372 56946956",email:"danil.katkov.work@gmail.com",website:"",bank:"Swedbank",swift:"HABAEE2X",iban:"EE552200221072686011",vatRegistered:false,showArvesemuFooter:false};
     const guestSessionId=new URLSearchParams(location.search).get("guest"),guestMode=/^[0-9a-f-]{36}$/i.test(guestSessionId||""),guestCompanyId=guestMode?`guest-${guestSessionId}`:"";
     let companyListKey=guestMode?`accounting-companies-v1:${guestSessionId}`:"accounting-companies-v1",activeCompanyKey=guestMode?`accounting-active-company-v1:${guestSessionId}`:"accounting-active-company-v1";
@@ -832,6 +833,7 @@
     STORAGE.permissions=companyStorageKey("accounting-role-permissions-v1",activeCompanyId);
     const CLOUD_ACCOUNTING_KEYS=new Set(["purchases","expenses","suppliers","supplierInvoices","quotes","salesOrders","articles","background","logo","color","theme","designTokens","invoiceNumberStart","paymentTermsDays","invoiceLateFee","emailTemplate","sellerWebsite","permissions"]),cloudDataWrites=new Map();
     CLOUD_ACCOUNTING_KEYS.add("fixedAssets");
+    CLOUD_ACCOUNTING_KEYS.add("manualJournalEntries");
     let fixedAssetsCloudSupported=true;
     let cloudWorkspace=null,sellerWebsiteCloudSupported=true,invoiceLateFeeCloudSupported=true,salesDocumentsCloudSupported=true;
     const previousArticles=readStorage(STORAGE.articles,[]),invoiceArticleNames=new Set(readStorage(STORAGE.invoices,[]).flatMap(invoice=>(invoice.items||[]).map(item=>String(item.description||"").trim().toLocaleLowerCase("et"))));
@@ -929,6 +931,7 @@
     async function saveCloudCompanyProfile(seller){if(!cloudWorkspace)throw new Error("Sign in to save company settings.");const{data,error}=await cloudWorkspace.supabase.from("organizations").update({name:seller.name,address:seller.address||null,registration_code:seller.reg||null,kmkr_number:seller.kmkr||null,vat_registered:Boolean(seller.vatRegistered),phone:seller.phone||null,email:seller.email||null,bank_name:seller.bank||null,bank_swift:seller.swift||null,bank_iban:seller.iban||null}).eq("id",cloudWorkspace.organizationId).select("id").single();if(error)throw error;if(!data)throw new Error("Company settings were not saved.")}
     function queueCloudAccountingData(dataKey,dataValue){if(!cloudWorkspace)return;const pendingKey=`accounting-cloud-pending-v1:${cloudWorkspace.organizationId}:${dataKey}`;try{localStorage.setItem(pendingKey,"true")}catch{}if(dataKey==="fixedAssets"&&!fixedAssetsCloudSupported)return;const previous=cloudDataWrites.get(dataKey)||Promise.resolve();let write;write=previous.catch(()=>{}).then(async()=>{await saveCloudAccountingData(dataKey,dataValue);if(cloudDataWrites.get(dataKey)===write&&(dataKey!=="fixedAssets"||fixedAssetsCloudSupported))localStorage.removeItem(pendingKey)});cloudDataWrites.set(dataKey,write);write.catch(error=>{console.error(error);showMessage(error.message||translateCopy("Не удалось синхронизировать данные с облаком.","cloudSyncError"),true)})}
     function saveList(key,value){localStorage.setItem(key,JSON.stringify(value));const entry=Object.entries(STORAGE).find(([name,storageKey])=>storageKey===key&&CLOUD_ACCOUNTING_KEYS.has(name));if(entry)queueCloudAccountingData(entry[0],value)}
+    let manualJournalEntriesCloudSupported=true;const baseSaveCloudAccountingData=saveCloudAccountingData;saveCloudAccountingData=async(dataKey,dataValue)=>{if(dataKey==="manualJournalEntries"&&(!manualJournalEntriesCloudSupported||Array.isArray(dataValue)&&!dataValue.length))return;try{return await baseSaveCloudAccountingData(dataKey,dataValue)}catch(error){if(dataKey==="manualJournalEntries"&&error.code==="23514"){manualJournalEntriesCloudSupported=false;try{localStorage.removeItem(`accounting-cloud-pending-v1:${cloudWorkspace?.organizationId}:${dataKey}`)}catch{}showMessage(translateCopy("Ручные проводки сохранены на этом устройстве. Для облачной синхронизации примените миграцию БД.","journalLocalOnlySaved"),true);return}throw error}};
     async function saveCloudClient(client){if(!cloudWorkspace)throw new Error("Sign in to save client data.");const{error}=await cloudWorkspace.supabase.from("clients").upsert({id:client.id,organization_id:cloudWorkspace.organizationId,name:client.name,client_type:client.type||"person",registration_code:client.reg||null,reference_number:client.reference||null,address:client.address||null,email:client.email||null,phone:client.phone||null},{onConflict:"id"});if(error)throw error}
     async function removeCloudClient(client){if(!cloudWorkspace||!client.id)throw new Error("Client is not connected to the cloud.");const{error}=await cloudWorkspace.supabase.from("clients").delete().eq("id",client.id).eq("organization_id",cloudWorkspace.organizationId);if(error)throw error}
     async function saveCloudInvoice(invoice){if(!cloudWorkspace)throw new Error("Sign in to save invoice data.");const{data,error}=await cloudWorkspace.supabase.rpc("save_invoice",{p_organization_id:cloudWorkspace.organizationId,p_number:invoice.number,p_reference_number:invoice.reference||null,p_issue_date:invoice.date,p_due_date:invoice.dueDate||null,p_note:invoice.note||null,p_client_name:invoice.client.name,p_client_email:invoice.client.email||null,p_client_address:invoice.client.address||null,p_client_type:invoice.client.type||"person",p_client_registration_code:invoice.client.reg||null,p_client_phone:invoice.client.phone||null,p_items:invoice.items.map(item=>({articleNumber:item.articleNumber||null,description:item.description,quantity:item.quantity,price:item.price,discountPercent:item.discountPercent||0,taxRate:item.taxRate??invoice.taxRate??0}))});if(error)throw error;return data}
@@ -938,6 +941,7 @@
     const defaultRolePermissions={administrator:Object.fromEntries(rolePermissionRows.map(item=>[item.key,true])),accountant:{overview:true,sales:true,createInvoice:true,editInvoices:true,deleteInvoices:false,exportInvoices:true,payments:true,expenses:true,reports:true,exportReports:true,companySettings:false,manageUsers:false}};
     function currentDemoRole(){const index=document.getElementById("profilePicker").selectedIndex;return index===0?"owner":index===1?"accountant":index===2?"administrator":null}
     function currentInvoiceActorEmail(){const label=document.getElementById("profilePicker")?.selectedOptions[0]?.textContent||"";return label.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]||""}
+    let manualJournalEntries=readStorage(STORAGE.manualJournalEntries,[]);if(!Array.isArray(manualJournalEntries))manualJournalEntries=[];
     function permissionsFor(role=currentDemoRole()){if(role==="owner")return Object.fromEntries(rolePermissionRows.map(item=>[item.key,true]));if(!defaultRolePermissions[role])return{};const saved=readStorage(STORAGE.permissions,{});return{...defaultRolePermissions[role],...(saved[role]||{})}}
     function can(permission){return Boolean(permissionsFor()[permission])}
     function denyAction(permission){if(can(permission))return false;showMessage(translateCopy("У этой роли нет прав на это действие.","permissionActionDenied"),true);return true}
@@ -1267,7 +1271,100 @@
     function updateLedgerPicker(kind){const isAccount=kind==="account",search=document.getElementById(isAccount?"ledgerAccountSearch":"ledgerObjectSearch").value.trim().toLocaleLowerCase("et"),list=document.getElementById(isAccount?"ledgerAccountOptions":"ledgerObjectOptions"),values=isAccount?getLedgerAccounts().map(item=>({value:item.code,label:`${item.code} · ${item.label}`})):getLedgerObjects().map(value=>({value,label:value})),selected=isAccount?ledgerSelectedAccounts:ledgerSelectedObjects;list.innerHTML=values.filter(item=>item.label.toLocaleLowerCase("et").includes(search)).map(item=>`<label class="ledger-option"><input type="checkbox" data-ledger-kind="${kind}" value="${escapeHtml(item.value)}" ${selected===null||selected.has(item.value)?"checked":""}><span>${escapeHtml(item.label)}</span></label>`).join("")||`<span class="hint">${escapeHtml(translateCopy("Ничего не найдено","ledgerNoOptions"))}</span>`}
     function changeLedgerSelection(kind,checkbox){const options=kind==="account"?getLedgerAccounts().map(item=>item.code):getLedgerObjects();let selected=kind==="account"?ledgerSelectedAccounts:ledgerSelectedObjects;if(selected===null)selected=new Set(options);if(checkbox.checked)selected.add(checkbox.value);else selected.delete(checkbox.value);if(selected.size===options.length)selected=null;if(kind==="account")ledgerSelectedAccounts=selected;else ledgerSelectedObjects=selected;updateLedgerPicker(kind)}
     function generateGeneralLedger(){const start=document.getElementById("ledgerStartDate").value,end=document.getElementById("ledgerEndDate").value;if(!start||!end||start>end){showMessage(translateCopy("Укажите корректный период.","ledgerInvalidDates"),true);return}const accounts=getLedgerAccounts();let rows=createLedgerEntries(start,end).filter(entry=>(ledgerSelectedAccounts===null||ledgerSelectedAccounts.has(entry.accountCode))&&(ledgerSelectedObjects===null||ledgerSelectedObjects.has(entry.object)));if(document.getElementById("ledgerShowZeroAccounts").checked&&ledgerSelectedObjects===null){const accountCodes=ledgerSelectedAccounts===null?accounts.map(account=>account.code):[...ledgerSelectedAccounts];for(const code of accountCodes){const account=accounts.find(item=>item.code===code);if(account&&!rows.some(entry=>entry.accountCode===code))rows.push({id:`zero-${code}`,date:end,documentNumber:"",object:"",description:"",accountCode:code,account:account.label,debit:0,credit:0})}}rows.sort((first,second)=>String(first.date).localeCompare(String(second.date))||first.id.localeCompare(second.id)||first.accountCode.localeCompare(second.accountCode));let debit=0,credit=0;const balances={};for(const entry of rows){debit+=entry.debit;credit+=entry.credit;balances[entry.accountCode]=(balances[entry.accountCode]||0)+entry.debit-entry.credit;entry.balance=balances[entry.accountCode]}lastLedgerEntries=rows;document.getElementById("ledgerTableRows").innerHTML=rows.map(entry=>`<tr><td>${escapeHtml(formatDate(entry.date))}</td><td>${escapeHtml(entry.documentNumber)}</td><td>${escapeHtml(entry.object)}</td><td>${escapeHtml(entry.accountCode)} · ${escapeHtml(entry.account)}</td><td>${escapeHtml(entry.description)}</td><td>${entry.debit?money(entry.debit):"—"}</td><td>${entry.credit?money(entry.credit):"—"}</td><td>${money(entry.balance||0)} EUR</td></tr>`).join("")||`<tr><td colspan="8" class="empty-row">${escapeHtml(translateCopy("Нет проводок за выбранный период.","ledgerEmpty"))}</td></tr>`;document.getElementById("ledgerPeriodSummary").textContent=`${formatDate(start)} – ${formatDate(end)} · EUR`;document.getElementById("ledgerDebitTotal").textContent=`${money(debit)} EUR`;document.getElementById("ledgerCreditTotal").textContent=`${money(credit)} EUR`;document.getElementById("ledgerGeneratedStatus").textContent=translateCopy("Главная книга сформирована.","ledgerGenerated");document.getElementById("ledgerResults").hidden=false}
-    function exportGeneralLedgerCsv(){if(!lastLedgerEntries.length)generateGeneralLedger();const start=document.getElementById("ledgerStartDate").value,end=document.getElementById("ledgerEndDate").value,headers=["ledgerDateColumn","ledgerDocumentColumn","ledgerObjectColumn","ledgerAccountColumn","ledgerDescriptionColumn","ledgerDebitColumn","ledgerCreditColumn","ledgerBalanceColumn"].map(key=>translateCopy(key,key)),rows=lastLedgerEntries.map(entry=>[formatDate(entry.date),entry.documentNumber,entry.object,`${entry.accountCode} · ${entry.account}`,entry.description,entry.debit.toFixed(2),entry.credit.toFixed(2),""]),csv=[headers,...rows].map(row=>row.map(value=>`"${String(value).replaceAll('"','""')}"`).join(";")).join("\r\n"),url=URL.createObjectURL(new Blob(["\ufeff",csv],{type:"text/csv;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download=`pearaamat-${start}-${end}.csv`;link.click();URL.revokeObjectURL(url)}
+    function exportGeneralLedgerCsv(){if(!lastLedgerEntries.length)generateGeneralLedger();const start=document.getElementById("ledgerStartDate").value,end=document.getElementById("ledgerEndDate").value,entries=window.getLedgerPrintOptions?.().printRelated?window.getLedgerPrintEntries?.()||lastLedgerEntries:lastLedgerEntries,headers=["ledgerDateColumn","ledgerDocumentColumn","ledgerObjectColumn","ledgerAccountColumn","ledgerDescriptionColumn","ledgerDebitColumn","ledgerCreditColumn","ledgerBalanceColumn"].map(key=>translateCopy(key,key)),balances={},rows=entries.map(entry=>{const account=String(entry.accountCode||"");balances[account]=(balances[account]||0)+(Number(entry.debit)||0)-(Number(entry.credit)||0);return[formatDate(entry.date),entry.documentNumber,entry.object,`${account} · ${entry.account}`,entry.description,Number(entry.debit||0).toFixed(2),Number(entry.credit||0).toFixed(2),`${money(balances[account])} EUR`]}),csv=[headers,...rows].map(row=>row.map(value=>`"${String(value).replaceAll('"','""')}"`).join(";")).join("\r\n"),url=URL.createObjectURL(new Blob(["\ufeff",csv],{type:"text/csv;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download=`pearaamat-${start}-${end}.csv`;link.click();URL.revokeObjectURL(url)}
+    let ledgerDemoMode=false,ledgerAccountReportMode=false;
+    const liveGetLedgerAccounts=getLedgerAccounts;
+    const liveCreateLedgerEntries=createLedgerEntries;
+    const demoLedgerAccounts=[
+      {code:"1000",nameKey:"demoBankAccount",openingBalance:2500},
+      {code:"1100",nameKey:"demoCashAccount",openingBalance:200},
+      {code:"1200",nameKey:"demoReceivableAccount",openingBalance:0},
+      {code:"3000",nameKey:"demoEquityAccount",openingBalance:-2700},
+      {code:"4000",nameKey:"demoRevenueAccount",openingBalance:0},
+      {code:"5000",nameKey:"demoRentAccount",openingBalance:0},
+      {code:"5100",nameKey:"demoOfficeExpenseAccount",openingBalance:0}
+    ];
+    const demoAccounts=()=>demoLedgerAccounts.map(account=>({code:account.code,key:account.nameKey,label:translateCopy(account.nameKey,account.nameKey),openingBalance:account.openingBalance}));
+    getLedgerAccounts=()=>ledgerDemoMode?demoAccounts():liveGetLedgerAccounts();
+    const demoLedgerEntries=(start,end)=>{
+      const accounts=Object.fromEntries(demoAccounts().map(account=>[account.code,account.label]));
+      const asDate=value=>new Date(`${value}T12:00:00`);
+      const fromDate=value=>`${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,"0")}-${String(value.getDate()).padStart(2,"0")}`;
+      const rangeStart=asDate(start),rangeEnd=asDate(end),dateAt=offset=>fromDate(new Date(Math.min(rangeEnd.getTime(),rangeStart.getTime()+offset*86400000)));
+      const entries=[];
+      const addPair=(id,date,documentNumber,object,description,debitCode,creditCode,amount)=>{
+        const common={id,entryId:id,date,documentNumber,sourceDocument:documentNumber,object,description};
+        entries.push({...common,accountCode:debitCode,account:accounts[debitCode],debit:amount,credit:0},{...common,accountCode:creditCode,account:accounts[creditCode],debit:0,credit:amount});
+      };
+      addPair("DEMO-2026-001",dateAt(0),"DEMO-ARVE-001","Näitisklient OÜ",translateCopy("Näidisteenus","demoServiceDescription"),"1200","4000",600);
+      addPair("DEMO-2026-002",dateAt(4),"DEMO-MAKSE-001","Näitisklient OÜ",translateCopy("Näidisarve laekumine","demoReceiptDescription"),"1000","1200",600);
+      addPair("DEMO-2026-003",dateAt(8),"DEMO-ARVE-002","Näidiskontor OÜ",translateCopy("Näidisruumi rent","demoRentDescription"),"5000","1000",300);
+      addPair("DEMO-2026-004",dateAt(12),"DEMO-KULU-001","Näidiskontor OÜ",translateCopy("Näidistarbed","demoOfficeDescription"),"5100","1100",50);
+      return entries.filter(entry=>entry.date>=start&&entry.date<=end).sort((first,second)=>first.date.localeCompare(second.date)||first.id.localeCompare(second.id)||first.accountCode.localeCompare(second.accountCode));
+    };
+    createLedgerEntries=(start,end)=>ledgerDemoMode?demoLedgerEntries(start,end):liveCreateLedgerEntries(start,end);
+    window.setLedgerAccountReportMode=enabled=>{ledgerAccountReportMode=Boolean(enabled)};
+    const liveGenerateGeneralLedger=generateGeneralLedger;
+    generateGeneralLedger=function(){
+      liveGenerateGeneralLedger();
+      if(!ledgerAccountReportMode)return;
+      const table=document.querySelector("#ledgerResults table");
+      const body=document.getElementById("ledgerTableRows");
+      if(!table||!body||document.getElementById("ledgerResults").hidden)return;
+      const labels={entryId:translateCopy("ledgerEntryId","ledgerEntryId"),document:translateCopy("ledgerSourceColumn","ledgerSourceColumn"),opening:translateCopy("ledgerOpeningBalance","ledgerOpeningBalance"),closing:translateCopy("ledgerClosingBalance","ledgerClosingBalance"),unknown:translateCopy("ledgerOpeningUnavailable","ledgerOpeningUnavailable")};
+      table.querySelector("thead tr").innerHTML=["ledgerDateColumn","ledgerEntryId","ledgerDescriptionColumn","ledgerSourceColumn","ledgerObjectColumn","ledgerDebitColumn","ledgerCreditColumn","ledgerBalanceColumn"].map(key=>`<th>${escapeHtml(translateCopy(key,key))}</th>`).join("");
+      const accounts=new Map(getLedgerAccounts().map(account=>[account.code,account]));
+      const groups=new Map();
+      for(const entry of lastLedgerEntries){if(!groups.has(entry.accountCode))groups.set(entry.accountCode,[]);groups.get(entry.accountCode).push(entry)}
+      let html="";
+      for(const[code,entries]of [...groups].sort(([first],[second])=>first.localeCompare(second,language,{numeric:true}))){
+        const account=accounts.get(code),opening=ledgerDemoMode?Number(account?.openingBalance)||0:null;
+        let balance=opening??0;
+        html+=`<tr class="ledger-account-heading-row"><th colspan="8">${escapeHtml(code)} · ${escapeHtml(account?.label||entries[0]?.account||"")}</th></tr>`;
+        html+=`<tr class="ledger-balance-row"><td colspan="5">${escapeHtml(labels.opening)}</td><td colspan="3">${opening===null?escapeHtml(labels.unknown):`${money(Math.max(opening,0))} / ${money(Math.max(-opening,0))} EUR`}</td></tr>`;
+        for(const entry of entries){
+          balance+=(Number(entry.debit)||0)-(Number(entry.credit)||0);
+          html+=`<tr><td>${escapeHtml(formatDate(entry.date))}</td><td>${escapeHtml(entry.entryId||entry.id||"")}</td><td>${escapeHtml(entry.description||"")}</td><td>${escapeHtml(entry.sourceDocument||entry.documentNumber||"")}</td><td>${escapeHtml(entry.object||"")}</td><td>${entry.debit?money(entry.debit):"—"}</td><td>${entry.credit?money(entry.credit):"—"}</td><td>${money(balance)} EUR</td></tr>`;
+        }
+        html+=`<tr class="ledger-balance-row"><td colspan="5">${escapeHtml(labels.closing)}</td><td colspan="3">${opening===null?`${money(balance)} EUR · ${escapeHtml(labels.unknown)}`:`${money(Math.max(balance,0))} / ${money(Math.max(-balance,0))} EUR`}</td></tr>`;
+      }
+      body.innerHTML=html||`<tr><td colspan="8" class="empty-row">${escapeHtml(translateCopy("Нет проводок за выбранный период.","ledgerEmpty"))}</td></tr>`;
+      const disclaimer=document.getElementById("ledgerDisclaimer");
+      if(disclaimer)disclaimer.textContent=translateCopy(ledgerDemoMode?"Демонстрационные счета и проводки вымышлены, используются только в этом отчете и не сохраняются в данных компании.":"Проводки сформированы из записей приложения. Начальные остатки не загружены; сальдо показано только по операциям выбранного периода.",ledgerDemoMode?"ledgerDemoDisclaimer":"ledgerLiveDisclaimer");
+    };
+    window.setLedgerDemoMode=enabled=>{
+      ledgerDemoMode=Boolean(enabled);
+      ledgerSelectedAccounts=null;
+      ledgerSelectedObjects=null;
+      updateLedgerPicker("account");
+      updateLedgerPicker("object");
+      if(!document.getElementById("ledgerResults").hidden)generateGeneralLedger();
+    };
+    const liveExportGeneralLedgerCsv=exportGeneralLedgerCsv;
+    exportGeneralLedgerCsv=function(){
+      if(!ledgerAccountReportMode){liveExportGeneralLedgerCsv();return}
+      if(!lastLedgerEntries.length)generateGeneralLedger();
+      const start=document.getElementById("ledgerStartDate").value,end=document.getElementById("ledgerEndDate").value;
+      const entries=window.getLedgerPrintOptions?.().printRelated?window.getLedgerPrintEntries?.()||lastLedgerEntries:lastLedgerEntries;
+      const headers=["ledgerDateColumn","ledgerEntryId","ledgerDescriptionColumn","ledgerSourceColumn","ledgerObjectColumn","ledgerDebitColumn","ledgerCreditColumn","ledgerBalanceColumn"].map(key=>translateCopy(key,key));
+      const csvCell=value=>{let text=String(value??"");if(/^[\s]*[=+@-]/.test(text))text=`'${text}`;return`"${text.replaceAll('"','""')}"`};
+      const rows=[headers],groups=new Map(),accounts=new Map(getLedgerAccounts().map(account=>[account.code,account]));
+      for(const entry of entries){if(!groups.has(entry.accountCode))groups.set(entry.accountCode,[]);groups.get(entry.accountCode).push(entry)}
+      for(const[code,accountEntries]of [...groups].sort(([first],[second])=>first.localeCompare(second,language,{numeric:true}))){
+        const account=accounts.get(code),opening=ledgerDemoMode?Number(account?.openingBalance)||0:null;
+        let balance=opening??0;
+        rows.push([`${code} · ${account?.label||accountEntries[0]?.account||""}`,"","","","","","",""]);
+        rows.push(["", "", translateCopy("ledgerOpeningBalance","ledgerOpeningBalance"), "", "", opening===null?"":Math.max(opening,0).toFixed(2), opening===null?"":Math.max(-opening,0).toFixed(2), opening===null?translateCopy("ledgerOpeningUnavailable","ledgerOpeningUnavailable"):balance.toFixed(2)]);
+        for(const entry of accountEntries){
+          balance+=(Number(entry.debit)||0)-(Number(entry.credit)||0);
+          rows.push([formatDate(entry.date),entry.entryId||entry.id||"",entry.description||"",entry.sourceDocument||entry.documentNumber||"",entry.object||"",Number(entry.debit||0).toFixed(2),Number(entry.credit||0).toFixed(2),balance.toFixed(2)]);
+        }
+        rows.push(["", "", translateCopy("ledgerClosingBalance","ledgerClosingBalance"), "", "", Math.max(balance,0).toFixed(2), Math.max(-balance,0).toFixed(2), balance.toFixed(2)]);
+      }
+      triggerBlobDownload(new Blob(["\ufeff",rows.map(row=>row.map(csvCell).join(";")).join("\r\n")],{type:"text/csv;charset=utf-8"}),`pearaamat-${start}-${end}.csv`);
+    };
+    Object.assign(ruTexts,{ledgerEntryId:"ID проводки",ledgerSourceColumn:"Документ-основание",ledgerOpeningBalance:"Начальное сальдо (Дт / Кт)",ledgerClosingBalance:"Конечное сальдо (Дт / Кт)",ledgerOpeningUnavailable:"Не загружено",ledgerDemoDisclaimer:"Демонстрационные счета и проводки вымышлены, используются только в этом отчете и не сохраняются в данных компании.",ledgerLiveDisclaimer:"Проводки сформированы из записей приложения. Начальные остатки не загружены; сальдо показано только по операциям выбранного периода.",demoBankAccount:"Банк",demoCashAccount:"Касса",demoReceivableAccount:"Расчеты с покупателями",demoEquityAccount:"Капитал",demoRevenueAccount:"Доход от услуг",demoRentAccount:"Расходы на аренду",demoOfficeExpenseAccount:"Канцелярские расходы",demoServiceDescription:"Демонстрационная услуга",demoReceiptDescription:"Оплата демонстрационного счета",demoRentDescription:"Демонстрационная аренда",demoOfficeDescription:"Демонстрационные материалы"});
+    Object.assign(etTexts,{ledgerEntryId:"Kande ID",ledgerSourceColumn:"Alusdokument",ledgerOpeningBalance:"Algsaldo (D / K)",ledgerClosingBalance:"Lõppsaldo (D / K)",ledgerOpeningUnavailable:"Andmed puuduvad",ledgerDemoDisclaimer:"Näidiskontod ja kanded on väljamõeldud, kuvatakse ainult selles aruandes ega salvestu ettevõtte andmetesse.",ledgerLiveDisclaimer:"Kanded on koostatud rakenduse kirjetest. Algsaldosid pole sisestatud; saldo näitab ainult valitud perioodi liikumisi.",demoBankAccount:"Pank",demoCashAccount:"Kassa",demoReceivableAccount:"Nõuded ostjate vastu",demoEquityAccount:"Omakapital",demoRevenueAccount:"Teenustulu",demoRentAccount:"Rendikulu",demoOfficeExpenseAccount:"Kontorikulu",demoServiceDescription:"Näidisteenus",demoReceiptDescription:"Näidisarve laekumine",demoRentDescription:"Näidisruumi rent",demoOfficeDescription:"Näidistarbed"});
     function setupGeneralLedgerReport(){
       const tabs=document.querySelector(".report-tabs"),tab=document.createElement("button"),panel=document.createElement("section");
       tab.className="report-tab";tab.id="generalLedgerTab";tab.type="button";tab.setAttribute("role","tab");tab.setAttribute("aria-selected","false");tab.setAttribute("aria-controls","generalLedgerPanel");tab.dataset.i18n="generalLedgerTab";tab.textContent=translateCopy("Pearaamat","generalLedgerTab");tabs.append(tab);
@@ -1507,6 +1604,9 @@
       }catch(error){console.error(error);showMessage("Не удалось собрать PDF. Проверьте, что файлы фона и логотипа доступны.",true)}finally{button.disabled=false;button.textContent=language==="et"?"↓ Laadi PDF alla":"↓　Скачать PDF"}
     }
     function triggerBlobDownload(blob,filename){const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=filename;link.hidden=true;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+    function exportTableFile({format,filename,title,period="",headers,rows}){if(format==="csv"){const cell=value=>{let text=String(value??"");if(/^[\s]*[=+@-]/.test(text))text=`'${text}`;return`"${text.replaceAll('"','""')}"`},csv=[headers,...rows].map(row=>row.map(cell).join(";")).join("\r\n");triggerBlobDownload(new Blob(["\ufeff",csv],{type:"text/csv;charset=utf-8"}),`${filename}.csv`);return true}if(format==="xls"){const xmlRows=[headers,...rows].map(row=>`<Row>${row.map(value=>`<Cell><Data ss:Type="String">${escapeHtml(value)}</Data></Cell>`).join("")}</Row>`).join(""),xml=`<?xml version="1.0" encoding="UTF-8"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="${escapeHtml(title.slice(0,31))}"><Table>${xmlRows}</Table></Worksheet></Workbook>`;triggerBlobDownload(new Blob([xml],{type:"application/vnd.ms-excel;charset=utf-8"}),`${filename}.xls`);return true}if(format==="pdf"){const table=`<h1>${escapeHtml(title)}</h1>${period?`<p>${escapeHtml(period)}</p>`:""}<table><thead><tr>${headers.map(value=>`<th>${escapeHtml(value)}</th>`).join("")}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(value=>`<td>${escapeHtml(value)}</td>`).join("")}</tr>`).join("")}</tbody></table>`,popup=window.open("","_blank","width=1100,height=760");if(!popup){showMessage(translateCopy("Разрешите всплывающее окно для сохранения PDF.","pdfPopupBlocked"),true);return false}popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>body{font:12px Arial,sans-serif;padding:24px;color:#1d2b27}h1{font-size:22px}p{color:#66736b}table{width:100%;border-collapse:collapse}th,td{padding:7px;border:1px solid #dfe6e1;text-align:left;vertical-align:top}th{background:#e8eeea;color:#58675f}tbody tr:nth-child(even){background:#fafbf9}@media print{body{padding:0}}</style></head><body>${table}</body></html>`);popup.document.close();popup.opener=null;popup.focus();popup.print();return true}return false}
+    window.exportTableFile=exportTableFile;
+    function bindRenderedTableExports(root,selector,title,filename,period=""){document.querySelectorAll(`${root} [data-report-export]`).forEach(button=>button.addEventListener("click",()=>{if(!can("exportReports")){denyAction("exportReports");return}const table=document.querySelector(selector);if(!table)return;const headers=[...table.querySelectorAll("thead th")].map(cell=>cell.innerText.trim()),rows=[...table.querySelectorAll("tbody tr")].filter(row=>!row.querySelector(".empty-row,.fixed-assets-empty")).map(row=>[...row.cells].map(cell=>cell.innerText.trim()));if(!rows.length){showMessage(translateCopy("Нет строк для экспорта.","reportExportEmpty"),true);return}exportTableFile({format:button.dataset.reportExport,filename,title,period,headers,rows})}))}
     function zipCrc32(bytes){let crc=0xffffffff;for(const byte of bytes){crc^=byte;for(let bit=0;bit<8;bit++)crc=(crc>>>1)^(crc&1?0xedb88320:0)}return(crc^0xffffffff)>>>0}
     async function createStoredZip(files){const encoder=new TextEncoder(),localParts=[],centralParts=[];let localOffset=0;for(const file of files){const name=encoder.encode(file.name),data=new Uint8Array(await file.blob.arrayBuffer()),crc=zipCrc32(data),localHeader=new Uint8Array(30+name.length),localView=new DataView(localHeader.buffer);localView.setUint32(0,0x04034b50,true);localView.setUint16(4,20,true);localView.setUint16(6,0x0800,true);localView.setUint16(8,0,true);localView.setUint16(12,0x21,true);localView.setUint32(14,crc,true);localView.setUint32(18,data.length,true);localView.setUint32(22,data.length,true);localView.setUint16(26,name.length,true);localHeader.set(name,30);localParts.push(localHeader,data);const centralHeader=new Uint8Array(46+name.length),centralView=new DataView(centralHeader.buffer);centralView.setUint32(0,0x02014b50,true);centralView.setUint16(4,20,true);centralView.setUint16(6,20,true);centralView.setUint16(8,0x0800,true);centralView.setUint16(14,0x21,true);centralView.setUint32(16,crc,true);centralView.setUint32(20,data.length,true);centralView.setUint32(24,data.length,true);centralView.setUint16(28,name.length,true);centralView.setUint32(42,localOffset,true);centralHeader.set(name,46);centralParts.push(centralHeader);localOffset+=localHeader.length+data.length}const centralSize=centralParts.reduce((size,part)=>size+part.length,0),endRecord=new Uint8Array(22),endView=new DataView(endRecord.buffer);endView.setUint32(0,0x06054b50,true);endView.setUint16(8,files.length,true);endView.setUint16(10,files.length,true);endView.setUint32(12,centralSize,true);endView.setUint32(16,localOffset,true);return new Blob([...localParts,...centralParts,endRecord],{type:"application/zip"})}
     function invoicePdfFilename(invoice,suffix=""){const safeNumber=String(invoice.number||"uus").replace(/[^a-z0-9_-]/gi,"-")||"uus";return`Arve-${safeNumber}${suffix}.pdf`}
@@ -1852,8 +1952,10 @@
         STORAGE=Object.fromEntries(Object.entries(STORAGE_BASE).map(([key,value])=>[key,companyStorageKey(value,organizationId)]));STORAGE.permissions=companyStorageKey("accounting-role-permissions-v1",organizationId);
         const storedCloudData=new Map((accountingResult.data||[]).map(row=>[row.data_key,row.data_value])),rawCloudKeys=new Set(["background","logo","color"]),cloudDataDefaults={purchases:[],expenses:[],suppliers:[],supplierInvoices:[],quotes:[],salesOrders:[],articles:[],background:"",logo:"",color:defaultInvoiceTheme.accent,theme:defaultInvoiceTheme,designTokens:{},invoiceNumberStart:1463,paymentTermsDays:14,invoiceLateFee:readStorage(STORAGE.invoiceLateFee,defaultInvoiceLateFee),emailTemplate:{},sellerWebsite:"",permissions:defaultRolePermissions};
         cloudDataDefaults.fixedAssets=readStorage(STORAGE.fixedAssets,[]);
+        cloudDataDefaults.manualJournalEntries=readStorage(STORAGE.manualJournalEntries,[]);
         async function loadAccountingData(dataKey){const storageKey=STORAGE[dataKey],pendingKey=`accounting-cloud-pending-v1:${organizationId}:${dataKey}`;let pending=false;try{pending=localStorage.getItem(pendingKey)==="true"}catch{}let value;if(pending){let localValue=null;try{localValue=storageKey?localStorage.getItem(storageKey):null}catch{}if(localValue===null)value=storedCloudData.get(dataKey)??cloudDataDefaults[dataKey];else if(rawCloudKeys.has(dataKey))value=localValue;else try{value=JSON.parse(localValue)}catch{value=cloudDataDefaults[dataKey]}await saveCloudAccountingData(dataKey,value);if(dataKey!=="fixedAssets"||fixedAssetsCloudSupported)localStorage.removeItem(pendingKey)}else if(storedCloudData.has(dataKey))value=storedCloudData.get(dataKey);else{const legacyKey=dataKey==="fixedAssets"?storageKey:previousStorage[dataKey];let legacyValue=null;try{legacyValue=legacyKey?localStorage.getItem(legacyKey):null}catch{}if(legacyValue===null)value=cloudDataDefaults[dataKey];else if(rawCloudKeys.has(dataKey))value=legacyValue;else try{value=JSON.parse(legacyValue)}catch{value=cloudDataDefaults[dataKey]}await saveCloudAccountingData(dataKey,value)}if(storageKey)localStorage.setItem(storageKey,rawCloudKeys.has(dataKey)?String(value??""):JSON.stringify(value));return value}
         const organizationData={};for(const dataKey of CLOUD_ACCOUNTING_KEYS)organizationData[dataKey]=await loadAccountingData(dataKey);invoiceLateFeeSettings=normalizeInvoiceLateFeeSettings(organizationData.invoiceLateFee);loadInvoiceEmailTemplateSettings();syncSharedInvoiceEmailTemplate();
+        manualJournalEntries=Array.isArray(organizationData.manualJournalEntries)?organizationData.manualJournalEntries:[];
         purchases=Array.isArray(organizationData.purchases)?organizationData.purchases:[];expenses=Array.isArray(organizationData.expenses)?organizationData.expenses:[];suppliers=Array.isArray(organizationData.suppliers)?organizationData.suppliers:[];supplierInvoices=Array.isArray(organizationData.supplierInvoices)?organizationData.supplierInvoices:[];quotes=Array.isArray(organizationData.quotes)?organizationData.quotes:[];salesOrders=Array.isArray(organizationData.salesOrders)?organizationData.salesOrders:[];members=[{email:user.email,role,status:"Активен"}];articleEntries=Array.isArray(organizationData.articles)?organizationData.articles:[];
         const legacySeller={...readStorage(previousStorage.seller,{}),...readStorage(STORAGE.seller,{})};savedSeller={name:organization.name,address:organization.address||legacySeller.address||"",reg:organization.registration_code||legacySeller.reg||"",kmkr:organization.kmkr_number||legacySeller.kmkr||"",phone:organization.phone||legacySeller.phone||"",email:organization.email||legacySeller.email||user.email||"",website:String(organizationData.sellerWebsite||legacySeller.website||""),bank:organization.bank_name||legacySeller.bank||"",swift:organization.bank_swift||legacySeller.swift||"",iban:organization.bank_iban||legacySeller.iban||"",vatRegistered:typeof organization.vat_registered==="boolean"?organization.vat_registered:legacySeller.vatRegistered===true};
         if(sellerWebsiteCloudSupported&&!organizationData.sellerWebsite&&savedSeller.website)queueCloudAccountingData("sellerWebsite",savedSeller.website);
@@ -1893,25 +1995,30 @@
   <script src="supabase/auth.js?v=20261004-2"></script>
   <link rel="stylesheet" href="./supplier-invoice-editor.css?v=20261007-2">
   <link rel="stylesheet" href="./cash-payments-register.css?v=20261007-8">
-  <link rel="stylesheet" href="./payments-menu.css?v=20261007-8">
+  <link rel="stylesheet" href="./payments-menu.css?v=20261007-15">
   <style>.payments-nav-wrap .payments-nav-menu{top:100%}@media(max-width:760px){.app-nav .payments-nav-wrap .payments-nav-menu{top:100%}}</style>
   <script src="./supplier-invoice-editor.js?v=20261007-5"></script>
-  <script src="./payments-menu.js?v=20261007-8"></script>
+  <script src="./payments-menu.js?v=20261007-9"></script>
   <link rel="stylesheet" href="./procurement-menu.css?v=20261007-1">
   <script src="./procurement-menu.js?v=20261007-1"></script>
-  <script src="./settings-menu.js?v=20261006-3"></script>
+  <script src="./settings-menu.js?v=20261007-1"></script>
   <script src="./taxes-menu.js?v=20261006-5"></script>
   <script src="./fixed-assets-menu.js?v=20261007-3"></script>
-  <link rel="stylesheet" href="./fixed-assets-register.css?v=20261007-1">
-  <script src="./fixed-assets-register.js?v=20261007-3"></script>
-  <script src="./ledger-menu.js?v=20261007-1"></script>
+  <link rel="stylesheet" href="./fixed-assets-register.css?v=20261007-15">
+  <script src="./fixed-assets-register.js?v=20261007-7"></script>
+  <script src="./fixed-assets-depreciation.js?v=20261007-9"></script>
+  <script src="./fixed-assets-report.js?v=20261007-2"></script>
+  <script src="./fixed-assets-settings.js?v=20261007-2"></script>
+  <script src="./ledger-menu.js?v=20261007-27"></script>
   <link rel="stylesheet" href="./cash-flow-report.css?v=20261007-1">
   <script src="./cash-flow-report.js?v=20261007-2"></script>
-  <script src="./reports-menu.js?v=20261007-9"></script>
+  <script src="./reports-menu.js?v=20261007-13"></script>
+  <link rel="stylesheet" href="./payroll-register.css?v=20261007-2">
+  <script src="./payroll-register.js?v=20261007-5"></script>
   <link rel="stylesheet" href="./bank-payments-register.css?v=20261007-6">
   <script src="./bank-payments-register.js?v=20261007-3"></script>
   <link rel="stylesheet" href="./expenses-register.css?v=20261007-6">
-  <script src="./expenses-register.js?v=20261007-3"></script>
+  <script src="./expenses-register.js?v=20261007-4"></script>
   <link rel="stylesheet" href="./register-page-totals.css?v=20261006-1">
   <script src="./sales-register-page-totals.js?v=20261006-1"></script>
   <link rel="stylesheet" href="./bank-payment-composer.css?v=20261007-7">
@@ -1922,5 +2029,6 @@
   <script src="./header-workspace.js?v=20261007-7"></script>
   <link rel="stylesheet" href="./annual-report.css?v=20261007-1">
   <script src="./annual-report.js?v=20261007-2"></script>
+  <script src="./report-export-buttons.js?v=20261007-5"></script>
 </body>
 </html>

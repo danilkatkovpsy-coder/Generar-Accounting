@@ -9,8 +9,10 @@
 
   ruTexts.navPayroll = "Зарплата";
   etTexts.navPayroll = "Palk";
+  ruTexts.payrollTitle = "Зарплата";
+  etTexts.payrollTitle = "Töötasud";
   ruTexts.payrollDescription = "Реестр начислений и выплат сотрудникам.";
-  etTexts.payrollDescription = "Töötajate palgaarvestus ja väljamaksed.";
+  etTexts.payrollDescription = "Töötasude register ja koondsummad.";
   ruTexts.payrollEmpty = "Записей о зарплате пока нет.";
   etTexts.payrollEmpty = "Palgakirjeid pole veel lisatud.";
   ruTexts.payrollEmployees = "Сотрудники";
@@ -31,8 +33,8 @@
   payrollHeading.className = "view-heading";
   const payrollHeadingContent = document.createElement("div");
   const payrollTitle = document.createElement("h1");
-  payrollTitle.dataset.i18n = "navPayroll";
-  payrollTitle.textContent = translateCopy("Зарплата", "navPayroll");
+  payrollTitle.dataset.i18n = "payrollTitle";
+  payrollTitle.textContent = translateCopy("Töötasud", "payrollTitle");
   const payrollDescription = document.createElement("p");
   payrollDescription.dataset.i18n = "payrollDescription";
   payrollDescription.textContent = translateCopy("Реестр начислений и выплат сотрудникам.", "payrollDescription");
@@ -72,7 +74,7 @@
   payrollNav.append(payrollMenu);
   const setPayrollOpen = open => { payrollMenu.hidden = !open; payrollNav.classList.toggle("is-open", open); payrollButton.setAttribute("aria-expanded", String(open)); };
   const payrollEntries = [
-    { view: "payrollView", key: "navPayroll", icon: '<path d="M4 5h16v14H4zM8 9h8M8 13h5"></path>' },
+    { view: "payrollView", key: "payrollTitle", icon: '<path d="M4 5h16v14H4zM8 9h8M8 13h5"></path>' },
     { view: "payrollEmployeesView", key: "payrollEmployees", icon: '<circle cx="9" cy="8" r="3"></circle><path d="M3 21v-1a6 6 0 0 1 12 0v1M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 5v1"></path>' }
   ];
   for (const entry of payrollEntries) {
@@ -85,6 +87,7 @@
     item.addEventListener("click", () => {
       if (!can("payments")) { setPayrollOpen(false); denyAction("payments"); return; }
       switchView(entry.view);
+      document.getElementById(entry.view).dispatchEvent(new Event("payroll-open"));
       const mobileToggle = document.getElementById("mobileMenuToggle");
       if (mobileToggle?.getAttribute("aria-expanded") === "true") mobileToggle.click();
       window.scrollTo({ top: 0, behavior: "smooth" });

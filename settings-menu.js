@@ -5,7 +5,8 @@
 
   const menuOrder = ["companyDetailsPanel", "invoiceStylePanel", "invoiceNumberSettingsPanel", "accountPlanPanel", "accountSettingsPanel"];
   const tabs = [...document.querySelectorAll("#settingsView .settings-tab")].filter(tab => !tab.hidden).sort((first, second) => menuOrder.indexOf(first.dataset.settingsTarget) - menuOrder.indexOf(second.dataset.settingsTarget));
-  if (!tabs.length) return;
+  const contactsButton = document.querySelector('.nav-button[data-view="contactsView"]');
+  if (!tabs.length && !contactsButton) return;
 
   const wrapper = document.createElement("div");
   wrapper.className = "payments-nav-wrap settings-nav-wrap";
@@ -33,7 +34,8 @@
     invoiceStylePanel: '<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"></path>',
     invoiceNumberSettingsPanel: '<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7"></path>',
     accountSettingsPanel: '<circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2z"></path>',
-    accountPlanPanel: '<path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"></path>'
+    accountPlanPanel: '<path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"></path>',
+    contactsView: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M5.5 17a3.5 3.5 0 0 1 7 0M15 9h3m-3 4h3m-3 4h3"></path>'
   };
   const iconFor = target => `<svg class="payments-nav-icon" viewBox="0 0 24 24" aria-hidden="true">${iconPaths[target] || iconPaths.accountPlanPanel}</svg>`;
   const entries = tabs.map(tab => {
@@ -56,9 +58,42 @@
     menu.append(item);
     return { tab, item };
   });
-  const syncActive = () => entries.forEach(({ tab, item }) => item.setAttribute("aria-current", String(tab.getAttribute("aria-pressed") === "true")));
+  let contactsMenuItem = null;
+  if (contactsButton) {
+    contactsMenuItem = document.createElement("button");
+    contactsMenuItem.type = "button";
+    contactsMenuItem.className = "payments-nav-menu-item settings-nav-menu-item";
+    contactsMenuItem.dataset.target = "contactsView";
+    contactsMenuItem.setAttribute("role", "menuitem");
+    contactsMenuItem.innerHTML = `${iconFor("contactsView")}<span data-i18n="navContacts">${contactsButton.textContent.trim()}</span>`;
+    contactsMenuItem.addEventListener("click", () => {
+      if (!can("overview")) { closeMenu(); denyAction("overview"); return; }
+      closeMenu();
+      switchView("contactsView");
+      contactsMenuItem.setAttribute("aria-current", "page");
+      const mobileToggle = document.getElementById("mobileMenuToggle");
+      if (mobileToggle?.getAttribute("aria-expanded") === "true") mobileToggle.click();
+    });
+    menu.append(contactsMenuItem);
+    contactsButton.remove();
+  }
+  const syncActive = () => {
+    entries.forEach(({ tab, item }) => item.setAttribute("aria-current", String(tab.getAttribute("aria-pressed") === "true")));
+    if (contactsMenuItem) contactsMenuItem.setAttribute("aria-current", String(!document.getElementById("contactsView")?.hidden));
+  };
   const openMenu = () => { syncActive(); menu.hidden = false; wrapper.classList.add("is-open"); trigger.setAttribute("aria-expanded", "true"); };
   const closeMenu = () => { menu.hidden = true; wrapper.classList.remove("is-open"); trigger.setAttribute("aria-expanded", "false"); };
+  const syncAccess = () => {
+    const settingsAllowed = can("companySettings") || can("manageUsers");
+    const contactsAllowed = can("overview");
+    trigger.hidden = !(settingsAllowed || contactsAllowed);
+    wrapper.hidden = trigger.hidden;
+    if (contactsMenuItem) contactsMenuItem.hidden = !contactsAllowed;
+    if (wrapper.hidden) closeMenu();
+  };
+  const baseApplyRoleAccess = applyRoleAccess;
+  applyRoleAccess = (...args) => { baseApplyRoleAccess(...args); syncAccess(); };
+  syncAccess();
   const hoverCapable = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   trigger.addEventListener("click", event => {

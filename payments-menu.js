@@ -518,6 +518,7 @@
     const pageLabel = document.createElement("span");
     pageLabel.textContent = `${translateCopy("Страница", "salesPageOf")} ${cashCurrentPage} / ${pageCount}`;
     pageNav.append(pageLabel);
+    cashExports.querySelectorAll("[data-cash-export]").forEach(button => { button.disabled = !rows.length || !can("exportInvoices"); });
     document.getElementById("cashPaymentTotal").textContent = `${translateCopy("Всего", "cashPaymentTotal")}: ${rows.length}`;
     document.getElementById("cashPaymentPageSize").value = String(cashPageSize);
     const pageAmount = visible.reduce((sum, record) => sum + (Number(record.item.amount) || 0), 0);

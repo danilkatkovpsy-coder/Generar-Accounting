@@ -1,0 +1,57 @@
+.payroll-register-heading{align-items:flex-start;gap:16px}
+.payroll-register-heading>div:first-child{min-width:0;flex:1}
+.payroll-export-links{gap:12px;margin-top:6px}
+.payroll-export-links button{padding:0;border:0;color:#35634d;background:transparent;font-size:11px;font-weight:600}
+.payroll-export-links button:hover{text-decoration:underline}
+.payroll-register-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.payroll-register-actions>button,.payroll-register-actions .fixed-assets-menu-wrap>button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 11px;border-radius:4px;font-size:12px;white-space:nowrap}
+.payroll-register-actions svg{width:16px;height:16px;flex:0 0 16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#payrollView{width:min(100%,1600px)}
+#payrollView .payroll-register-panel{width:100%;max-width:none;min-width:0;margin-right:0;margin-left:0;padding:14px}
+.payroll-filters{display:grid;grid-template-columns:100px 110px minmax(130px,1fr) minmax(135px,1fr) minmax(135px,.9fr) 10px minmax(135px,.9fr) 34px auto;align-items:end;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e6ebe8}
+.payroll-filters .field{min-width:0;margin:0}
+.payroll-filters .field>span{font-size:10px}
+.payroll-filters select,.payroll-filters input{width:100%;min-width:0;min-height:35px;padding:6px 8px;font-size:12px}
+.payroll-date-separator{align-self:center;padding-bottom:3px;color:#78847d;text-align:center}
+.payroll-filters .primary-button{min-height:35px;padding:7px 12px;font-size:11px}
+.payroll-clear{width:34px;height:34px}
+.payroll-local-note,.payroll-help-text{margin:8px 0;color:#78847d;font-size:11px;line-height:1.5}
+.payroll-help-text{padding:9px 11px;border-left:3px solid #c5a76c;background:#faf8f2;color:#66736b}
+.payroll-help-text[hidden]{display:none}
+.payroll-status{margin:8px 0;color:#35634d;font-size:12px}
+.payroll-status[hidden]{display:none}
+.payroll-status.is-error{color:#a35446}
+.payroll-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}
+.payroll-table th{min-width:0;padding:9px 7px;border-bottom:1px solid #dfe6e1;background:#e8eeea;color:#58675f;font-size:10px;text-align:left;white-space:normal;overflow-wrap:anywhere;vertical-align:bottom}
+.payroll-table th:nth-child(1){width:5%}.payroll-table th:nth-child(2){width:8%}.payroll-table th:nth-child(3){width:6%}.payroll-table th:nth-child(4){width:12%}.payroll-table th:nth-child(5){width:15%}.payroll-table th:nth-child(6){width:12%}.payroll-table th:nth-child(7){width:10%}.payroll-table th:nth-child(8){width:15%}.payroll-table th:nth-child(9){width:17%}
+.payroll-table td{height:42px;min-width:0;padding:9px 7px;border-bottom:1px solid #e6ebe8;color:var(--ink);font-size:11px;overflow-wrap:anywhere}
+.payroll-table tbody tr:nth-child(even){background:#fafbf9}
+.payroll-table tbody tr[data-payroll-period]{cursor:pointer}
+.payroll-table tbody tr[data-payroll-period]:hover{background:#f0f5f1}
+.payroll-table tbody tr[data-payroll-period]:focus-visible{outline:2px solid #718c72;outline-offset:-2px}
+.payroll-table td:nth-child(n+5):nth-child(-n+8){text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.payroll-table tfoot{background:#f0f5f1}
+.payroll-table tfoot th{padding:10px 8px;background:transparent;color:#234337;font-size:11px;text-align:right}
+.payroll-table tfoot th:first-child{text-align:left}
+.payroll-entry-dialog{width:min(1740px,calc(100vw - 24px))}
+.payroll-entry-period{margin:0 0 14px;padding:12px;background:#f0f1ee;color:var(--ink);font-size:13px;font-weight:600}
+.payroll-entry-table-wrap{max-width:100%;overflow:auto}
+.payroll-entry-table{width:100%;min-width:2200px;border-collapse:collapse;table-layout:fixed}
+.payroll-entry-table th{padding:8px 6px;border:1px solid #dfe6e1;background:#e8eeea;color:#58675f;font-size:10px;text-align:left;vertical-align:middle}
+.payroll-entry-table td{padding:5px;border:1px solid #e3e8e4;background:#fff;vertical-align:middle}
+.payroll-entry-table tbody tr:nth-child(even) td{background:#fafbf9}
+.payroll-entry-table th:nth-child(1){width:180px}.payroll-entry-table th:nth-child(2){width:120px}.payroll-entry-table th:nth-child(3){width:190px}
+.payroll-entry-table th:nth-child(4),.payroll-entry-table th:nth-child(5){width:70px}
+.payroll-entry-table th:nth-child(6),.payroll-entry-table th:nth-child(7),.payroll-entry-table th:nth-child(8),.payroll-entry-table th:nth-child(9),.payroll-entry-table th:nth-child(10),.payroll-entry-table th:nth-child(11),.payroll-entry-table th:nth-child(12),.payroll-entry-table th:nth-child(13){width:110px}
+.payroll-entry-table th:nth-child(14),.payroll-entry-table th:nth-child(15){width:125px}.payroll-entry-table th:nth-child(16){width:130px}.payroll-entry-table th:last-child{width:38px}
+.payroll-entry-table input,.payroll-entry-table select{display:block;width:100%;min-width:0;min-height:34px;padding:5px 6px;border:1px solid #dfe6e1;border-radius:3px;background:#fff;font:inherit;font-size:11px}
+.payroll-entry-table input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+.payroll-entry-table tfoot th{padding:9px 6px;background:#f0f5f1;color:#234337;font-size:11px;text-align:right;white-space:nowrap}
+.payroll-entry-tools{display:grid;grid-template-columns:auto minmax(180px,.5fr) minmax(240px,1fr);align-items:end;gap:12px;margin-top:12px}
+.payroll-entry-tools .secondary-button{min-height:34px;padding:6px 10px;font-size:11px}
+.payroll-entry-tools label{display:grid;gap:5px;min-width:0;margin:0;color:#66736b;font-size:11px}
+.payroll-entry-tools input,.payroll-entry-tools textarea{width:100%;min-width:0;min-height:34px;padding:6px 8px;border:1px solid #dfe6e1;border-radius:4px;background:#fff;font:inherit;font-size:12px}
+.payroll-entry-tools textarea{resize:vertical}
+.payroll-line-remove{width:30px;height:30px}
+@media(max-width:1180px){.payroll-filters{grid-template-columns:repeat(4,minmax(0,1fr))}.payroll-date-separator{display:none}}
+@media(max-width:760px){#payrollView .payroll-register-panel{padding:10px}.payroll-register-heading{flex-direction:column;align-items:stretch}.payroll-register-actions{justify-content:flex-start}.payroll-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.payroll-entry-tools{grid-template-columns:minmax(0,1fr)}.payroll-table th{padding:6px 3px;font-size:8px}.payroll-table td{padding:6px 3px;font-size:9px}}
