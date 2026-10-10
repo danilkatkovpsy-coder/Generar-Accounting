@@ -34,7 +34,7 @@
     supplierInvoiceFilesLabel: "Перетащите файлы сюда или выберите на компьютере",
     supplierInvoiceAdditionalInfo: "Дополнительная информация",
     supplierInvoiceSaveDraft: "Сохранить черновик",
-    supplierInvoicePrint: "Печать / PDF",
+    supplierInvoicePrint: "Скачать PDF",
     supplierInvoiceCopy: "Копировать",
     supplierInvoicePaymentMethod: "Способ оплаты",
     supplierInvoiceDraftSaved: "Черновик счета сохранен.",
@@ -74,7 +74,7 @@
     supplierInvoiceFilesLabel: "Lohista failid siia või vali arvutist",
     supplierInvoiceAdditionalInfo: "Lisainfo",
     supplierInvoiceSaveDraft: "Salvesta mustand",
-    supplierInvoicePrint: "Prindi / PDF",
+    supplierInvoicePrint: "Laadi PDF alla",
     supplierInvoiceCopy: "Kopeeri",
     supplierInvoicePaymentMethod: "Makseviis",
     supplierInvoiceDraftSaved: "Arve mustand salvestati.",
@@ -545,7 +545,7 @@
     supplierPostingFiles: "Файлы", supplierPostingNote: "Примечание", supplierPostingEdit: "Изменить",
     supplierPostingClose: "Закрыть", supplierPostingNoFiles: "Файлы не прикреплены.",
     supplierPostingEmpty: "Проводка отсутствует.", supplierPostingFileError: "Не удалось скачать файл.",
-    supplierPostingPrint: "Печать / PDF"
+    supplierPostingPrint: "Скачать PDF"
   });
   Object.assign(etTexts, {
     supplierPostingTitle: "Kanne", supplierPostingDocument: "Alusdokument", supplierPostingCurrency: "Valuuta",
@@ -554,7 +554,7 @@
     supplierPostingFiles: "Failid", supplierPostingNote: "Siseinfo", supplierPostingEdit: "Muuda",
     supplierPostingClose: "Sulge", supplierPostingNoFiles: "Faile pole lisatud.",
     supplierPostingEmpty: "Kanne puudub.", supplierPostingFileError: "Faili ei saanud alla laadida.",
-    supplierPostingPrint: "Prindi / PDF"
+    supplierPostingPrint: "Laadi PDF alla"
   });
   const postingCopy = key => translateCopy(key, key);
   const postingIcon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${{
@@ -637,14 +637,53 @@
     const bounds = postingDialog.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) postingDialog.close();
   });
-  byId("supplierPostingPdf").addEventListener("click", () => {
+  byId("supplierPostingPdf").addEventListener("click", async () => {
     if (!can("exportReports")) return;
-    document.body.classList.add("supplier-posting-printing");
-    const cleanup = () => document.body.classList.remove("supplier-posting-printing");
-    window.addEventListener("afterprint", cleanup, { once: true });
-    try { window.print(); } catch { cleanup(); }
+    const headers = [...postingDialog.querySelectorAll(".supplier-posting-table thead th")].map(cell => cell.textContent.trim());
+    const rows = [...byId("supplierPostingRows").querySelectorAll("tr")]
+      .filter(row => !row.querySelector(".supplier-posting-empty"))
+      .map(row => [...row.cells].map(cell => cell.textContent.trim()));
+    rows.push([postingCopy("supplierPostingTotal"), byId("supplierPostingDebitTotal").textContent, byId("supplierPostingCreditTotal").textContent, "", ""]);
+    const documentNumber = byId("supplierPostingDocument").textContent.trim();
+    const safeDocumentNumber = documentNumber.replace(/[^a-z0-9_-]/gi, "-") || localDate();
+    await window.downloadTablePdf({
+      filename: `supplier-posting-${safeDocumentNumber}.pdf`,
+      title: postingCopy("supplierPostingTitle"),
+      period: [byId("supplierPostingDate").textContent, documentNumber, byId("supplierPostingCurrency").textContent].filter(Boolean).join(" · "),
+      headers,
+      rows
+    });
   });
-  postingDialog.addEventListener("close", () => document.body.classList.remove("supplier-posting-printing"));
+  const downloadSupplierInvoicePdf = async () => {
+    if (!can("exportReports")) { denyAction("exportReports"); return; }
+    const saved = supplierInvoices.find(invoice => invoice.id === editingSupplierInvoiceId);
+    const invoice = { ...saved, ...collectDraft() };
+    const isEstonian = language === "et";
+    const headers = isEstonian
+      ? ["Kirjeldus", "Kogus", "Ühik", "Hind, EUR", "Allahindlus, %", "KM, %", "Summa, EUR"]
+      : ["Описание", "Количество", "Ед.", "Цена, EUR", "Скидка, %", "НДС, %", "Сумма, EUR"];
+    const rows = (invoice.items || []).map(item => {
+      if (item.isTextLine) return [item.description || "", "", "", "", "", "", ""];
+      const net = number(item.quantity) * number(item.price) * (1 - Math.min(100, Math.max(0, number(item.discountPercent))) / 100);
+      const total = net * (1 + number(item.taxRate) / 100);
+      return [item.description || "", item.quantity, item.unit || "", euro(item.price), `${item.discountPercent || 0}%`, `${item.taxRate || 0}%`, euro(total)];
+    });
+    const totalLabel = isEstonian ? "Kokku" : "Итого";
+    rows.push(["", "", "", "", "", isEstonian ? "Summa km-ta" : "Сумма без НДС", euro(invoice.subtotal)]);
+    rows.push(["", "", "", "", "", isEstonian ? "Käibemaks" : "НДС", euro(invoice.taxTotal)]);
+    if (number(invoice.rounding)) rows.push(["", "", "", "", "", isEstonian ? "Ümardus" : "Округление", euro(invoice.rounding)]);
+    rows.push(["", "", "", "", "", totalLabel, euro(invoice.amount)]);
+    rows.push(["", "", "", "", "", isEstonian ? "Maksmata" : "К оплате", euro(invoice.amountDue)]);
+    const numberPart = String(invoice.invoiceNumber || "draft").replace(/[^a-z0-9_-]/gi, "-");
+    const title = `${isEstonian ? "Hankija arve" : "Счёт поставщика"} ${invoice.invoiceNumber || ""}`.trim();
+    await window.downloadTablePdf({
+      filename: `${isEstonian ? "hankija-arve" : "supplier-invoice"}-${numberPart}.pdf`,
+      title,
+      period: [invoice.supplierName, invoice.date, invoice.dueDate].filter(Boolean).join(" · "),
+      headers,
+      rows
+    });
+  };
   const addToolbar = () => {
     const editor = byId("supplierInvoiceEditorView");
     const toolbar = editor?.querySelector(".invoice-editor-actions");
@@ -664,11 +703,7 @@
     };
     const draft = makeButton("supplierInvoiceSaveDraft", "supplierInvoiceSaveDraft", "Salvesta mustand", saveDraft);
     draft.classList.add("supplier-invoice-draft");
-    const print = makeButton("supplierInvoicePrint", "supplierInvoicePrint", "Prindi / PDF", () => {
-      document.body.classList.add("supplier-invoice-printing");
-      window.print();
-      setTimeout(() => document.body.classList.remove("supplier-invoice-printing"), 500);
-    });
+    const downloadPdf = makeButton("supplierInvoicePrint", "supplierInvoicePrint", "Laadi PDF alla", () => { void downloadSupplierInvoicePdf(); });
     const copy = makeButton("supplierInvoiceCopy", "supplierInvoiceCopy", "Kopeeri", () => {
       const draftData = collectDraft();
       resetSupplierInvoiceForm();
@@ -682,7 +717,7 @@
     draftGroup.className = "supplier-invoice-draft-group";
     draftGroup.append(draft, posting);
     toolbar.insertBefore(draftGroup, save);
-    toolbar.insertBefore(print, save);
+    toolbar.insertBefore(downloadPdf, save);
     toolbar.insertBefore(copy, save);
     const remove = byId("deleteSupplierInvoiceButton");
     if (remove) {

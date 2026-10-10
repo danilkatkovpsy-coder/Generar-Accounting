@@ -150,11 +150,7 @@
       const sheet = [headers, ...values].map(row => `<Row>${row.map(value => `<Cell><Data ss:Type="String">${escapeHtml(value)}</Data></Cell>`).join("")}</Row>`).join("");
       triggerBlobDownload(new Blob([`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Tootasud"><Table>${sheet}</Table></Worksheet></Workbook>`], { type: "application/vnd.ms-excel;charset=utf-8" }), `tootasud-${localDate()}.xls`);
     } else {
-      const table = `<h1>${escapeHtml(copy("payrollTitle"))}</h1><table><thead><tr>${headers.map(value => `<th>${escapeHtml(value)}</th>`).join("")}</tr></thead><tbody>${values.map(row => `<tr>${row.map(value => `<td>${escapeHtml(value)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-      const popup = window.open("", "_blank", "width=1100,height=760");
-      if (!popup) return;
-      popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><style>body{font:12px Arial;padding:24px}table{width:100%;border-collapse:collapse}th,td{padding:7px;border:1px solid #ddd;text-align:left}th{background:#e8eeea}</style></head><body>${table}</body></html>`);
-      popup.document.close(); popup.opener = null; popup.focus(); popup.print();
+      void window.downloadTablePdf({ filename: `tootasud-${localDate()}.pdf`, title: copy("payrollTitle"), headers, rows: values });
     }
   };
   const updateDetailTotals = () => {

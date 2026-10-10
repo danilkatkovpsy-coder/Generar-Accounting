@@ -15,7 +15,7 @@
     assetHelpText: "Остаток рассчитывается из стоимости за вычетом износа на начало и сохранённых начислений амортизации.",
     assetLocalSaved: "Сохранено на этом устройстве. Облачная синхронизация основных средств пока недоступна.",
     assetLocalMode: "Основные средства сохраняются на этом устройстве. Облачная синхронизация пока недоступна.",
-    assetPdf: "Печать / PDF", assetSettingsAction: "Настройки основных средств", assetFirst: "Первая страница",
+    assetPdf: "Скачать PDF", assetSettingsAction: "Настройки основных средств", assetFirst: "Первая страница",
     assetPrevious: "Предыдущая страница", assetNext: "Следующая страница", assetLast: "Последняя страница"
   });
   Object.assign(etTexts, {
@@ -32,7 +32,7 @@
     assetHelpText: "Jääk arvutatakse soetusmaksumusest, lahutades algkulum ja salvestatud amortisatsioonikanded.",
     assetLocalSaved: "Salvestatud selles seadmes. Põhivara pilvesünkroonimine ei ole veel saadaval.",
     assetLocalMode: "Põhivara salvestatakse selles seadmes. Pilvesünkroonimine ei ole veel saadaval.",
-    assetPdf: "Prindi / PDF", assetSettingsAction: "Põhivara seaded", assetFirst: "Esimene lehekülg",
+    assetPdf: "Laadi PDF alla", assetSettingsAction: "Põhivara seaded", assetFirst: "Esimene lehekülg",
     assetPrevious: "Eelmine lehekülg", assetNext: "Järgmine lehekülg", assetLast: "Viimane lehekülg"
   });
   const copy = key => translateCopy(key, key);
@@ -310,8 +310,6 @@
   get("fixedAssetShowInactive").addEventListener("change", () => { page = 1; render(); });
   view.querySelectorAll('.fixed-assets-filterbar input[type="search"]').forEach(input => input.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); page = 1; render(); } }));
   get("fixedAssetsPageSize").addEventListener("change", event => { pageSize = Number(event.target.value); page = 1; render(); });
-  const printRoot = document.createElement("div"); printRoot.id = "fixedAssetsPrint"; printRoot.hidden = true; document.body.append(printRoot);
-  const stopPrinting = () => { document.body.classList.remove("fixed-assets-printing"); printRoot.hidden = true; printRoot.replaceChildren(); };
   view.querySelectorAll("[data-asset-export]").forEach(button => button.addEventListener("click", () => {
     if (!can("exportReports")) { denyAction("exportReports"); return; }
     readAssets(); const rows = filtered(); if (!rows.length) return;
@@ -319,9 +317,8 @@
     const format = button.dataset.assetExport;
     const data = [columns.map(([, label]) => copy(label)), ...rows.map(asset => columns.map(([key]) => asset[key] ?? ""))];
     if (format === "pdf") {
-      printRoot.innerHTML = `<h1>${escapeHtml(copy("fixedAssetsList"))}</h1><p>${escapeHtml(currentSeller()?.name || "")} · EUR · ${escapeHtml(formatDate(localDate()))}</p><table><thead><tr>${data[0].map(value => `<th>${escapeHtml(value)}</th>`).join("")}</tr></thead><tbody>${rows.map(asset => `<tr>${columns.map(([key]) => `<td>${escapeHtml(displayValue(asset, key))}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-      printRoot.hidden = false; document.body.classList.add("fixed-assets-printing"); window.addEventListener("afterprint", stopPrinting, { once: true });
-      try { window.print(); } catch { stopPrinting(); }
+      const values = rows.map(asset => columns.map(([key]) => displayValue(asset, key)));
+      void window.downloadTablePdf({ filename: `pohivarad-${localDate()}.pdf`, title: copy("fixedAssetsList"), period: `EUR · ${formatDate(localDate())}`, headers: data[0], rows: values });
       return;
     }
     const cell = value => { let text = String(value); if (/^[\s]*[=+@-]/.test(text)) text = `'${text}`; return `"${text.replaceAll('"', '""')}"`; };

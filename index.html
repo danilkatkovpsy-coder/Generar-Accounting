@@ -596,7 +596,8 @@
     .account-plan-table{width:100%;min-width:940px;border-collapse:collapse;font-size:12px}
     .account-plan-table th{padding:11px 9px;border-bottom:1px solid #e6ebe8;color:#74817c;background:#f6f8f7;font-size:11px;font-weight:600;text-align:left;white-space:nowrap}
     .account-plan-table td{padding:10px 9px;border-bottom:1px solid #e6ebe8}
-    .account-plan-table tbody tr:nth-child(even){background:#fafbf9}.account-plan-table tbody tr:hover{background:#f6f8f7}
+    .account-plan-line-display{width:100%;min-height:0;margin:0;padding:0!important;appearance:none;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;color:inherit;font:inherit;line-height:inherit;pointer-events:none}
+    .account-plan-table tbody tr:nth-child(even){background:#fafbf9}.account-plan-table tbody tr[data-account-code]{cursor:pointer}.account-plan-table tbody tr:hover{background:#f6f8f7}
     .account-plan-sort{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;color:inherit;background:none;font:inherit;text-align:left}
     .account-plan-sort-mark{color:#7a898d;font-size:11px}
     .account-plan-empty{text-align:center;color:var(--muted);height:58px}
@@ -1647,7 +1648,7 @@
     }
     function triggerBlobDownload(blob,filename){const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=filename;link.hidden=true;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
     function exportTableFile({format,filename,title,period="",headers,rows}){if(format==="csv"){const cell=value=>{let text=String(value??"");if(/^[\s]*[=+@-]/.test(text))text=`'${text}`;return`"${text.replaceAll('"','""')}"`},csv=[headers,...rows].map(row=>row.map(cell).join(";")).join("\r\n");triggerBlobDownload(new Blob(["\ufeff",csv],{type:"text/csv;charset=utf-8"}),`${filename}.csv`);return true}if(format==="xls"){const xmlRows=[headers,...rows].map(row=>`<Row>${row.map(value=>`<Cell><Data ss:Type="String">${escapeHtml(value)}</Data></Cell>`).join("")}</Row>`).join(""),xml=`<?xml version="1.0" encoding="UTF-8"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="${escapeHtml(title.slice(0,31))}"><Table>${xmlRows}</Table></Worksheet></Workbook>`;triggerBlobDownload(new Blob([xml],{type:"application/vnd.ms-excel;charset=utf-8"}),`${filename}.xls`);return true}if(format==="pdf"){const table=`<h1>${escapeHtml(title)}</h1>${period?`<p>${escapeHtml(period)}</p>`:""}<table><thead><tr>${headers.map(value=>`<th>${escapeHtml(value)}</th>`).join("")}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(value=>`<td>${escapeHtml(value)}</td>`).join("")}</tr>`).join("")}</tbody></table>`,popup=window.open("","_blank","width=1100,height=760");if(!popup){showMessage(translateCopy("Разрешите всплывающее окно для сохранения PDF.","pdfPopupBlocked"),true);return false}popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>body{font:12px Arial,sans-serif;padding:24px;color:#1d2b27}h1{font-size:22px}p{color:#66736b}table{width:100%;border-collapse:collapse}th,td{padding:7px;border:1px solid #dfe6e1;text-align:left;vertical-align:top}th{background:#e8eeea;color:#58675f}tbody tr:nth-child(even){background:#fafbf9}@media print{body{padding:0}}</style></head><body>${table}</body></html>`);popup.document.close();popup.opener=null;popup.focus();popup.print();return true}return false}
-    window.exportTableFile=exportTableFile;
+    const printBasedExportTableFile=exportTableFile;exportTableFile=options=>{if(options.format!=="pdf")return printBasedExportTableFile(options);if(typeof window.downloadTablePdf!=="function"){showMessage(translateCopy("Не удалось создать PDF-файл.","pdfExportFailed"),true);return false}void window.downloadTablePdf({...options,filename:`${options.filename}.pdf`}).catch(error=>{console.error(error);showMessage(translateCopy("Не удалось создать PDF-файл.","pdfExportFailed"),true)});return true};window.exportTableFile=exportTableFile;
     function bindRenderedTableExports(root,selector,title,filename,period=""){document.querySelectorAll(`${root} [data-report-export]`).forEach(button=>button.addEventListener("click",()=>{if(!can("exportReports")){denyAction("exportReports");return}const table=document.querySelector(selector);if(!table)return;const headers=[...table.querySelectorAll("thead th")].map(cell=>cell.innerText.trim()),rows=[...table.querySelectorAll("tbody tr")].filter(row=>!row.querySelector(".empty-row,.fixed-assets-empty")).map(row=>[...row.cells].map(cell=>cell.innerText.trim()));if(!rows.length){showMessage(translateCopy("Нет строк для экспорта.","reportExportEmpty"),true);return}exportTableFile({format:button.dataset.reportExport,filename,title,period,headers,rows})}))}
     function zipCrc32(bytes){let crc=0xffffffff;for(const byte of bytes){crc^=byte;for(let bit=0;bit<8;bit++)crc=(crc>>>1)^(crc&1?0xedb88320:0)}return(crc^0xffffffff)>>>0}
     async function createStoredZip(files){const encoder=new TextEncoder(),localParts=[],centralParts=[];let localOffset=0;for(const file of files){const name=encoder.encode(file.name),data=new Uint8Array(await file.blob.arrayBuffer()),crc=zipCrc32(data),localHeader=new Uint8Array(30+name.length),localView=new DataView(localHeader.buffer);localView.setUint32(0,0x04034b50,true);localView.setUint16(4,20,true);localView.setUint16(6,0x0800,true);localView.setUint16(8,0,true);localView.setUint16(12,0x21,true);localView.setUint32(14,crc,true);localView.setUint32(18,data.length,true);localView.setUint32(22,data.length,true);localView.setUint16(26,name.length,true);localHeader.set(name,30);localParts.push(localHeader,data);const centralHeader=new Uint8Array(46+name.length),centralView=new DataView(centralHeader.buffer);centralView.setUint32(0,0x02014b50,true);centralView.setUint16(4,20,true);centralView.setUint16(6,20,true);centralView.setUint16(8,0x0800,true);centralView.setUint16(14,0x21,true);centralView.setUint32(16,crc,true);centralView.setUint32(20,data.length,true);centralView.setUint32(24,data.length,true);centralView.setUint16(28,name.length,true);centralView.setUint32(42,localOffset,true);centralHeader.set(name,46);centralParts.push(centralHeader);localOffset+=localHeader.length+data.length}const centralSize=centralParts.reduce((size,part)=>size+part.length,0),endRecord=new Uint8Array(22),endView=new DataView(endRecord.buffer);endView.setUint32(0,0x06054b50,true);endView.setUint16(8,files.length,true);endView.setUint16(10,files.length,true);endView.setUint32(12,centralSize,true);endView.setUint32(16,localOffset,true);return new Blob([...localParts,...centralParts,endRecord],{type:"application/zip"})}
@@ -2079,6 +2080,157 @@
     applyRoleAccess();applyLanguage(language);
   </script>
   <script>
+    (() => {
+      Object.assign(ruTexts, {
+        accountingResetTitle: "Массовое удаление счетов и проводок",
+        accountingResetDescription: "Удалить бухгалтерские записи активной фирмы для повторного тестирования отчётов.",
+        accountingResetButton: "Удалить все счета и проводки",
+        accountingResetConfirmTitle: "Удалить все счета и проводки фирмы «{company}»?",
+        accountingResetWarning: "Будут безвозвратно удалены все счета продаж и поставщиков, связанные с ними позиции и оплаты, закупки, платежи, расходы, ручные проводки, начальные остатки и начисления амортизации.",
+        accountingResetKeep: "Фирма и её реквизиты, клиенты, поставщики, план счетов, карточки основных средств, шаблоны, коммерческие предложения и заказы сохранятся.",
+        accountingResetCancel: "Отмена",
+        accountingResetConfirm: "Удалить все счета и проводки",
+        accountingResetError: "Не удалось завершить очистку. Проверьте соединение и права доступа."
+      });
+      Object.assign(etTexts, {
+        accountingResetTitle: "Arvete ja kannete hulgi kustutamine",
+        accountingResetDescription: "Kustuta aktiivse ettevõtte raamatupidamiskirjed aruannete uuesti testimiseks.",
+        accountingResetButton: "Kustuta kõik arved ja kanded",
+        accountingResetConfirmTitle: "Kas kustutada ettevõtte „{company}” kõik arved ja kanded?",
+        accountingResetWarning: "Jäädavalt kustutatakse kõik müügi- ja hankijate arved, nende read ja maksed, ostud, muud maksed, kulud, käsitsi lisatud kanded, algsaldod ja amortisatsioonikanded.",
+        accountingResetKeep: "Ettevõte ja selle andmed, kliendid, hankijad, kontoplaan, põhivara kaardid, mallid, hinnapakkumised ja tellimused säilivad.",
+        accountingResetCancel: "Tühista",
+        accountingResetConfirm: "Kustuta kõik arved ja kanded",
+        accountingResetError: "Andmeid ei saanud tühjendada. Kontrolli ühendust ja õigusi."
+      });
+
+      const panel = document.querySelector(".company-management-panel");
+      if (!panel) return;
+
+      const controls = document.createElement("section");
+      controls.className = "company-management-accounting-reset";
+      controls.innerHTML = `<div><h3 data-i18n="accountingResetTitle">${ruTexts.accountingResetTitle}</h3><p data-i18n="accountingResetDescription">${ruTexts.accountingResetDescription}</p></div><button type="button" class="secondary-button company-management-reset-button" id="accountingResetOpen" data-i18n="accountingResetButton">${ruTexts.accountingResetButton}</button>`;
+      panel.append(controls);
+
+      const dialog = document.createElement("dialog");
+      dialog.className = "company-dialog accounting-reset-dialog";
+      dialog.innerHTML = `<form id="accountingResetForm"><h2 id="accountingResetConfirmTitle" data-i18n="accountingResetConfirmTitle">${ruTexts.accountingResetConfirmTitle}</h2><p class="accounting-reset-warning" data-i18n="accountingResetWarning">${ruTexts.accountingResetWarning}</p><p class="accounting-reset-keep" data-i18n="accountingResetKeep">${ruTexts.accountingResetKeep}</p><p class="company-delete-status" id="accountingResetStatus" role="alert" hidden></p><div class="company-dialog-actions"><button type="button" class="secondary-button" id="accountingResetCancel" data-i18n="accountingResetCancel">${ruTexts.accountingResetCancel}</button><button type="submit" class="secondary-button company-management-delete" id="accountingResetConfirm" data-i18n="accountingResetConfirm">${ruTexts.accountingResetConfirm}</button></div></form>`;
+      document.body.append(dialog);
+
+      const styles = document.createElement("style");
+      styles.textContent = ".company-management-accounting-reset{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:14px;padding:14px 2px 2px;border-top:1px solid var(--line)}.company-management-accounting-reset h3{margin:0 0 4px;color:var(--ink);font-size:13px}.company-management-accounting-reset p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.company-management-reset-button,.accounting-reset-dialog .company-management-delete{border-color:#e3cbc5;color:#984c40;background:#fff9f7}.accounting-reset-dialog{width:min(580px,calc(100vw - 28px))}.accounting-reset-dialog form{display:grid;gap:14px}.accounting-reset-dialog h2{margin:0}.accounting-reset-warning{margin:0;padding:12px;border-left:3px solid #a35446;background:#fbf3f1;color:var(--ink);font-size:13px;line-height:1.5}.accounting-reset-keep{margin:0;color:var(--muted);font-size:12px;line-height:1.5}.accounting-reset-dialog .company-dialog-actions{display:flex;justify-content:flex-end;gap:8px}";
+      document.head.append(styles);
+
+      const isAllowed = () => Boolean(cloudWorkspace && ["owner", "administrator"].includes(companyManagementRole));
+      let resetInProgress = false;
+      const baseRefreshCompanyManagement = refreshCompanyManagement;
+      refreshCompanyManagement = () => {
+        baseRefreshCompanyManagement();
+        controls.hidden = !isAllowed();
+      };
+      refreshCompanyManagement();
+
+      document.getElementById("accountingResetOpen").addEventListener("click", () => {
+        if (!isAllowed()) return;
+        const company = companies.find(item => item.id === cloudWorkspace.organizationId);
+        document.getElementById("accountingResetConfirmTitle").textContent = translateCopy("Удалить все счета и проводки фирмы «{company}»?", "accountingResetConfirmTitle").replace("{company}", company?.name || "");
+        document.getElementById("accountingResetStatus").hidden = true;
+        dialog.showModal();
+      });
+      dialog.addEventListener("cancel", event => { if (resetInProgress) event.preventDefault(); });
+      document.getElementById("accountingResetCancel").addEventListener("click", () => { if (!resetInProgress) dialog.close(); });
+      document.getElementById("accountingResetForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (!isAllowed()) return;
+        const confirmButton = document.getElementById("accountingResetConfirm");
+        const cancelButton = document.getElementById("accountingResetCancel");
+        const status = document.getElementById("accountingResetStatus");
+        resetInProgress = true;
+        confirmButton.disabled = true;
+        cancelButton.disabled = true;
+        status.hidden = true;
+
+        const companyId = cloudWorkspace.organizationId;
+        const optionalKeys = new Set(["manualJournalEntries", "ledgerOpeningBalances"]);
+        const entries = [
+          ["purchases", []],
+          ["expenses", []],
+          ["supplierInvoices", []],
+          ["fixedAssets", (() => { const assets = readStorage(STORAGE.fixedAssets, []); return Array.isArray(assets) ? assets.map(asset => ({ ...asset, depreciationEntries: [] })) : []; })()],
+          ["manualJournalEntries", []],
+          ["ledgerOpeningBalances", {}]
+        ];
+        const localChanges = [
+          [STORAGE.invoices, []],
+          ...entries.map(([key, value]) => [STORAGE[key], value])
+        ];
+        const localBackup = localChanges.map(([key]) => [key, localStorage.getItem(key)]);
+        let cloudBackup = new Map();
+        let cloudKeysWritten = [];
+
+        const restoreLocal = () => {
+          for (const [key, value] of localBackup) {
+            try {
+              if (value === null) localStorage.removeItem(key);
+              else localStorage.setItem(key, value);
+            } catch {}
+          }
+        };
+        const restoreCloud = async () => {
+          for (const key of cloudKeysWritten.reverse()) {
+            try {
+              const previous = cloudBackup.get(key);
+              if (previous) {
+                await cloudWorkspace.supabase.from("organization_accounting_data").upsert({ ...previous, updated_by: cloudWorkspace.userId, updated_at: new Date().toISOString() }, { onConflict: "organization_id,data_key" });
+              } else {
+                await cloudWorkspace.supabase.from("organization_accounting_data").delete().eq("organization_id", companyId).eq("data_key", key);
+              }
+            } catch {}
+          }
+        };
+
+        try {
+          await Promise.all([...cloudDataWrites.values()]);
+          const cloudKeys = entries.map(([key]) => key);
+          const { data: previousRows, error: readError } = await cloudWorkspace.supabase.from("organization_accounting_data").select("organization_id,data_key,data_value,updated_by,updated_at").eq("organization_id", companyId).in("data_key", cloudKeys);
+          if (readError) throw readError;
+          cloudBackup = new Map((previousRows || []).map(row => [row.data_key, row]));
+
+          for (const [key, value] of entries) {
+            if (optionalKeys.has(key) && unsupportedLedgerCloudKeys.has(key)) continue;
+            if (key === "fixedAssets" && !fixedAssetsCloudSupported) continue;
+            const { error } = await cloudWorkspace.supabase.from("organization_accounting_data").upsert({ organization_id: companyId, data_key: key, data_value: value, updated_by: cloudWorkspace.userId, updated_at: new Date().toISOString() }, { onConflict: "organization_id,data_key" });
+            if (error) throw error;
+            cloudKeysWritten.push(key);
+          }
+
+          for (const [key, value] of localChanges) localStorage.setItem(key, JSON.stringify(value));
+          const { error: invoiceError } = await cloudWorkspace.supabase.from("invoices").delete().eq("organization_id", companyId);
+          if (invoiceError) throw invoiceError;
+
+          for (const [key] of entries) try { localStorage.removeItem(`accounting-cloud-pending-v1:${companyId}:${key}`); } catch {}
+          const invoiceMetadataPrefix = `accounting-invoice-editor-v1:${companyId}:`;
+          for (let index = localStorage.length - 1; index >= 0; index--) {
+            const key = localStorage.key(index);
+            if (key?.startsWith(invoiceMetadataPrefix)) try { localStorage.removeItem(key); } catch {}
+          }
+          dialog.close();
+          location.reload();
+        } catch (error) {
+          console.error(error);
+          restoreLocal();
+          await restoreCloud();
+          status.textContent = translateCopy("Не удалось очистить бухгалтерию фирмы.", "accountingResetError");
+          status.hidden = false;
+          confirmButton.disabled = false;
+          cancelButton.disabled = false;
+          resetInProgress = false;
+        }
+      });
+      applyLanguage(language);
+    })();
+  </script>
+  <script>
     (()=>{const listView=document.getElementById("purchasesView"),form=document.getElementById("purchaseForm"),openButton=document.getElementById("openPurchaseFormButton"),formGrid=form?.querySelector(".form-grid"),title=form?.querySelector(":scope > h2"),submitButton=formGrid?.querySelector('button[type="submit"]');if(!listView||!form||!openButton||!title||!submitButton||document.getElementById("purchaseEditorView"))return;const editorView=document.createElement("section"),editorHeading=document.createElement("div"),actions=document.createElement("div"),backButton=document.createElement("button"),language=document.documentElement.lang==="et"?"et":"ru";editorView.id="purchaseEditorView";editorView.className="app-view";editorView.hidden=true;editorHeading.className="view-heading purchase-editor-heading";actions.className="inline-actions invoice-editor-actions";backButton.type="button";backButton.className="secondary-button";backButton.innerHTML=`<svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7 7-7-7 7-7"></path></svg><span data-i18n="backToPayments">${language==="et"?"Tagasi maksete juurde":"Назад к платежам"}</span>`;backButton.addEventListener("click",()=>window.setPurchaseFormOpen(false,true));submitButton.removeAttribute("data-i18n");submitButton.setAttribute("form",form.id);submitButton.innerHTML=`<svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l4 4v14H4z"></path><path d="M8 3v6h9V3M8 21v-7h9v7"></path></svg><span data-i18n="savePaymentButton">${language==="et"?"Salvesta makse":"Сохранить платеж"}</span>`;editorHeading.append(title,actions);actions.append(submitButton,backButton);editorView.append(editorHeading,form);listView.after(editorView);form.hidden=false;form.dataset.formSetup="true";form.dataset.open="false";openButton.hidden=document.querySelector('.nav-button[data-view="purchasesView"]')?.hidden||false;document.querySelector("main").insertBefore(editorView,document.getElementById("otherExpensesView"));applyLanguage(language)})();
   </script>
   <script src="supabase/auth.js?v=20261004-2"></script>
@@ -2087,28 +2239,29 @@
   <link rel="stylesheet" href="./payments-menu.css?v=20261007-21">
   <link rel="stylesheet" href="./payment-import-review.css?v=20261007-2">
   <style>.payments-nav-wrap .payments-nav-menu{top:100%}@media(max-width:760px){.app-nav .payments-nav-wrap .payments-nav-menu{top:100%}}</style>
-  <script src="./supplier-invoice-editor.js?v=20261007-6"></script>
-  <script src="./payments-menu.js?v=20261008-1"></script>
+  <script src="./supplier-invoice-editor.js?v=20261010-2"></script>
+  <script src="./payments-menu.js?v=20261010-1"></script>
   <link rel="stylesheet" href="./procurement-menu.css?v=20261007-1">
   <script src="./procurement-menu.js?v=20261007-1"></script>
   <script src="./settings-menu.js?v=20261007-1"></script>
   <script src="./taxes-menu.js?v=20261006-5"></script>
   <script src="./fixed-assets-menu.js?v=20261007-3"></script>
   <link rel="stylesheet" href="./fixed-assets-register.css?v=20261007-15">
-  <script src="./fixed-assets-register.js?v=20261007-7"></script>
-  <script src="./fixed-assets-depreciation.js?v=20261007-10"></script>
-  <script src="./fixed-assets-report.js?v=20261007-2"></script>
+  <script src="./fixed-assets-register.js?v=20261010-2"></script>
+  <script src="./fixed-assets-depreciation.js?v=20261010-1"></script>
+  <script src="./fixed-assets-report.js?v=20261010-1"></script>
   <script src="./fixed-assets-settings.js?v=20261007-2"></script>
-  <script src="./ledger-menu.js?v=20261008-3"></script>
+  <link rel="stylesheet" href="./ledger-export.css?v=20261008-2">
+  <script src="./ledger-menu.js?v=20261010-4"></script>
   <link rel="stylesheet" href="./cash-flow-report.css?v=20261007-1">
   <script src="./cash-flow-report.js?v=20261007-3"></script>
   <script src="./reports-menu.js?v=20261007-13"></script>
   <link rel="stylesheet" href="./payroll-register.css?v=20261007-2">
-  <script src="./payroll-register.js?v=20261007-5"></script>
+  <script src="./payroll-register.js?v=20261010-1"></script>
   <link rel="stylesheet" href="./bank-payments-register.css?v=20261007-6">
-  <script src="./bank-payments-register.js?v=20261007-3"></script>
+  <script src="./bank-payments-register.js?v=20261010-1"></script>
   <link rel="stylesheet" href="./expenses-register.css?v=20261007-6">
-  <script src="./expenses-register.js?v=20261007-4"></script>
+  <script src="./expenses-register.js?v=20261010-1"></script>
   <link rel="stylesheet" href="./register-page-totals.css?v=20261006-1">
   <script src="./sales-register-page-totals.js?v=20261006-1"></script>
   <link rel="stylesheet" href="./bank-payment-composer.css?v=20261007-7">
@@ -2120,12 +2273,15 @@
   <link rel="stylesheet" href="./annual-report.css?v=20261007-5">
   <script src="./annual-report.js?v=20261007-8"></script>
   <script src="./report-export-buttons.js?v=20261007-5"></script>
-  <script src="./accounting-ledger.js?v=20261008-7"></script>
+  <script src="./accounting-ledger.js?v=20261010-9"></script>
   <script src="./invoice-tax-policy.js?v=20261007-3"></script>
   <link rel="stylesheet" href="./client-registry-autocomplete.css?v=20261007-1">
   <script src="./client-registry-autocomplete.js?v=20261007-1"></script>
   <link rel="stylesheet" href="./client-type-switch.css?v=20261008-2">
   <script src="./client-type-switch.js?v=20261008-2"></script>
   <script src="./invoice-email-status.js?v=20261008-1"></script>
+  <link rel="stylesheet" href="./accounting-ai-assistant.css?v=20261010-7">
+  <link rel="stylesheet" href="./accounting-table-theme.css?v=20261010-1">
+  <script src="./accounting-ai-assistant.js?v=20261010-3"></script>
 </body>
 </html>

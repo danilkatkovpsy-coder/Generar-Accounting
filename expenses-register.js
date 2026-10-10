@@ -306,12 +306,7 @@
     const records = [columns.map(([, label]) => copy(label)), ...rows.map(({ item }) => columns.map(([key]) => key === "date" ? formatDate(item.date) : key === "amount" ? Number(item.amount || 0).toFixed(2) : valueFor(item, key)))];
     const format = button.dataset.expenseExport;
     if (format === "pdf") {
-      const headings = records[0], dataRows = records.slice(1);
-      const tableHtml = `<h1>${escapeHtml(copy("expensesRegisterTitle"))}</h1><p>${escapeHtml(currentSeller()?.name || "")} · ${escapeHtml(localDate())}</p><table><thead><tr>${headings.map(value => `<th>${escapeHtml(value)}</th>`).join("")}</tr></thead><tbody>${dataRows.map(row => `<tr>${row.map(value => `<td>${escapeHtml(value)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-      const popup = window.open("", "_blank", "width=1100,height=760");
-      if (!popup) { showMessage(copy("Не удалось открыть окно печати для PDF."), true); return; }
-      popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(copy("expensesRegisterTitle"))}</title><style>body{font:12px Arial,sans-serif;padding:24px;color:#1d2b27}h1{font-size:22px}table{width:100%;border-collapse:collapse}th,td{padding:7px;border:1px solid #dfe6e1;text-align:left;vertical-align:top}th{background:#e8eeea;color:#58675f}tbody tr:nth-child(even){background:#fafbf9}@media print{body{padding:0}}</style></head><body>${tableHtml}</body></html>`);
-      popup.document.close(); popup.opener = null; popup.focus(); popup.print();
+      void window.downloadTablePdf({ filename: `kulud-${localDate()}.pdf`, title: copy("expensesRegisterTitle"), period: localDate(), headers: records[0], rows: records.slice(1) });
     } else {
       const blob = format === "csv" ? new Blob(["\ufeff", records.map(row => row.map(csvCell).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" })
         : new Blob([`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Kulud"><Table>${records.map(row => `<Row>${row.map(value => `<Cell><Data ss:Type="String">${escapeHtml(String(value))}</Data></Cell>`).join("")}</Row>`).join("")}</Table></Worksheet></Workbook>`], { type: "application/vnd.ms-excel;charset=utf-8" });

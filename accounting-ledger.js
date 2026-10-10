@@ -514,14 +514,27 @@
 
   const getAccountPlanPanel = () => document.getElementById("accountPlanPanel");
   const accountTypeLabel = type => ({ asset: copy("Активы", "Aktiva", "accountPlanAsset"), liability: copy("Пассивы", "Passiva", "accountPlanLiability"), income: copy("Доходы", "Tulud", "accountPlanIncome"), expense: copy("Расходы", "Kulud", "accountPlanExpense") })[type] || type;
+  Object.assign(ruTexts, { accountPlanPagination: "Страницы плана счетов" });
+  Object.assign(etTexts, { accountPlanPagination: "Kontoplaani leheküljed" });
+  let accountPlanCurrentPage = 1;
+  const accountPlanPageSize = 10;
   const annualReportLineOptions = (selected, type) => `<option value="">${escapeHtml(translateCopy("Не назначено", "accountPlanAnnualReportLine"))}</option>${(window.annualReportProfile?.forms || []).filter(form => form.code === annualReportFormCodeFor(type)).map(form => `<optgroup label="${escapeHtml(form.title)}">${form.rows.filter(concept => !concept.abstract && concept.type !== "xbrli:stringItemType").map(concept => `<option value="${escapeHtml(concept.name)}" ${annualReportLineFor({ annualReportLine: selected }) === concept.name ? "selected" : ""}>${escapeHtml(concept.label)}</option>`).join("")}</optgroup>`).join("")}`;
   const renderAccountPlan = () => {
     const panel = getAccountPlanPanel(), body = document.getElementById("accountPlanRows");
     if (!panel || !body) return;
+    let pagination = panel.querySelector("#accountPlanPagination");
+    if (!pagination) {
+      pagination = document.createElement("div");
+      pagination.id = "accountPlanPagination";
+      pagination.className = "register-page-footer account-plan-pagination";
+      pagination.innerHTML = '<nav class="register-page-numbers"></nav>';
+      panel.querySelector(".account-plan-table-wrap").after(pagination);
+    }
     const header = panel.querySelector(".account-plan-table thead tr");
     if (header && !header.querySelector("[data-annual-report-line-header]")) {
       const cell = document.createElement("th");
       cell.dataset.annualReportLineHeader = "true";
+      cell.dataset.accountPlanColumn = "annualReportLine";
       cell.dataset.i18n = "accountPlanAnnualReportLine";
       cell.textContent = translateCopy("Строка годового отчёта", "accountPlanAnnualReportLine");
       header.append(cell);
@@ -529,16 +542,105 @@
     const query = panel.querySelector("#accountPlanSearch")?.value.trim().toLocaleLowerCase(language) || "", type = panel.querySelector("#accountPlanTypeFilter")?.value || "";
     const rows = accountPlanEntries.filter(account => (!type || account.type === type) && (!query || `${account.code} ${account.descriptionEt} ${account.descriptionEn}`.toLocaleLowerCase(language).includes(query))).sort((a, b) => String(a.code).localeCompare(String(b.code), undefined, { numeric: true }));
     const emptyKey = query || type ? "accountPlanNoMatches" : "accountPlanEmpty";
-    body.innerHTML = rows.map(account => `<tr data-account-code="${escapeHtml(account.code)}"><td data-account-plan-column="code">${escapeHtml(account.code)}</td><td data-account-plan-column="description">${escapeHtml(language === "et" ? account.descriptionEt : account.descriptionEn || account.descriptionEt)}</td><td data-account-plan-column="type">${escapeHtml(accountTypeLabel(account.type))}</td><td data-account-plan-column="balanceLine">${escapeHtml(account.balanceLine || "—")}</td><td data-account-plan-column="cashFlowLine">${escapeHtml(account.cashFlowLine || "—")}</td><td><select data-account-plan-annual-line="${escapeHtml(account.code)}" aria-label="${escapeHtml(account.code)} ${escapeHtml(translateCopy("Строка годового отчёта", "accountPlanAnnualReportLine"))}" ${window.annualReportProfile ? "" : "disabled"}>${annualReportLineOptions(account.annualReportLine || defaultAnnualReportLines[String(account.code)] || "", account.type)}</select></td></tr>`).join("") || `<tr><td class="account-plan-empty" colspan="6">${escapeHtml(translateCopy(emptyKey === "accountPlanNoMatches" ? "Счета по заданному фильтру не найдены." : "Счета пока не добавлены.", emptyKey))}</td></tr>`;
+    const pageCount = Math.max(1, Math.ceil(rows.length / accountPlanPageSize));
+    accountPlanCurrentPage = Math.min(accountPlanCurrentPage, pageCount);
+    const pageStart = (accountPlanCurrentPage - 1) * accountPlanPageSize;
+    const visibleRows = rows.slice(pageStart, pageStart + accountPlanPageSize);
+    body.innerHTML = visibleRows.map(account => `<tr data-account-code="${escapeHtml(account.code)}"><td data-account-plan-column="code">${escapeHtml(account.code)}</td><td data-account-plan-column="description">${escapeHtml(language === "et" ? account.descriptionEt : account.descriptionEn || account.descriptionEt)}</td><td data-account-plan-column="type">${escapeHtml(accountTypeLabel(account.type))}</td><td data-account-plan-column="balanceLine">${escapeHtml(account.balanceLine || "—")}</td><td data-account-plan-column="cashFlowLine">${escapeHtml(account.cashFlowLine || "—")}</td><td data-account-plan-column="annualReportLine"><select class="account-plan-line-display" data-account-plan-annual-line="${escapeHtml(account.code)}" tabindex="-1" aria-readonly="true" aria-label="${escapeHtml(account.code)} ${escapeHtml(translateCopy("Строка годового отчёта", "accountPlanAnnualReportLine"))}">${annualReportLineOptions(account.annualReportLine || defaultAnnualReportLines[String(account.code)] || "", account.type)}</select></td></tr>`).join("") || `<tr><td class="account-plan-empty" colspan="6">${escapeHtml(translateCopy(emptyKey === "accountPlanNoMatches" ? "Счета по заданному фильтру не найдены." : "Счета пока не добавлены.", emptyKey))}</td></tr>`;
     panel.querySelectorAll("[data-account-plan-column]").forEach(cell => { const toggle = panel.querySelector(`[data-account-plan-column-toggle="${cell.dataset.accountPlanColumn}"]`); if (toggle) cell.hidden = !toggle.checked; });
-    body.querySelectorAll("[data-account-plan-annual-line]").forEach(select => select.addEventListener("change", () => {
-      const next = accountPlanEntries.map(account => account.code === select.dataset.accountPlanAnnualLine ? { ...account, annualReportLine: select.value } : account);
-      try { saveList(STORAGE.accountPlanEntries, next); }
-      catch { showMessage(copy("Не удалось сохранить Kontoplaan", "Kontoplaani ei saanud salvestada", "accountPlanSaveError"), true); renderAccountPlan(); return; }
-      accountPlanEntries = next;
-      window.refreshAccountingLedger?.();
-    }));
+    pagination.hidden = rows.length === 0;
+    const pageButtons = pagination.querySelector(".register-page-numbers");
+    pageButtons.setAttribute("aria-label", translateCopy("Страницы плана счетов", "accountPlanPagination"));
+    pageButtons.replaceChildren();
+    const addPageButton = pageNumber => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = String(pageNumber);
+      if (pageNumber === accountPlanCurrentPage) button.setAttribute("aria-current", "page");
+      button.addEventListener("click", () => { accountPlanCurrentPage = pageNumber; renderAccountPlan(); });
+      pageButtons.append(button);
+    };
+    const firstPage = Math.max(1, Math.min(accountPlanCurrentPage - 2, pageCount - 4));
+    for (let pageNumber = firstPage; pageNumber <= Math.min(pageCount, firstPage + 4); pageNumber++) addPageButton(pageNumber);
   };
+  const accountPlanExportButtons = [...(getAccountPlanPanel()?.querySelectorAll(".account-plan-exports button") || [])];
+  const exportAccountPlan = async format => {
+    if (!can("exportReports")) { denyAction("exportReports"); return; }
+    if (typeof window.exportTableFile !== "function") return;
+    const panel = getAccountPlanPanel();
+    const query = panel.querySelector("#accountPlanSearch")?.value.trim().toLocaleLowerCase(language) || "";
+    const type = panel.querySelector("#accountPlanTypeFilter")?.value || "";
+    const accounts = accountPlanEntries
+      .filter(account => (!type || account.type === type) && (!query || `${account.code} ${account.descriptionEt} ${account.descriptionEn}`.toLocaleLowerCase(language).includes(query)))
+      .sort((first, second) => String(first.code).localeCompare(String(second.code), undefined, { numeric: true }));
+    if (!accounts.length) { showMessage(translateCopy("Нет счетов для экспорта.", "accountPlanExportEmpty"), true); return; }
+    const headers = ["accountPlanCode", "accountPlanDescription", "accountPlanTypeColumn", "accountPlanStatementLine", "accountPlanCashFlowLine", "accountPlanAnnualReportLine"]
+      .map(key => translateCopy(key, key));
+    const rows = accounts.map(account => {
+      const annualLine = annualReportLineFor(account);
+      const reportForm = (window.annualReportProfile?.forms || []).find(form => form.code === annualReportFormCodeFor(account.type));
+      const reportLineLabel = reportForm?.rows.find(concept => concept.name === annualLine)?.label || annualLine || "—";
+      return [account.code, language === "et" ? account.descriptionEt : account.descriptionEn || account.descriptionEt, accountTypeLabel(account.type), account.balanceLine || "—", account.cashFlowLine || "—", reportLineLabel];
+    });
+    const filename = `${language === "et" ? "kontoplaan" : "plan-schetov"}-${localDate()}`;
+    const title = translateCopy("План счетов", "accountPlanTab");
+    try {
+      if (format === "pdf") {
+        const blob = await window.createLedgerPdfBlob({ title, period: localDate(), headers, rows });
+        triggerBlobDownload(blob, `${filename}.pdf`);
+      } else {
+        window.exportTableFile({ format, filename, title, headers, rows });
+      }
+    } catch (error) {
+      console.error(error);
+      showMessage(translateCopy("Не удалось экспортировать план счетов.", "accountPlanExportError"), true);
+    }
+  };
+  accountPlanExportButtons.forEach((button, index) => {
+    const format = ["pdf", "xls", "csv"][index];
+    if (!format) return;
+    button.dataset.accountPlanExport = format;
+    button.disabled = false;
+    button.addEventListener("click", () => { void exportAccountPlan(format); });
+  });
+  const accountRows = document.getElementById("accountPlanRows");
+  accountRows?.addEventListener("click", event => {
+    if (event.target.closest("button, input, a")) return;
+    const row = event.target.closest("tr[data-account-code]");
+    const account = accountPlanEntries.find(item => item.code === row?.dataset.accountCode);
+    if (!account) return;
+    const dialog = document.getElementById("accountPlanCreateDialog");
+    document.getElementById("accountPlanCodeInput").value = account.code;
+    document.getElementById("accountPlanCodeInput").readOnly = true;
+    document.getElementById("accountPlanDescriptionEtInput").value = account.descriptionEt || "";
+    document.getElementById("accountPlanDescriptionEnInput").value = account.descriptionEn || "";
+    const entryType = document.getElementById("accountPlanEntryType");
+    entryType.value = account.type;
+    entryType.dispatchEvent(new Event("change", { bubbles: true }));
+    document.getElementById("accountPlanBalanceLineInput").value = account.balanceLine || "";
+    document.getElementById("accountPlanCashFlowLineInput").value = account.cashFlowLine || "";
+    annualReportLineInput.value = account.annualReportLine || defaultAnnualReportLines[String(account.code)] || "";
+    window.accountPlanEditingCode = account.code;
+    const saveButton = dialog.querySelector('[type="submit"]');
+    saveButton.disabled = false;
+    saveButton.removeAttribute("title");
+    dialog.showModal();
+  });
+  accountRows?.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const row = event.target.closest("tr[data-account-code]");
+    if (!row || event.target.closest("select, button, input, a")) return;
+    event.preventDefault();
+    row.querySelector("td")?.click();
+  });
+  document.getElementById("accountPlanAddButton")?.addEventListener("click", () => {
+    window.accountPlanEditingCode = "";
+    const codeInput = document.getElementById("accountPlanCodeInput");
+    codeInput.readOnly = false;
+    const saveButton = document.querySelector("#accountPlanCreateDialog [type=submit]");
+    saveButton.disabled = false;
+    saveButton.removeAttribute("title");
+  });
   window.renderAccountPlan = renderAccountPlan;
   const refreshVisibleAccountingReports = () => {
     const balance = document.getElementById("balanceResults"), profit = document.getElementById("profitResults"), ledger = document.getElementById("ledgerResults"), turnover = document.getElementById("ledgerTurnoverResults");
@@ -633,8 +735,9 @@
     showMessage(copy("ledgerOpeningBalancesSaved"));
     window.refreshAccountingLedger?.();
   });
-  Object.assign(ruTexts, { accountPlanAnnualReportLine: "Строка годового отчёта", accountPlanAnnualReportLineRequired: "Выберите строку годового отчёта для счёта." });
-  Object.assign(etTexts, { accountPlanAnnualReportLine: "Aastaaruande rida", accountPlanAnnualReportLineRequired: "Valige kontole aastaaruande rida." });
+  Object.assign(ruTexts, { accountPlanAnnualReportLine: "Строка годового отчёта", accountPlanAnnualReportLineRequired: "Выберите строку годового отчёта для счёта.", accountPlanExportEmpty: "Нет счетов для экспорта.", accountPlanExportError: "Не удалось скачать план счетов." });
+  Object.assign(ruTexts, { accountPlanDialogSaveHint: "Изменения будут сохранены в плане счетов." });
+  Object.assign(etTexts, { accountPlanAnnualReportLine: "Aastaaruande rida", accountPlanAnnualReportLineRequired: "Valige kontole aastaaruande rida.", accountPlanDialogSaveHint: "Muudatused salvestatakse kontoplaani.", accountPlanExportEmpty: "Eksportimiseks pole kontosid.", accountPlanExportError: "Kontoplaani allalaadimine ebaõnnestus." });
   const accountPlanForm = document.getElementById("accountPlanCreateForm");
   const annualReportLineInput = document.createElement("select");
   annualReportLineInput.id = "accountPlanAnnualReportLineInput";
@@ -659,13 +762,15 @@
   accountPlanForm?.addEventListener("submit", event => {
     event.preventDefault(); event.stopImmediatePropagation();
     const code = document.getElementById("accountPlanCodeInput").value.trim(), descriptionEt = document.getElementById("accountPlanDescriptionEtInput").value.trim(), descriptionEn = document.getElementById("accountPlanDescriptionEnInput").value.trim(), type = document.getElementById("accountPlanEntryType").value;
+    const editingCode = String(window.accountPlanEditingCode || "");
     const annualReportLine = annualReportLineInput.value;
-    if (!code || !descriptionEt || accountPlanEntries.some(account => account.code === code)) { showMessage(translateCopy("Kontokood peab olema unikaalne ja eestikeelne kirjeldus täidetud.", "accountPlanSaveError"), true); return; }
+    if (!code || !descriptionEt || (!editingCode && accountPlanEntries.some(account => account.code === code))) { showMessage(translateCopy("Kontokood peab olema unikaalne ja eestikeelne kirjeldus täidetud.", "accountPlanSaveError"), true); return; }
     if (!annualReportLine) { showMessage(translateCopy("Выберите строку годового отчёта для счёта.", "accountPlanAnnualReportLineRequired"), true); return; }
-    const account = { code, descriptionEt, descriptionEn, type, annualReportLine, balanceLine: document.getElementById("accountPlanBalanceLineInput")?.value.trim() || "", cashFlowLine: document.getElementById("accountPlanCashFlowLineInput")?.value.trim() || "", reportGroup: type === "expense" ? "expenses" : type === "income" ? "sales" : "balance" };
-    const next = [...accountPlanEntries, account];
+    const existingAccount = accountPlanEntries.find(account => account.code === editingCode);
+    const account = { ...existingAccount, code, descriptionEt, descriptionEn, type, annualReportLine, balanceLine: document.getElementById("accountPlanBalanceLineInput")?.value.trim() || "", cashFlowLine: document.getElementById("accountPlanCashFlowLineInput")?.value.trim() || "", reportGroup: type === "expense" ? "expenses" : type === "income" ? "sales" : "balance" };
+    const next = editingCode ? accountPlanEntries.map(item => item.code === editingCode ? account : item) : [...accountPlanEntries, account];
     try { saveList(STORAGE.accountPlanEntries, next); } catch { showMessage(translateCopy("Kontoplaani kontot ei saanud salvestada.", "accountPlanSaveError"), true); return; }
-    accountPlanEntries = next; document.getElementById("accountPlanCreateDialog").close(); renderAccountPlan(); window.refreshAccountingLedger?.();
+    accountPlanEntries = next; window.accountPlanEditingCode = ""; document.getElementById("accountPlanCodeInput").readOnly = false; document.getElementById("accountPlanCreateDialog").close(); renderAccountPlan(); window.refreshAccountingLedger?.();
   }, true);
   getAccountPlanPanel()?.querySelector("#accountPlanApplyFilter")?.addEventListener("click", renderAccountPlan);
   getAccountPlanPanel()?.querySelector("#accountPlanClearFilters")?.addEventListener("click", () => requestAnimationFrame(renderAccountPlan));

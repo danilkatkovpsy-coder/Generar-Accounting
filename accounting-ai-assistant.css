@@ -1,0 +1,60 @@
+.accounting-ai{position:fixed;right:22px;bottom:20px;z-index:320;font-family:var(--app-font,Arial,sans-serif);color:var(--ink,#302820)}
+.accounting-ai [hidden]{display:none!important}
+.accounting-ai-launcher{position:relative;display:grid;width:60px;height:60px;min-height:60px;padding:0;place-items:center;border:1px solid #24483b;border-radius:50%;background:#24483b;color:#fff;font-size:13px;font-weight:650;box-shadow:0 5px 18px rgba(25,48,39,.2);transition:background .18s ease,transform .18s ease,box-shadow .18s ease}
+.accounting-ai-launcher:hover{background:#1c3b31;transform:translateY(-1px);box-shadow:0 8px 22px rgba(25,48,39,.25)}
+.accounting-ai-launcher-mark{position:relative;display:grid;width:36px;height:36px;flex:0 0 36px;place-items:center;color:inherit}
+.accounting-ai-launcher-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}
+.accounting-ai-launcher-mark svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;overflow:visible;animation:accountingAiSparkle 2.8s ease-in-out infinite}
+.accounting-ai-launcher-mark>span{position:absolute;right:-5px;bottom:-3px;padding:1px 3px;border:1px solid #24483b;border-radius:5px;background:#f0e4d1;color:#24483b;font-size:7px;font-weight:800;line-height:1.15;letter-spacing:0}
+.accounting-ai-launcher-mark svg path:first-child{transform-box:fill-box;transform-origin:center;animation:accountingAiCore 2.8s ease-in-out infinite}
+.accounting-ai-launcher-mark svg path:last-child{transform-box:fill-box;transform-origin:center;animation:accountingAiTwinkle 2.8s ease-in-out infinite}
+.accounting-ai-panel{position:absolute;right:0;bottom:56px;display:grid;grid-template-rows:auto auto auto auto auto auto minmax(120px,1fr) auto auto;gap:10px;width:min(490px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 100px));padding:16px;border:1px solid var(--line,#e8dfd4);border-radius:8px;background:linear-gradient(155deg,#fffefa 0%,var(--paper,#fffdf9) 58%,#f8f6ef 100%);box-shadow:0 14px 42px rgba(48,40,32,.2);animation:accountingAiPanelIn .2s ease-out both}
+.accounting-ai-panel[hidden]{display:none!important}
+.accounting-ai-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line,#e8dfd4)}
+.accounting-ai-identity{display:flex;align-items:center;gap:11px;min-width:0}
+.accounting-ai-avatar{position:relative;display:grid;width:42px;height:42px;flex:0 0 42px;place-items:center;border:1px solid #cbd8cc;border-radius:50%;background:#e9efe7;color:#24483b}
+.accounting-ai-avatar:before{position:absolute;inset:-4px;border:1px solid rgba(71,119,91,.25);border-radius:50%;content:"";animation:accountingAiOrbit 8s linear infinite}
+.accounting-ai-avatar:after{position:absolute;right:-1px;bottom:1px;width:9px;height:9px;border:2px solid #fffefa;border-radius:50%;background:#47775b;content:"";box-shadow:0 0 0 0 rgba(71,119,91,.35);animation:accountingAiReady 2s ease-out infinite}
+.accounting-ai-avatar svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;animation:accountingAiFloat 2.8s ease-in-out infinite}
+.accounting-ai-avatar>span{position:absolute;right:-4px;bottom:-3px;padding:1px 3px;border:1px solid #e9efe7;border-radius:3px;background:#24483b;color:#fff;font-size:7px;font-weight:750;line-height:1.15}
+.accounting-ai-header h2{margin:0;color:var(--ink,#302820);font:600 17px/1.25 var(--app-font,Arial,sans-serif)}
+.accounting-ai-badges{display:flex;flex-wrap:wrap;gap:12px;margin-top:5px;color:var(--muted,#887b6d);font-size:11px}
+.accounting-ai-badges span+span:before{content:"";display:inline-block;width:6px;height:6px;margin:0 6px 1px 0;border-radius:50%;background:var(--green,#47775b)}
+.accounting-ai-close{width:32px;height:32px;flex:0 0 32px;border:1px solid var(--line,#e8dfd4);border-radius:5px;background:transparent;color:var(--muted,#887b6d);font-size:22px;line-height:1}
+.accounting-ai-intro,.accounting-ai-attachment-note,.accounting-ai-footer{margin:0;color:var(--muted,#75695c);font-size:11px;line-height:1.45}
+.accounting-ai-attachment-note{padding-left:9px;border-left:2px solid #c1a886}
+.accounting-ai-connection{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.accounting-ai-status{min-width:0;color:var(--muted,#887b6d);font-size:11px;line-height:1.35}
+.accounting-ai-status[data-state="ready"]{color:var(--green,#47775b)}
+.accounting-ai-status[data-state="ready"]:before{display:inline-block;width:7px;height:7px;margin:0 6px 1px 0;border-radius:50%;background:#47775b;content:"";box-shadow:0 0 0 3px rgba(71,119,91,.12)}
+.accounting-ai-status[data-state="offline"],.accounting-ai-status[data-state="missing"]{color:var(--status-error,#a35446)}
+.accounting-ai-connection .secondary-button{min-height:32px;padding:6px 9px;white-space:nowrap}
+.accounting-ai-period{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.accounting-ai-period label{display:grid;gap:4px;min-width:0;color:var(--muted,#887b6d);font-size:10px}
+.accounting-ai-period input{min-width:0;min-height:34px;padding:6px 8px;font-size:12px}
+.accounting-ai-suggestions{display:flex;flex-wrap:wrap;gap:5px}
+.accounting-ai-suggestions button{min-height:29px;padding:5px 8px;border:1px solid var(--line,#e8dfd4);border-radius:4px;background:#fffdfa;color:var(--accent-dark,#70583f);font-size:10px;text-align:left}
+.accounting-ai-suggestions button:hover{background:var(--soft,#ede4d8)}
+.accounting-ai-messages{display:grid;align-content:start;gap:9px;min-height:120px;overflow:auto;padding:10px;border:1px solid var(--line,#e8dfd4);border-radius:6px;background:linear-gradient(145deg,#f3f5ef,#f6f2ec)}
+.accounting-ai-message{max-width:94%;padding:9px 11px;border:1px solid var(--line,#e8dfd4);border-radius:6px;background:var(--paper,#fffdf9);box-shadow:0 2px 5px rgba(48,40,32,.035);animation:accountingAiMessageIn .18s ease-out both}
+.accounting-ai-message.is-assistant{border-left:2px solid #78917a}
+.accounting-ai-message.is-user{justify-self:end;border-color:#dfd2c3;background:var(--soft,#ede4d8)}
+.accounting-ai-message strong{display:block;margin-bottom:3px;color:var(--muted,#75695c);font-size:10px;font-weight:650}
+.accounting-ai-message p{margin:0;color:var(--ink,#302820);font-size:12px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.accounting-ai-message.is-streaming p:after{display:inline-block;width:2px;height:1em;margin-left:3px;background:#47775b;content:"";vertical-align:-2px;animation:accountingAiCaret .8s steps(2,start) infinite}
+.accounting-ai-compose{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:7px}
+.accounting-ai-compose textarea{min-width:0;min-height:42px;max-height:112px;padding:8px 9px;font-size:12px;resize:vertical}
+.accounting-ai-compose .primary-button{min-height:38px;padding:8px 11px;white-space:nowrap}
+.accounting-ai-compose .primary-button:disabled{cursor:not-allowed}
+.accounting-ai-footer{padding-top:1px}
+@keyframes accountingAiSparkle{0%,100%{filter:drop-shadow(0 0 0 rgba(255,255,255,0));transform:scale(1)}45%{filter:drop-shadow(0 0 3px rgba(255,255,255,.65));transform:scale(1.08)}60%{transform:scale(1.02)}}
+@keyframes accountingAiCore{0%,100%{transform:rotate(0) scale(1)}45%{transform:rotate(12deg) scale(1.08)}60%{transform:rotate(-5deg) scale(1)}}
+@keyframes accountingAiTwinkle{0%,35%,100%{opacity:.7;transform:scale(.78) rotate(-12deg)}48%,70%{opacity:1;transform:scale(1.18) rotate(12deg)}}
+@keyframes accountingAiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes accountingAiOrbit{to{transform:rotate(360deg)}}
+@keyframes accountingAiReady{0%{box-shadow:0 0 0 0 rgba(71,119,91,.35)}70%,100%{box-shadow:0 0 0 5px rgba(71,119,91,0)}}
+@keyframes accountingAiPanelIn{from{transform:translateY(7px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes accountingAiMessageIn{from{transform:translateY(3px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes accountingAiCaret{to{visibility:hidden}}
+@media(prefers-reduced-motion:reduce){.accounting-ai *, .accounting-ai *:before, .accounting-ai *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+@media(max-width:600px){.accounting-ai{right:12px;bottom:12px}.accounting-ai-panel{position:fixed;right:12px;bottom:66px;width:calc(100vw - 24px);max-height:calc(100dvh - 82px);padding:13px;gap:8px}.accounting-ai-launcher{width:56px;height:56px;min-height:56px;padding:0}.accounting-ai-messages{min-height:100px}}

@@ -645,20 +645,7 @@
     else if (format === "xls") {
       const xml = data.map(row => `<Row>${row.map(value => `<Cell><Data ss:Type="String">${escapeHtml(value)}</Data></Cell>`).join("")}</Row>`).join("");
       blob = new Blob([`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Kassamaksed"><Table>${xml}</Table></Worksheet></Workbook>`], { type: "application/vnd.ms-excel;charset=utf-8" });
-    } else {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1500; canvas.height = Math.max(500, 120 + rows.length * 32);
-      const context = canvas.getContext("2d");
-      context.fillStyle = "#fff"; context.fillRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = "#29483d"; context.font = "bold 26px Arial";
-      context.fillText(translateCopy("Кассовые платежи", "paymentCashTitle"), 32, 42);
-      context.fillStyle = "#e8eeea"; context.fillRect(32, 62, 1436, 32);
-      const widths = [48, 190, 330, 150, 105, 95, 65, 100, 150, 160];
-      context.fillStyle = "#35483e"; context.font = "bold 11px Arial";
-      let x = 38; data[0].forEach((value, index) => { context.fillText(String(value), x, 83, widths[index] - 6); x += widths[index]; });
-      data.slice(1).forEach((row, rowIndex) => { const y = 94 + rowIndex * 32; context.fillStyle = rowIndex % 2 ? "#fafbf9" : "#fff"; context.fillRect(32, y, 1436, 32); context.fillStyle = "#26352e"; context.font = "11px Arial"; x = 38; row.forEach((value, index) => { context.fillText(String(value), x, y + 21, widths[index] - 6); x += widths[index]; }); });
-      blob = await createCanvasPdfBlob(canvas);
-    }
+    } else blob = await window.createLedgerPdfBlob({ title: translateCopy("Кассовые платежи", "paymentCashTitle"), headers: data[0], rows: data.slice(1) });
     triggerBlobDownload(blob, `kassamaksed-${localDate()}.${format}`);
   };
   cashExports.querySelectorAll("[data-cash-export]").forEach(button => button.addEventListener("click", () => exportCashRegister(button.dataset.cashExport)));

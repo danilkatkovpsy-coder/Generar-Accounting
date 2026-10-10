@@ -8,8 +8,139 @@
   const get = id => document.getElementById(id);
 
   Object.assign(ruTexts, { navLedger: "Главная книга", ledgerEntriesMenu: "Проводки главной книги", ledgerBookMenu: "Главная книга", ledgerTurnoverMenu: "Оборотная ведомость", ledgerAdvancedTitle: "Дополнительные настройки", ledgerPrintRelated: "Показывать связанные счета при печати", ledgerOnlyTransactions: "Показывать только счета с операциями", ledgerOptionsApply: "Применить", ledgerOptionsCancel: "Отмена", ledgerDemoMode: "Тестовые данные", ledgerLiveMode: "Обычные данные", ledgerTurnoverNotice: "Обороты по счетам за выбранный период.", ledgerReportBlock: "Отчет", ledgerAccountsBlock: "Счета", ledgerObjectsBlock: "Объекты", ledgerGroupDays: "Группировка", ledgerNoGrouping: "Без группировки", ledgerByDay: "По дням", ledgerByWeek: "По неделям", ledgerByMonth: "По месяцам", ledgerAvailableList: "Доступные", ledgerSelectedList: "Выбранные", ledgerAddAll: "Добавить все", ledgerRemoveAll: "Убрать все", ledgerAddItem: "Добавить", ledgerRemoveItem: "Убрать", ledgerChooseAccount: "Выберите хотя бы один счет.", ledgerNoSelection: "Ничего не выбрано.", ledgerEur: "EUR" });
+  Object.assign(ruTexts, { pdfExportFailed: "Не удалось создать PDF-файл." });
+  Object.assign(etTexts, { pdfExportFailed: "PDF-faili loomine ebaõnnestus." });
+  Object.assign(ruTexts, { printPdf: "Скачать PDF" });
+  Object.assign(etTexts, { printPdf: "Laadi PDF alla" });
   Object.assign(etTexts, { navLedger: "Pearaamat", ledgerEntriesMenu: "Pearaamatu kanded", ledgerBookMenu: "Pearaamat", ledgerTurnoverMenu: "Käibeandmik", ledgerAdvancedTitle: "Täpsemad seaded", ledgerPrintRelated: "Kuva väljarükil seotud kontod", ledgerOnlyTransactions: "Kuva ainult tehingutega kontod", ledgerOptionsApply: "Rakenda", ledgerOptionsCancel: "Tühista", ledgerDemoMode: "Näidisandmed", ledgerLiveMode: "Tegelikud andmed", ledgerTurnoverNotice: "Kontode käibeandmik valitud perioodi kohta.", ledgerReportBlock: "Aruanne", ledgerAccountsBlock: "Kontod", ledgerObjectsBlock: "Objektid", ledgerGroupDays: "Rühmitamine", ledgerNoGrouping: "Ära rühmita", ledgerByDay: "Päeva kaupa", ledgerByWeek: "Nädala kaupa", ledgerByMonth: "Kuu kaupa", ledgerAvailableList: "Kõik", ledgerSelectedList: "Valitud", ledgerAddAll: "Lisa kõik", ledgerRemoveAll: "Eemalda kõik", ledgerAddItem: "Lisa", ledgerRemoveItem: "Eemalda", ledgerChooseAccount: "Vali vähemalt üks konto.", ledgerNoSelection: "Valikuid pole.", ledgerEur: "EUR" });
   const copy = key => translateCopy(key, key);
+  const ledgerFormats = ["pdf", "xls", "csv"];
+  const makeLedgerExportGroup = kind => {
+    const group = document.createElement("div");
+    group.className = "ledger-export-formats";
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", language === "et" ? "Ekspordi vorming" : "Формат экспорта");
+    for (const format of ledgerFormats) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "secondary-button ledger-export-format";
+      button.dataset.ledgerExportKind = kind;
+      button.dataset.ledgerExportFormat = format;
+      button.textContent = format.toUpperCase();
+      button.setAttribute("aria-label", `${language === "et" ? "Ekspordi" : "Скачать"} ${format.toUpperCase()}`);
+      group.append(button);
+    }
+    group.addEventListener("click", event => {
+      const button = event.target.closest("[data-ledger-export-format]");
+      if (button) void exportLedgerView(button.dataset.ledgerExportKind, button.dataset.ledgerExportFormat);
+    });
+    return group;
+  };
+  const safeLedgerCell = value => {
+    let text = String(value ?? "");
+    if (/^[\s]*[=+@-]/.test(text)) text = `'${text}`;
+    return text;
+  };
+  const ledgerCsvBlob = (headers, rows) => {
+    const cell = value => `"${safeLedgerCell(value).replaceAll('"', '""')}"`;
+    return new Blob(["\ufeff", [headers, ...rows].map(row => row.map(cell).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" });
+  };
+  const ledgerXlsBlob = (sheetName, headers, rows) => {
+    const cell = value => {
+      const number = typeof value === "number" && Number.isFinite(value);
+      return `<Cell><Data ss:Type="${number ? "Number" : "String"}">${escapeHtml(safeLedgerCell(value))}</Data></Cell>`;
+    };
+    const row = values => `<Row>${values.map(cell).join("")}</Row>`;
+    const xml = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="${escapeHtml(sheetName.slice(0, 31))}"><Table>${row(headers)}${rows.map(row).join("")}</Table></Worksheet></Workbook>`;
+    return new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8" });
+  };
+  const ledgerPdfCanvases = (title, period, headers, rows) => {
+    const pageSize = 32, pages = [];
+    for (let offset = 0; offset < rows.length; offset += pageSize) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1240; canvas.height = 1754;
+      const context = canvas.getContext("2d"), pageRows = rows.slice(offset, offset + pageSize), left = 48, right = 1192, top = 170, headerHeight = 48, rowHeight = 42;
+      context.fillStyle = "#ffffff"; context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#203c34"; context.font = "bold 30px Arial, sans-serif"; context.fillText(title, left, 62, right - left);
+      context.fillStyle = "#59665f"; context.font = "17px Arial, sans-serif"; context.fillText(currentSeller().name || "Arvesemu", left, 98, right - left);
+      context.textAlign = "right"; context.fillText(period, right, 98, right - left); context.textAlign = "left";
+      context.fillStyle = "#e8ece8"; context.fillRect(left, top, right - left, headerHeight);
+      const columnWidth = (right - left) / headers.length;
+      const fitText = (value, width) => { let text = String(value ?? ""); while (text && context.measureText(text).width > width && text.length > 2) text = `${text.slice(0, -2)}…`; return text; };
+      context.fillStyle = "#203c34"; context.font = "bold 15px Arial, sans-serif";
+      headers.forEach((header, index) => context.fillText(fitText(header, columnWidth - 14), left + index * columnWidth + 7, top + 29, columnWidth - 14));
+      pageRows.forEach((row, rowIndex) => {
+        const y = top + headerHeight + rowIndex * rowHeight;
+        if (rowIndex % 2) { context.fillStyle = "#f7f8f6"; context.fillRect(left, y, right - left, rowHeight); }
+        context.strokeStyle = "#dfe6e2"; context.beginPath(); context.moveTo(left, y + rowHeight); context.lineTo(right, y + rowHeight); context.stroke();
+        context.fillStyle = "#1d2b27"; context.font = "14px Arial, sans-serif";
+        row.forEach((value, index) => context.fillText(fitText(value, columnWidth - 14), left + index * columnWidth + 7, y + 27, columnWidth - 14));
+      });
+      context.fillStyle = "#75695c"; context.font = "13px Arial, sans-serif"; context.textAlign = "right";
+      context.fillText(`${offset + 1}–${offset + pageRows.length} / ${rows.length}`, right, 1710); context.textAlign = "left";
+      pages.push(canvas);
+    }
+    return pages;
+  };
+  const ledgerPdfBlob = async canvases => {
+    const encoder = new TextEncoder(), objects = new Map(), pageIds = canvases.map((_, index) => 3 + index * 3);
+    objects.set(1, encoder.encode("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"));
+    objects.set(2, encoder.encode(`2 0 obj\n<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>\nendobj\n`));
+    for (const [index, canvas] of canvases.entries()) {
+      const pageId = pageIds[index], imageId = pageId + 1, contentId = pageId + 2, width = canvas.width > canvas.height ? 841.89 : 595.28, height = canvas.width > canvas.height ? 595.28 : 841.89;
+      const jpeg = new Uint8Array(await (await canvasToJpeg(canvas)).arrayBuffer()), pageContent = `q\n${width} 0 0 ${height} 0 0 cm\n/Im${index} Do\nQ\n`;
+      objects.set(pageId, encoder.encode(`${pageId} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /XObject << /Im${index} ${imageId} 0 R >> >> /Contents ${contentId} 0 R >>\nendobj\n`));
+      objects.set(imageId, concatBytes([encoder.encode(`${imageId} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`), jpeg, encoder.encode("\nendstream\nendobj\n")]));
+      objects.set(contentId, encoder.encode(`${contentId} 0 obj\n<< /Length ${encoder.encode(pageContent).length} >>\nstream\n${pageContent}endstream\nendobj\n`));
+    }
+    const maximumId = Math.max(...objects.keys()), parts = [encoder.encode("%PDF-1.4\n")], offsets = Array(maximumId + 1).fill(0);
+    let offset = parts[0].length;
+    for (const [id, object] of [...objects.entries()].sort(([first], [second]) => first - second)) { offsets[id] = offset; parts.push(object); offset += object.length; }
+    const xrefOffset = offset, xref = `xref\n0 ${maximumId + 1}\n0000000000 65535 f \n${offsets.slice(1).map(position => `${String(position).padStart(10, "0")} 00000 n \n`).join("")}trailer\n<< /Size ${maximumId + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    parts.push(encoder.encode(xref)); return new Blob(parts, { type: "application/pdf" });
+  };
+  window.createLedgerPdfBlob = ({ title, period = "", headers, rows }) => ledgerPdfBlob(ledgerPdfCanvases(title, period, headers, rows));
+  window.downloadTablePdf = async ({ filename, ...documentData }) => {
+    try {
+      const blob = await window.createLedgerPdfBlob(documentData);
+      triggerBlobDownload(blob, filename.toLowerCase().endsWith(".pdf") ? filename : `${filename}.pdf`);
+    } catch (error) {
+      console.error(error);
+      showMessage(translateCopy("Не удалось создать PDF-файл.", "pdfExportFailed"), true);
+    }
+  };
+  async function exportLedgerView(kind, format) {
+    if (!can("exportReports")) { denyAction("exportReports"); return; }
+    let title, period, headers, rows, fileStem;
+    if (kind === "journal") {
+      if (!loadJournalRows()) return;
+      title = copy("ledgerEntriesMenu");
+      period = `${get("ledgerJournalStart").value || ""} – ${get("ledgerJournalEnd").value || localDate()}`;
+      headers = [...get("ledgerJournalTable").querySelectorAll("thead [data-journal-label]")].map(cell => cell.textContent.trim());
+      rows = [...get("ledgerJournalRows").querySelectorAll("tr")].filter(row => !row.querySelector(".empty-row")).map(row => [...row.cells].map(cell => cell.innerText.trim()));
+      fileStem = "pearamaatu-kanded";
+    } else if (kind === "ledger") {
+      generateGeneralLedger(); title = copy("ledgerBookMenu");
+      period = `${get("ledgerStartDate").value} – ${get("ledgerEndDate").value}`;
+      headers = ["ledgerDateColumn", "ledgerDocumentColumn", "ledgerObjectColumn", "ledgerAccountColumn", "ledgerDescriptionColumn", "ledgerDebitColumn", "ledgerCreditColumn", "ledgerBalanceColumn"].map(key => copy(key));
+      rows = lastLedgerEntries.map(entry => [formatDate(entry.date), entry.documentNumber || "", entry.object || "", `${entry.accountCode} · ${entry.account || ""}`, entry.description || "", Number(entry.debit) || 0, Number(entry.credit) || 0, Number(entry.balance) || 0]);
+      fileStem = "pearamaamat";
+    } else {
+      if (!calculateTurnover()) return;
+      title = copy("ledgerTurnoverMenu");
+      period = `${get("ledgerTurnoverStart").value} – ${get("ledgerTurnoverEnd").value}`;
+      headers = turnoverFlatHeaders();
+      const side = balance => balance === null ? "—" : Math.max(0, balance);
+      const creditSide = balance => balance === null ? "—" : Math.max(0, -balance);
+      rows = turnoverRows.map(row => [`${row.code} · ${row.label || ""}${row.period ? ` · ${formatTurnoverPeriod(row.period)}` : ""}`, side(row.openingBalance), creditSide(row.openingBalance), side(row.fiscalOpeningBalance), creditSide(row.fiscalOpeningBalance), Number(row.debit) || 0, Number(row.credit) || 0, side(row.fiscalClosingBalance), creditSide(row.fiscalClosingBalance), side(row.closingBalance), creditSide(row.closingBalance)]);
+      fileStem = "kaibeandmik";
+    }
+    if (!rows.length) { showMessage(copy("reportExportEmpty"), true); return; }
+    try {
+      const blob = format === "csv" ? ledgerCsvBlob(headers, rows) : format === "xls" ? ledgerXlsBlob(title, headers, rows) : await ledgerPdfBlob(ledgerPdfCanvases(title, period, headers, rows));
+      triggerBlobDownload(blob, `${fileStem}-${period.replaceAll(" ", "").replaceAll("–", "-")}.${format}`);
+    } catch (error) { console.error(error); showMessage(copy("reportExportEmpty"), true); }
+  }
   Object.assign(ruTexts, { journalEntryCorrectionOf: "Исправляет операцию", journalEntryNoCorrection: "Без корректировки", journalEntryCorrectionMissing: "Исходная операция не найдена за дату корректировки." });
   Object.assign(etTexts, { journalEntryCorrectionOf: "Parandab tehingut", journalEntryNoCorrection: "Paranduseta", journalEntryCorrectionMissing: "Algset tehingut ei leitud paranduse kuupäevaks." });
   Object.assign(ruTexts, { journalDocumentOrDescription: "Документ или описание", journalPostingAmount: "Сумма проводки", journalDate: "КП", journalEnteredAt: "Внесено", journalEnteredBy: "Внесший", journalClearFilters: "Сбросить фильтры", journalFilter: "ФИЛЬТРОВАТЬ", journalNoRows: "Нет проводок за выбранный период.", journalSort: "Сортировать", journalNumberColumn: "№", journalDocumentColumn: "ДОКУМЕНТ-ОСНОВАНИЕ", journalDescriptionColumn: "ОПИСАНИЕ", journalAmountColumn: "СУММА ПРОВОДКИ", journalCurrencyColumn: "€/$", journalDateColumn: "КП", journalEnteredAtColumn: "ВНЕСЕНО", journalEnteredByColumn: "ВНЕСШИЙ" });
@@ -47,7 +178,14 @@
   ledgerView.className = "app-view payments-subview ledger-subview";
   ledgerView.hidden = true;
   ledgerView.innerHTML = `<div class="view-heading"><div><h1 data-i18n="ledgerBookMenu">${copy("ledgerBookMenu")}</h1></div></div>`;
-  ledgerView.querySelector(".view-heading").append(document.getElementById("createLedgerButton"));
+  const ledgerHeading = ledgerView.querySelector(".view-heading");
+  ledgerHeading.append(document.getElementById("createLedgerButton"));
+  const ledgerExports = document.createElement("div");
+  ledgerExports.className = "ledger-main-exports";
+  ledgerExports.hidden = true;
+  ledgerExports.append(makeLedgerExportGroup("ledger"));
+  ledgerHeading.firstElementChild.append(ledgerExports);
+  get("exportLedgerCsv")?.remove();
   const demoToggle = document.createElement("button");
   demoToggle.type = "button";
   demoToggle.className = "secondary-button ledger-demo-toggle";
@@ -79,7 +217,7 @@
   journalHeading.classList.add("ledger-journal-heading");
   const journalExports = document.createElement("div");
   journalExports.className = "ledger-journal-exports";
-  journalExports.innerHTML = `<span id="ledgerJournalExportAnchor" hidden></span><button type="button" id="ledgerJournalCsv" data-i18n="assetDepExportCsv">CSV</button>`;
+  journalExports.append(makeLedgerExportGroup("journal"));
   journalHeading.firstElementChild.append(journalExports);
   const journalActions = document.createElement("div");
   journalActions.className = "ledger-journal-page-actions";
@@ -344,15 +482,6 @@
     journalRegister.querySelectorAll("[data-journal-sort]").forEach(item => item.setAttribute("aria-sort", item === button ? journalSort.direction === 1 ? "ascending" : "descending" : "none"));
     renderJournalRows();
   }));
-  get("ledgerJournalCsv").addEventListener("click", () => {
-    if (!can("exportReports")) { denyAction("exportReports"); return; }
-    const headers = [...get("ledgerJournalTable").querySelectorAll("thead th")].map(cell => cell.innerText.trim());
-    const rows = [...get("ledgerJournalRows").querySelectorAll("tr")].filter(row => !row.querySelector(".empty-row")).map(row => [...row.cells].map(cell => cell.innerText.trim()));
-    if (!rows.length) { showMessage(copy("reportExportEmpty"), true); return; }
-    const cell = value => { let text = String(value ?? ""); if (/^[\s]*[=+@-]/.test(text)) text = `'${text}`; return `"${text.replaceAll('"', '""')}"`; };
-    const csv = [headers, ...rows].map(row => row.map(cell).join(";")).join("\r\n");
-    triggerBlobDownload(new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }), `pearamaatu-kanded-${get("ledgerJournalStart").value}-${get("ledgerJournalEnd").value}.csv`);
-  });
   get("ledgerJournalStart").value = get("ledgerStartDate").value;
   get("ledgerJournalEnd").value = get("ledgerEndDate").value;
   loadJournalRows();
@@ -384,7 +513,8 @@
   turnoverResultsHead.prepend(turnoverTitleGroup);
   const turnoverResultActions = document.createElement("div");
   turnoverResultActions.className = "ledger-turnover-result-actions";
-  turnoverResultActions.append(get("ledgerTurnoverExport"));
+  get("ledgerTurnoverExport").replaceWith(makeLedgerExportGroup("turnover"));
+  turnoverResultActions.append(turnoverResultsHead.querySelector(".ledger-export-formats"));
   turnoverResultsHead.append(turnoverResultActions);
   const turnoverTable = get("ledgerTurnoverRows").closest("table");
   const turnoverHeaderKeys = ["ledgerTurnoverAccount", "ledgerTurnoverOpening", "ledgerTurnoverFiscalOpening", "ledgerTurnoverActivity", "ledgerTurnoverFiscalClosing", "ledgerTurnoverClosing"];
@@ -564,18 +694,6 @@
     if (ledgerMode === "entries" && !journalRegister.hidden) loadJournalRows();
   });
   get("ledgerTurnoverGenerate").addEventListener("click", () => { if (can("reports")) calculateTurnover(); });
-  get("ledgerTurnoverExport").addEventListener("click", () => {
-    if (!can("exportReports")) { denyAction("exportReports"); return; }
-    if (!calculateTurnover()) return;
-    const cell = value => {
-      let text = String(value ?? "");
-      if (/^[\s]*[=+@-]/.test(text)) text = `'${text}`;
-      return `"${text.replaceAll('"', '""')}"`;
-    };
-    const data = [turnoverFlatHeaders(), ...turnoverRows.map(account => [`${account.code} · ${account.label || ""}${account.period ? ` · ${formatTurnoverPeriod(account.period)}` : ""}`, ...valueCells(account)])];
-    triggerBlobDownload(new Blob(["\ufeff", data.map(row => row.map(cell).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" }), `kaibeandmik-${get("ledgerTurnoverStart").value}-${get("ledgerTurnoverEnd").value}.csv`);
-  });
-
   const setOpen = open => { menu.hidden = !open; wrapper.classList.toggle("is-open", open); trigger.setAttribute("aria-expanded", String(open)); };
   const entries = [{ mode: "entries", key: "ledgerEntriesMenu" }, { mode: "ledger", key: "ledgerBookMenu" }, { mode: "turnover", key: "ledgerTurnoverMenu" }];
   for (const entry of entries) {
@@ -595,6 +713,7 @@
         title.dataset.i18n = entry.key;
         title.textContent = copy(entry.key);
         switchView("ledgerView");
+        ledgerExports.hidden = entry.mode !== "ledger";
         journalRegister.hidden = entry.mode !== "entries";
         journalExports.hidden = entry.mode !== "entries";
         journalActions.hidden = entry.mode !== "entries";
@@ -630,7 +749,7 @@
   const syncAccess = () => {
     wrapper.hidden = !can("reports");
     trigger.hidden = wrapper.hidden;
-    get("ledgerTurnoverExport").disabled = !can("exportReports");
+    document.querySelectorAll(".ledger-export-format").forEach(button => { button.hidden = !can("exportReports"); button.disabled = !can("exportReports"); });
     if (wrapper.hidden) setOpen(false);
   };
   const baseApplyRoleAccess = applyRoleAccess;

@@ -1,0 +1,67 @@
+:root{
+  --accounting-table-head:#f6f8f7;
+  --accounting-table-row:#fff;
+  --accounting-table-line:#e6ebe8;
+  --accounting-table-divider:#e3e9e5;
+  --accounting-table-muted:#74817c;
+  --accounting-table-hover:#eae5dc;
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table),
+main table:not(.invoice-table){
+  border-collapse:collapse;
+  color:var(--ink,#302820);
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) thead th,
+main table:not(.invoice-table) thead th{
+  padding:10px 12px;
+  border:0;
+  border-bottom:1px solid var(--accounting-table-line);
+  color:var(--accounting-table-muted);
+  background:var(--accounting-table-head);
+  font-size:11px;
+  font-weight:600;
+  text-align:left;
+  vertical-align:middle;
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) tbody td,
+main table:not(.invoice-table) tbody td{
+  padding:12px;
+  border:0;
+  border-bottom:1px solid var(--accounting-table-line);
+  color:var(--ink,#302820);
+  background:var(--accounting-table-row);
+  font-size:12px;
+  vertical-align:middle;
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) thead th:not(:last-child),
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) tbody td:not(:last-child){
+  border-right:1px solid var(--accounting-table-divider);
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) tbody tr:nth-child(even) td{
+  background:var(--accounting-table-row);
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) tbody tr:hover td{
+  background:var(--accounting-table-hover);
+}
+
+body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) thead th button{
+  padding:0;
+  border:0;
+  color:inherit;
+  background:transparent;
+  font:inherit;
+  text-align:inherit;
+}
+
+@media(max-width:760px){
+  body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) th,
+  body main :is(#overviewView,#salesView,#purchasesView,#expensesView,#otherExpensesView,#cashPaymentsView,#cashPaymentEditorView,#fixedAssetsView,#settingsView,#reportsView,#teamView,#annualReportView,#annualReportPanel,#cashFlowPanel,#ledgerTurnoverView,#supplierInvoiceRegisterPage,#procurementSuppliersView,#payrollView) table:not(.invoice-table) td{
+    padding:9px 10px;
+  }
+}
